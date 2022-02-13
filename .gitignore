@@ -1,0 +1,9 @@
+*build
+*.d
+*.o
+*.nds
+*.dsi
+*.elf
+
+*.DS_Store
+*._

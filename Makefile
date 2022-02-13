@@ -25,12 +25,12 @@ include $(DEVKITARM)/ds_rules
 # ICON is the image used to create the game icon, leave blank to use default rule
 # NITRO is a directory that will be accessible via NitroFS
 #---------------------------------------------------------------------------------
-TARGET   := wordle-ds
+TARGET   := WordleDS
 BUILD    := build
 SOURCES  := source
 INCLUDES := include
 DATA     := data
-GRAPHICS :=
+GRAPHICS := gfx
 AUDIO    :=
 ICON     :=
 

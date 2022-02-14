@@ -12,6 +12,7 @@ class Sprite {
 	OamState *_oam;
 	int _id = -1;
 	int _rotId = -1;
+	bool _visible = true;
 	SpriteSize _size;
 	SpriteColorFormat _format;
 
@@ -23,9 +24,10 @@ public:
 	Sprite &operator=(const Sprite &sprite);
 
 	static void update(bool top) { oamUpdate(top ? &oamMain : &oamSub); }
-	void update(void) { oamUpdate(_oam); }
+	Sprite &update(void) { oamUpdate(_oam); return *this; }
 
-	int id(void) { return _id; }
+	int id(void) const { return _id; }
+	bool visible(void) const { return _visible; }
 
 	Sprite &affineIndex(int affineIndex, bool sizeDouble) { _rotId = affineIndex; oamSetAffineIndex(_oam, _id, _rotId, sizeDouble); return *this; }
 	Sprite &affineTransform(float hdx, float hdy, float vdx, float vdy) { if(_rotId >= 0 && _rotId <= 31) oamAffineTransformation(_oam, _rotId, FLOAT_TO_FIXED(hdx), FLOAT_TO_FIXED(hdy), FLOAT_TO_FIXED(vdx), FLOAT_TO_FIXED(vdy)); return *this; }
@@ -35,7 +37,7 @@ public:
 	Sprite &palette(int palette) { oamSetPalette(_oam, _id, palette); return *this; }
 	Sprite &priority(int priority) { oamSetPriority(_oam, _id, priority); return *this; }
 	Sprite &rotateScale(int angle, float sx, float sy) { if(_rotId >= 0 && _rotId <= 31) oamRotateScale(_oam, _rotId, angle, FLOAT_TO_FIXED(sx), FLOAT_TO_FIXED(sy)); return *this; }
-	Sprite &visible(bool visible) { oamSetHidden(_oam, _id, !visible); return *this; }
+	Sprite &visible(bool visible) { _visible = visible; oamSetHidden(_oam, _id, !visible); return *this; }
 	Sprite &xy(int x, int y) { oamSetXY(_oam, _id, x, y); return *this; }
 };
 

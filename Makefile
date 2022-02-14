@@ -43,7 +43,7 @@ NITRO    :=
 #---------------------------------------------------------------------------------
 ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
 
-CFLAGS   := -g -Wall -O3\
+CFLAGS   := -g -Wall -Wno-psabi -O3\
 			$(ARCH) $(INCLUDE) -DARM9
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS  := -g $(ARCH)
@@ -52,16 +52,7 @@ LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project (order is important)
 #---------------------------------------------------------------------------------
-LIBS := -lnds9
-
-# automatigically add libraries for NitroFS
-ifneq ($(strip $(NITRO)),)
-LIBS := -lfilesystem -lfat $(LIBS)
-endif
-# automagically add maxmod library
-ifneq ($(strip $(AUDIO)),)
-LIBS := -lmm9 $(LIBS)
-endif
+LIBS := -lfat -lnds9
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

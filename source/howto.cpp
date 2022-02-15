@@ -14,6 +14,7 @@
 
 void howtoMenu() {
 	// Change to howto menu background and hide letterSprites
+	swiWaitForVBlank();
 	tonccpy(bgGetGfxPtr(BG(0)), howtoTopTiles, howtoTopTilesLen);
 	tonccpy(BG_PALETTE, howtoTopPal, howtoTopPalLen);
 	tonccpy(bgGetMapPtr(BG(0)), howtoTopMap, howtoTopMapLen);
@@ -46,6 +47,7 @@ void howtoMenu() {
 	} while(!((pressed & (KEY_A | KEY_B)) || ((pressed & KEY_TOUCH) && (touch.px > 232 && touch.py < 24))));
 
 	// Restore normal BG and letterSprites
+	swiWaitForVBlank();
 	tonccpy(bgGetGfxPtr(BG(0)), bgTopTiles, bgTopTilesLen);
 	tonccpy(BG_PALETTE, bgTopPal, bgTopPalLen);
 	tonccpy(bgGetMapPtr(BG(0)), bgTopMap, bgTopMapLen);

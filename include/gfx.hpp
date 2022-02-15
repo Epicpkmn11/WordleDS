@@ -36,6 +36,8 @@ extern std::vector<u16 *> letterGfx, letterGfxSub;
 
 void initGraphics(bool altPalette);
 
+void setSpritePalettes(bool altPalette);
+
 void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
 
 #endif // GFX_HPP

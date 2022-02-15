@@ -9,14 +9,23 @@
 #include "large_nftr.h"
 #include "small_nftr.h"
 
+#include <array>
 #include <algorithm>
 #include <nds.h>
 
-constexpr u16 fontPal[] = {
-	0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
-	0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
-	0x32AD, 0xBF10, 0xDBB7, 0xFFFF  // White on green
-};
+constexpr std::array<std::array<u16, 12>, 2> fontPal = {{
+	{
+		0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
+		0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
+		0x32AD, 0xC2D1, 0xDF57, 0xFFFF, // White on green
+	},
+	{
+		0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
+		0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
+		0x1DFD, 0xB63D, 0xD6DE, 0xFFFF, // White on orange
+	}
+
+}};
 
 #define TEXT_BLACK 0xF0
 #define TEXT_WHITE 0xF4
@@ -24,6 +33,7 @@ constexpr u16 fontPal[] = {
 
 void statsMenu(const Config &config, bool won) {
 	// Change to stats menu background
+	swiWaitForVBlank();
 	tonccpy(bgGetGfxPtr(BG_SUB(0)), statsBottomTiles, statsBottomTilesLen);
 	tonccpy(BG_PALETTE_SUB, statsBottomPal, statsBottomPalLen);
 	tonccpy(bgGetMapPtr(BG_SUB(0)), statsBottomMap, statsBottomMapLen);
@@ -32,7 +42,7 @@ void statsMenu(const Config &config, bool won) {
 	Font largeFont(large_nftr, large_nftr_size), smallFont(small_nftr, small_nftr_size);
 	largeFont.palette(TEXT_BLACK);
 	smallFont.palette(TEXT_BLACK);
-	tonccpy(BG_PALETTE_SUB + 0xF0, fontPal, sizeof(fontPal));
+	tonccpy(BG_PALETTE_SUB + 0xF0, fontPal[config.altPalette()].data(), fontPal[config.altPalette()].size() * sizeof(u16));
 
 	// Print scores
 	largeFont.print(-96, 32, false, config.gamesPlayed(), Alignment::center);
@@ -73,6 +83,7 @@ void statsMenu(const Config &config, bool won) {
 	largeFont.clear(false).update(false);
 
 	// Restore normal BG and letterSprites
+	swiWaitForVBlank();
 	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
 	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
 	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);

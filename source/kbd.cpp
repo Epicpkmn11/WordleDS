@@ -32,7 +32,9 @@ char Kbd::get() {
 	touchRead(&touch);
 
 	for(const Key &key : _keys) {
-		if(touch.px >= key.x && touch.px < key.x + 16 && touch.py >= key.y && touch.py < key.y + 16)
+		int w = (key.c == '\b' || key.c == '\n') ? 21 : 16;
+		int h = 16;
+		if(touch.px >= key.x && touch.px < key.x + w && touch.py >= key.y && touch.py < key.y + h)
 			return key.c;
 	}
 

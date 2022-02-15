@@ -2,6 +2,7 @@
 #include "gfx.hpp"
 #include "howto.hpp"
 #include "kbd.hpp"
+#include "settings.hpp"
 #include "stats.hpp"
 #include "tonccpy.h"
 #include "words.hpp"
@@ -59,7 +60,7 @@ void makeTxt(Config &config, const std::string &answer) {
 
 	if(file) {
 		char str[64];
-		sprintf(str, "Wordle DS %lld %d/%d\n\n", config.lastPlayed() - FIRST_DAY, config.boardState().size(), MAX_GUESSES);
+		sprintf(str, "Wordle DS %lld %d/%d%s\n\n", config.lastPlayed() - FIRST_DAY, config.boardState().size(), MAX_GUESSES, config.hardMode() ? "*" : "");
 		fwrite(str, 1, strlen(str), file);
 		for(const std::string &guess : config.boardState()) {
 			toncset(str, 0, 64);
@@ -251,23 +252,19 @@ int main(void) {
 
 		if(pressed & KEY_TOUCH) {
 			if(touch.py < 24) { // One of the icons at the top
-				if(touch.px < 24) { // Help
-					bool showKeyboard = kbd.visible();
-					if(showKeyboard)
-						kbd.hide();
+				bool showKeyboard = kbd.visible();
+				if(showKeyboard)
+					kbd.hide();
+
+				if(touch.px < 24)
 					howtoMenu();
-					if(showKeyboard)
-						kbd.show();
-				} else if(touch.px > 116 && touch.px < 140) {
-					bool showKeyboard = kbd.visible();
-					if(showKeyboard)
-						kbd.hide();
+				else if(touch.px > 116 && touch.px < 140)
 					statsMenu(config, won);
-					if(showKeyboard)
-						kbd.show();
-				} else if(touch.px > 232) {
-					// TODO settings
-				}
+				else if(touch.px > 232)
+					settingsMenu(config);
+
+				if(showKeyboard)
+					kbd.show();
 			}
 		}
 

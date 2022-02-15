@@ -3,6 +3,7 @@
 *.o
 *.nds
 *.dsi
+*.cia
 *.elf
 
 *.vscode

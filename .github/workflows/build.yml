@@ -24,9 +24,17 @@ jobs:
       - name: Build Wordle DS
         run: |
           make
+
+          # Make CIA
+          curl -LO https://github.com/DS-Homebrew/TWiLightMenu/raw/master/booter/make_cia
+          chmod +x make_cia
+          ./make_cia --srl=WordleDS.dsi
+
+          # Move builds to dir for upload
           mkdir artifacts
           mv *.nds artifacts
           mv *.dsi artifacts
+          mv *.cia artifacts
       - name: Publish build to GH Actions
         uses: actions/upload-artifact@v2
         with:

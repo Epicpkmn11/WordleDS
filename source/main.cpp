@@ -54,6 +54,33 @@ std::vector<TilePalette> check(const std::string &guess, const std::string &answ
 	return res;
 }
 
+void makeTxt(Config &config, const std::string &answer) {
+	FILE *file = fopen("WordleDS.txt", "w");
+
+	if(file) {
+		char str[64];
+		sprintf(str, "Wordle DS %lld %d/%d\n\n", config.lastPlayed() - FIRST_DAY, config.boardState().size(), MAX_GUESSES);
+		fwrite(str, 1, strlen(str), file);
+		for(const std::string &guess : config.boardState()) {
+			toncset(str, 0, 64);
+
+			const char *green = config.altPalette() ? "🟧" : "🟩";
+			const char *yellow = config.altPalette() ? "🟦" : "🟨";
+
+			std::vector<TilePalette> colors = check(guess, answer, nullptr);
+			for(uint i = 0; i < colors.size(); i++)
+				strcat(str, colors[i] == TilePalette::green ? green : (colors[i] == TilePalette::yellow ? yellow : "⬜"));
+
+			strcat(str, "\n");
+
+			fwrite(str, 1, strlen(str), file);
+		}
+
+		fclose(file);
+	}
+
+}
+
 int searchPredicate(const void *a, const void *b) {
 	return strcasecmp((const char *)a, *(const char **)b);
 }
@@ -257,6 +284,9 @@ int main(void) {
 			config.gamesPlayed(config.gamesPlayed() + 1);
 			config.streak(config.streak() + 1);
 			config.save();
+
+			// Generate sharable txt
+			makeTxt(config, answer);
 
 			if(won) {
 				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 4, SCREEN_SIZE_TILES);

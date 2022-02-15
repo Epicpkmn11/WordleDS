@@ -5,6 +5,8 @@
 #include <time.h>
 #include <vector>
 
+#define FIRST_DAY 19038
+
 class Config {
 	std::string _path;
 

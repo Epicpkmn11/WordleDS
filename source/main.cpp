@@ -82,10 +82,6 @@ void makeTxt(Config &config, const std::string &answer) {
 
 }
 
-int searchPredicate(const void *a, const void *b) {
-	return strcasecmp((const char *)a, *(const char **)b);
-}
-
 int main(void) {
 	if(!fatInitDefault()) {
 		consoleDemoInit();
@@ -103,10 +99,9 @@ int main(void) {
 		howtoMenu();
 
 	// Get random word based on date
-	time_t day = time(NULL) / 24 / 60 / 60;
-	srand(day);
-	std::string answer = choices[rand() % choices.size()];
-	config.lastPlayed(day);
+	time_t today = time(NULL) / 24 / 60 / 60;
+	std::string answer = choices[(today - FIRST_DAY) % choices.size()];
+	config.lastPlayed(today);
 
 	Kbd kbd;
 
@@ -161,7 +156,7 @@ int main(void) {
 				key = Kbd::NOKEY;
 
 			if(popupTimeout == 0)
-				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
+				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES); // Normal
 			if(popupTimeout >= 0)
 				popupTimeout--;
 		} while(!pressed && key == Kbd::NOKEY);
@@ -172,7 +167,8 @@ int main(void) {
 				break;
 			case Kbd::ENTER:
 				// Ensure guess is a choice or valid guess
-				if(bsearch(guess.c_str(), choices.data(), choices.size(), sizeof(choices[0]), searchPredicate) != nullptr || bsearch(guess.c_str(), guesses.data(), guesses.size(), sizeof(guesses[0]), searchPredicate) != nullptr) {
+				if(std::find(choices.begin(), choices.end(), guess) != choices.end()
+				|| std::binary_search(guesses.begin(), guesses.end(), guess)) {
 					// check if meets hard mode requirements
 					if(config.hardMode()) {
 						bool valid = true;
@@ -190,7 +186,7 @@ int main(void) {
 						}
 
 						if(!valid) {
-							tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 3, SCREEN_SIZE_TILES);
+							tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 3, SCREEN_SIZE_TILES); // Invalid hard mode guess message
 							popupTimeout = 120;
 							break;
 						}
@@ -218,10 +214,10 @@ int main(void) {
 					guess = "";
 					currentGuess++;
 				} else {
-					if(guess.length() < 5)
-						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24), SCREEN_SIZE_TILES);
+					if(guess.length() < WORD_LEN)
+						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24), SCREEN_SIZE_TILES); // Too short message
 					else
-						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 2, SCREEN_SIZE_TILES);
+						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 2, SCREEN_SIZE_TILES); // Not a word message
 					popupTimeout = 120;
 				}
 				break;
@@ -286,11 +282,11 @@ int main(void) {
 			makeTxt(config, answer);
 
 			if(won) {
-				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 4, SCREEN_SIZE_TILES);
+				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 4, SCREEN_SIZE_TILES); // Win message
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 5, SCREEN_SIZE_TILES);
+				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 5, SCREEN_SIZE_TILES); // Lose message
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < answer.length(); i++) {

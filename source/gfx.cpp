@@ -3,6 +3,7 @@
 #include "bgBottom.h"
 #include "bgTop.h"
 #include "letterTiles.h"
+#include "tonccpy.h"
 
 #include <array>
 #include <nds.h>
@@ -28,8 +29,8 @@ constexpr std::array<u16, 16 * 5> letterPalettesAlt = {
 };
 
 void initGraphics(bool altPalette) {
-	videoSetMode(MODE_0_2D);
-	videoSetModeSub(MODE_0_2D);
+	videoSetMode(MODE_5_2D);
+	videoSetModeSub(MODE_5_2D);
 
 	vramSetBankA(VRAM_A_MAIN_BG);
 	vramSetBankB(VRAM_B_MAIN_SPRITE);
@@ -40,26 +41,28 @@ void initGraphics(bool altPalette) {
 	bgSetPriority(BG(0), 3);
 	bgInitSub(0, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
 	bgSetPriority(BG_SUB(0), 3);
+	bgInitSub(2, BgType_Bmp8, BgSize_B8_256x256, 5, 0);
+	bgSetPriority(BG_SUB(2), 0);
 
 	// Copy BG data
-	dmaCopy(bgTopTiles, bgGetGfxPtr(BG(0)), bgTopTilesLen);
-	dmaCopy(bgTopPal, BG_PALETTE, bgTopPalLen);
-	dmaCopy(bgTopMap, bgGetMapPtr(BG(0)), bgTopMapLen);
-	dmaCopy(bgBottomTiles, bgGetGfxPtr(BG_SUB(0)), bgBottomTilesLen);
-	dmaCopy(bgBottomPal, BG_PALETTE_SUB, bgBottomPalLen);
-	dmaCopy(bgBottomMap, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+	tonccpy(bgGetGfxPtr(BG(0)), bgTopTiles, bgTopTilesLen);
+	tonccpy(BG_PALETTE, bgTopPal, bgTopPalLen);
+	tonccpy(bgGetMapPtr(BG(0)), bgTopMap, bgTopMapLen);
+	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
+	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
 
 	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
 	oamInit(&oamSub, SpriteMapping_Bmp_1D_128, false);
-	dmaCopy((altPalette ? letterPalettesAlt : letterPalettes).data(), SPRITE_PALETTE, letterPalettes.size() * sizeof(u16));
-	dmaCopy((altPalette ? letterPalettesAlt : letterPalettes).data(), SPRITE_PALETTE_SUB, letterPalettes.size() * sizeof(u16));
+	tonccpy(SPRITE_PALETTE, (altPalette ? letterPalettesAlt : letterPalettes).data(), letterPalettes.size() * sizeof(u16));
+	tonccpy(SPRITE_PALETTE_SUB, (altPalette ? letterPalettesAlt : letterPalettes).data(), letterPalettes.size() * sizeof(u16));
 
 	constexpr int tileSize = 32 * 32 / 2;
 	for(int i = 0; i < letterTilesTilesLen / tileSize; i++) {
 		letterGfx.push_back(oamAllocateGfx(&oamMain, SpriteSize_32x32, SpriteColorFormat_16Color));
 		letterGfxSub.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color));
-		dmaCopy(letterTilesTiles + (i * tileSize), letterGfx.back(), tileSize);
-		dmaCopy(letterTilesTiles + (i * tileSize), letterGfxSub.back(), tileSize);
+		tonccpy(letterGfx.back(), letterTilesTiles + (i * tileSize), tileSize);
+		tonccpy(letterGfxSub.back(), letterTilesTiles + (i * tileSize), tileSize);
 	}
 
 	for(int i = 0; i < WORD_LEN * MAX_GUESSES; i++) {

@@ -27,6 +27,8 @@ Config::Config(const std::string &path) : _path(path) {
 		}
 		if(json["stats"].contains("streak") && json["stats"]["streak"].is_number())
 			_streak = json["stats"]["streak"];
+		if(json["stats"].contains("maxStreak") && json["stats"]["maxStreak"].is_number())
+			_maxStreak = json["stats"]["maxStreak"];
 		if(json["stats"].contains("gamesPlayed") && json["stats"]["gamesPlayed"].is_number())
 			_gamesPlayed = json["stats"]["gamesPlayed"];
 		if(json["stats"].contains("lastPlayed") && json["stats"]["lastPlayed"].is_number())
@@ -35,6 +37,8 @@ Config::Config(const std::string &path) : _path(path) {
 		time_t today = time(NULL) / 24 / 60 / 60;
 		if(today - _lastPlayed > 1)
 			_streak = 0;
+		if(_streak > _maxStreak)
+			_maxStreak = _streak;
 		if(_lastPlayed != today)
 			_boardState = {};
 	}
@@ -54,6 +58,7 @@ void Config::save() {
 			{"guessCounts", _guessCounts},
 			{"boardState", _boardState},
 			{"streak", _streak},
+			{"maxStreak", _maxStreak},
 			{"gamesPlayed", _gamesPlayed},
 			{"lastPlayed", _lastPlayed}
 		}},

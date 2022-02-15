@@ -1,6 +1,6 @@
 #ifndef HOWTO_HPP
 #define HOWTO_HPP
 
-void howto(void);
+void howtoMenu(void);
 
 #endif // HOWTO_HPP

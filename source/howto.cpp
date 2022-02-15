@@ -6,20 +6,21 @@
 #include "bgTop.h"
 #include "howtoBottom.h"
 #include "howtoTop.h"
+#include "tonccpy.h"
 
 #include <array>
 #include <nds.h>
 #include <string>
 
-void howto() {
+void howtoMenu() {
 	// Change to howto menu background and hide letterSprites
-	dmaCopy(howtoTopTiles, bgGetGfxPtr(BG(0)), howtoTopTilesLen);
-	dmaCopy(howtoTopPal, BG_PALETTE, howtoTopPalLen);
-	dmaCopy(howtoTopMap, bgGetMapPtr(BG(0)), howtoTopMapLen);
+	tonccpy(bgGetGfxPtr(BG(0)), howtoTopTiles, howtoTopTilesLen);
+	tonccpy(BG_PALETTE, howtoTopPal, howtoTopPalLen);
+	tonccpy(bgGetMapPtr(BG(0)), howtoTopMap, howtoTopMapLen);
 
-	dmaCopy(howtoBottomTiles, bgGetGfxPtr(BG_SUB(0)), howtoBottomTilesLen);
-	dmaCopy(howtoBottomPal, BG_PALETTE_SUB, howtoBottomPalLen);
-	dmaCopy(howtoBottomMap, bgGetMapPtr(BG_SUB(0)), howtoBottomMapLen);
+	tonccpy(bgGetGfxPtr(BG_SUB(0)), howtoBottomTiles, howtoBottomTilesLen);
+	tonccpy(BG_PALETTE_SUB, howtoBottomPal, howtoBottomPalLen);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), howtoBottomMap, howtoBottomMapLen);
 
 	for(Sprite &sprite : letterSprites)
 		sprite.visible(false);
@@ -45,13 +46,13 @@ void howto() {
 	} while(!((pressed & (KEY_A | KEY_B)) || ((pressed & KEY_TOUCH) && (touch.px > 232 && touch.py < 24))));
 
 	// Restore normal BG and letterSprites
-	dmaCopy(bgTopTiles, bgGetGfxPtr(BG(0)), bgTopTilesLen);
-	dmaCopy(bgTopPal, BG_PALETTE, bgTopPalLen);
-	dmaCopy(bgTopMap, bgGetMapPtr(BG(0)), bgTopMapLen);
+	tonccpy(bgGetGfxPtr(BG(0)), bgTopTiles, bgTopTilesLen);
+	tonccpy(BG_PALETTE, bgTopPal, bgTopPalLen);
+	tonccpy(bgGetMapPtr(BG(0)), bgTopMap, bgTopMapLen);
 
-	dmaCopy(bgBottomTiles, bgGetGfxPtr(BG_SUB(0)), bgBottomTilesLen);
-	dmaCopy(bgBottomPal, BG_PALETTE_SUB, bgBottomPalLen);
-	dmaCopy(bgBottomMap, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
+	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
 
 	for(Sprite &sprite : letterSprites)
 		sprite.visible(true);

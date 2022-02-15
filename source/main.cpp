@@ -2,6 +2,8 @@
 #include "gfx.hpp"
 #include "howto.hpp"
 #include "kbd.hpp"
+#include "stats.hpp"
+#include "tonccpy.h"
 #include "words.hpp"
 
 #include "bgBottom.h"
@@ -68,9 +70,9 @@ int main(void) {
 
 	initGraphics(config.altPalette());
 
-	// Show howto if fist game
+	// Show howto if first game
 	if(config.gamesPlayed() < 1)
-		howto();
+		howtoMenu();
 
 	// Get random word based on date
 	time_t day = time(NULL) / 24 / 60 / 60;
@@ -104,11 +106,16 @@ int main(void) {
 			won = std::find_if_not(newPalettes.begin(), newPalettes.end(), [](TilePalette a) { return a == TilePalette::green; }) == newPalettes.end();
 			Sprite::update(false);
 			currentGuess++;
+			if(currentGuess >= MAX_GUESSES)
+				break;
 		}
 		flipSprites(letterSprites.data(), currentGuess * WORD_LEN, palettes);
 	}
 
-	if(!won && currentGuess < MAX_GUESSES)
+	if(currentGuess == MAX_GUESSES && !won)
+		currentGuess++;
+
+	if(!won && currentGuess <= MAX_GUESSES)
 		kbd.show();
 	else
 		statsSaved = true; // an already completed game was loaded, don't re-save
@@ -126,7 +133,7 @@ int main(void) {
 				key = Kbd::NOKEY;
 
 			if(popupTimeout == 0)
-				dmaCopy(bgBottomMap, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
 			if(popupTimeout >= 0)
 				popupTimeout--;
 		} while(!pressed && key == Kbd::NOKEY);
@@ -155,7 +162,7 @@ int main(void) {
 						}
 
 						if(!valid) {
-							dmaCopy(bgBottomMap + (32 * 24) * 3, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+							tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 3, SCREEN_SIZE_TILES);
 							popupTimeout = 120;
 							break;
 						}
@@ -184,9 +191,9 @@ int main(void) {
 					currentGuess++;
 				} else {
 					if(guess.length() < 5)
-						dmaCopy(bgBottomMap + (32 * 24), bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24), SCREEN_SIZE_TILES);
 					else
-						dmaCopy(bgBottomMap + (32 * 24) * 2, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 2, SCREEN_SIZE_TILES);
 					popupTimeout = 120;
 				}
 				break;
@@ -221,11 +228,16 @@ int main(void) {
 					bool showKeyboard = kbd.visible();
 					if(showKeyboard)
 						kbd.hide();
-					howto();
+					howtoMenu();
 					if(showKeyboard)
 						kbd.show();
 				} else if(touch.px > 116 && touch.px < 140) {
-					// TODO stats
+					bool showKeyboard = kbd.visible();
+					if(showKeyboard)
+						kbd.hide();
+					statsMenu(config, won);
+					if(showKeyboard)
+						kbd.show();
 				} else if(touch.px > 232) {
 					// TODO settings
 				}
@@ -234,6 +246,10 @@ int main(void) {
 
 		if(!statsSaved && (won || currentGuess >= MAX_GUESSES)) {
 			statsSaved = true;
+
+			if(currentGuess == MAX_GUESSES && !won)
+				currentGuess++;
+
 			kbd.hide();
 
 			// Update stats
@@ -243,10 +259,11 @@ int main(void) {
 			config.save();
 
 			if(won) {
-				dmaCopy(bgBottomMap + (32 * 24) * 4, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
-				popupTimeout = 240;
+				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 4, SCREEN_SIZE_TILES);
+				for(int i = 0; i < 180; i++)
+					swiWaitForVBlank();
 			} else {
-				dmaCopy(bgBottomMap + (32 * 24) * 5, bgGetMapPtr(BG_SUB(0)), 32 * 24 * sizeof(u16));
+				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 5, SCREEN_SIZE_TILES);
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < answer.length(); i++) {
@@ -260,13 +277,14 @@ int main(void) {
 
 				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::show);
 
-				for(int i = 0; i < 240; i++)
+				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 
 				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
-
-				popupTimeout = 0;
 			}
+
+			// Show stats
+			statsMenu(config, won);
 		}
 	}
 }

@@ -24,8 +24,7 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 	// Load character glyphs
 	tileAmount = (chunkSize - 0x10) / tileSize;
 	ptr += 4;
-	fontTiles = new u8[tileSize * tileAmount];
-	tonccpy(fontTiles, ptr, tileSize * tileAmount);
+	fontTiles = (u8 *)ptr;
 
 	// Load character widths
 	ptr = nftr + 0x24;
@@ -34,8 +33,7 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 	ptr = nftr + locHDWC - 4;
 	tonccpy(&chunkSize, ptr, 4);
 	ptr += 4 + 8;
-	fontWidths = new u8[3 * tileAmount];
-	tonccpy(fontWidths, ptr, 3 * tileAmount);
+	fontWidths = (u8 *)ptr;
 
 	// Load character maps
 	fontMap = new u16[tileAmount];
@@ -96,10 +94,6 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 }
 
 Font::~Font(void) {
-	if(fontTiles)
-		delete[] fontTiles;
-	if(fontWidths)
-		delete[] fontWidths;
 	if(fontMap)
 		delete[] fontMap;
 }

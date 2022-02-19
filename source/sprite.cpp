@@ -17,10 +17,14 @@ Sprite::Sprite(bool top, SpriteSize size, SpriteColorFormat format) : _top(top),
 	if(_id == -1)
 		return;
 
-	oamSet(_oam, _id, 0, 0, 0, 0, _size, _format, nullptr, _rotId, false, false, false, false, false);
+	oamSet(_oam, _id, _x, _y, _priority, _paletteAlpha, _size, _format, nullptr, _affineIndex, _sizeDouble, !_visible, _hFlip, _vFlip, false);
 }
 
-Sprite::Sprite(const Sprite &sprite) : _top(sprite._top), _oam(sprite._oam), _id(sprite._id), _rotId(sprite._rotId), _visible(sprite._visible), _size(sprite._size), _format(sprite._format) {
+Sprite::Sprite(const Sprite &sprite) :
+	_top(sprite._top), _oam(sprite._oam), _id(sprite._id), _size(sprite._size), _format(sprite._format),
+	_gfx(sprite._gfx), _affineIndex(sprite._affineIndex), _paletteAlpha(sprite._paletteAlpha),
+	_priority(sprite._priority), _x(sprite._x), _y(sprite._y), _hFlip(sprite._hFlip), _vFlip(sprite._vFlip),
+	_sizeDouble(sprite._sizeDouble), _visible(sprite._visible) {
 	activeIds[_top][_id]++;
 }
 
@@ -33,13 +37,22 @@ Sprite::~Sprite() {
 }
 
 Sprite &Sprite::operator=(const Sprite &sprite) {
-	_top     = sprite._top;
-	_oam     = sprite._oam;
-	_id      = sprite._id;
-	_rotId   = sprite._rotId;
-	_visible = sprite._visible;
-	_size    = sprite._size;
-	_format  = sprite._format;
+	_top    = sprite._top;
+	_oam    = sprite._oam;
+	_id     = sprite._id;
+	_size   = sprite._size;
+	_format = sprite._format;
+
+	_gfx          = sprite._gfx;
+	_affineIndex  = sprite._affineIndex;
+	_paletteAlpha = sprite._paletteAlpha;
+	_priority     = sprite._priority;
+	_x            = sprite._x;
+	_y            = sprite._y;
+	_hFlip        = sprite._hFlip;
+	_vFlip        = sprite._vFlip;
+	_sizeDouble   = sprite._sizeDouble;
+	_visible      = sprite._visible;
 
 	activeIds[_top][_id]++;
 

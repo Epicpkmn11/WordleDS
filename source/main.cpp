@@ -42,12 +42,12 @@ std::vector<TilePalette> check(const std::string &guess, const std::string &answ
 			continue;
 		} else if(letters[guess[i]] > 0) {
 			res[i] = TilePalette::yellow;
-			if(kbd)
+			if(kbd && kbd->palette(guess[i]) != TilePalette::green)
 				kbd->palette(guess[i], TilePalette::yellow);
 			letters[guess[i]]--;
 		} else {
 			res[i] = TilePalette::gray;
-			if(kbd)
+			if(kbd && (kbd->palette(guess[i]) != TilePalette::yellow && kbd->palette(guess[i]) != TilePalette::green))
 				kbd->palette(guess[i], TilePalette::gray);
 		}
 	}
@@ -292,7 +292,7 @@ int main(void) {
 				for(uint i = 0; i < answer.length(); i++) {
 					answerSprites.emplace_back(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 					answerSprites.back()
-						.xy((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, 96)
+						.move((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, 96)
 						.palette(TilePalette::white)
 						.gfx(letterGfxSub[answer[i] - 'a' + 1])
 						.visible(false);

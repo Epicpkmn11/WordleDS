@@ -68,7 +68,7 @@ void initGraphics(bool altPalette) {
 
 	for(int i = 0; i < WORD_LEN * MAX_GUESSES; i++) {
 		letterSprites.emplace_back(true, SpriteSize_32x32, SpriteColorFormat_16Color);
-		letterSprites.back().xy((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, (25 + (167 - (MAX_GUESSES * 24 + (MAX_GUESSES - 1) * 2)) / 2 - 4) + (i / WORD_LEN) * 26).gfx(letterGfx[0]);
+		letterSprites.back().move((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, (25 + (167 - (MAX_GUESSES * 24 + (MAX_GUESSES - 1) * 2)) / 2 - 4) + (i / WORD_LEN) * 26).gfx(letterGfx[0]);
 	}
 	Sprite::update(true);
 }

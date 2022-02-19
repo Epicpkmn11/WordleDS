@@ -40,6 +40,7 @@ public:
 	Kbd &show(void) { _visible = true; for(Sprite &sprite : _sprites) sprite.visible(true); Sprite::update(false); return *this; }
 	Kbd &hide(void) { _visible = false; for(Sprite &sprite : _sprites) sprite.visible(false); Sprite::update(false); return *this; }
 
+	TilePalette palette(char c);
 	Kbd &palette(char c, TilePalette pal);
 };
 

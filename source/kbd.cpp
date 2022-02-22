@@ -13,12 +13,12 @@ Kbd::Kbd() {
 		_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_16x16, SpriteColorFormat_16Color));
 		tonccpy(_gfx.back(), kbdKeysTiles + (i * tileSize), tileSize);
 	}
-	_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x16, SpriteColorFormat_16Color));
+	_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color));
 	tonccpy(_gfx.back(), backspaceKeyTiles, backspaceKeyTilesLen);
-	_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x16, SpriteColorFormat_16Color));
+	_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color));
 	tonccpy(_gfx.back(), enterKeyTiles, enterKeyTilesLen);
 	for(Key &key : _keys) {
-		_sprites.emplace_back(false, (key.c == '\b' || key.c == '\n') ? SpriteSize_32x16 : SpriteSize_16x16, SpriteColorFormat_16Color);
+		_sprites.emplace_back(false, (key.c == '\b' || key.c == '\n') ? SpriteSize_32x32 : SpriteSize_16x16, SpriteColorFormat_16Color);
 		_sprites.back().move(key.x, key.y).gfx(_gfx[key.c == '\b' ? 26 : (key.c == '\n' ? 27 : key.c - 'a')]).visible(false);
 	}
 	Sprite::update(false);
@@ -32,9 +32,8 @@ char Kbd::get() {
 	touchRead(&touch);
 
 	for(const Key &key : _keys) {
-		int w = (key.c == '\b' || key.c == '\n') ? 21 : 16;
-		int h = 16;
-		if(touch.px >= key.x && touch.px < key.x + w && touch.py >= key.y && touch.py < key.y + h)
+		int size = (key.c == '\b' || key.c == '\n') ? 32 : 16;
+		if(touch.px >= key.x && touch.px < key.x + size && touch.py >= key.y && touch.py < key.y + size)
 			return key.c;
 	}
 

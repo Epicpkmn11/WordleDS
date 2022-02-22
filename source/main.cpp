@@ -17,6 +17,9 @@
 #include <string>
 #include <time.h>
 
+extern char *fake_heap_end;
+__bootstub *bootstub = (struct __bootstub *)fake_heap_end;
+
 std::vector<TilePalette> check(const std::string &guess, const std::string &answer, Kbd *kbd) {
 	std::vector<TilePalette> res;
 	res.resize(std::min(guess.size(), answer.size()));
@@ -241,7 +244,7 @@ int main(void) {
 				break;
 		}
 
-		if(pressed & KEY_START) {
+		if(pressed & KEY_START && (bootstub->bootsig == BOOTSIG)) {
 			config.save();
 			return 0;
 		}

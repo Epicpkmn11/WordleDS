@@ -1,4 +1,5 @@
 #include "gfx.hpp"
+#include "defines.hpp"
 
 #include "bgBottom.h"
 #include "bgTop.h"
@@ -52,7 +53,7 @@ void initGraphics(bool altPalette) {
 	tonccpy(bgGetMapPtr(BG(0)), bgTopMap, bgTopMapLen);
 	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
 	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
-	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
 
 	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
 	oamInit(&oamSub, SpriteMapping_Bmp_1D_128, false);

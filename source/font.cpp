@@ -6,7 +6,7 @@
 #include <nds/arm9/background.h>
 #include <string.h>
 
-u8 Font::textBuf[2][SCREEN_SIZE];
+u8 Font::textBuf[2][SCREEN_WIDTH * SCREEN_HEIGHT];
 
 Font::Font(const u8 *nftr, u32 nftrSize) {
 	// Skip font info
@@ -98,7 +98,7 @@ Font::~Font(void) {
 		delete[] fontMap;
 }
 
-u16 Font::getCharIndex(char16_t c) {
+u16 Font::getCharIndex(char16_t c) const {
 	// Try a binary search
 	int left = 0;
 	int right = tileAmount;
@@ -140,7 +140,7 @@ std::u16string Font::utf8to16(std::string_view text) {
 	return out;
 }
 
-int Font::calcWidth(std::u16string_view text) {
+int Font::calcWidth(std::u16string_view text) const {
 	uint x = 0;
 
 	for(char16_t c : text) {
@@ -149,6 +149,17 @@ int Font::calcWidth(std::u16string_view text) {
 	}
 
 	return x;
+}
+
+int Font::calcHeight(std::u16string_view text) const {
+	uint height = tileHeight;
+
+	for(char16_t c : text) {
+		if(c == '\n')
+			height += tileHeight;
+	}
+
+	return height;
 }
 
 ITCM_CODE Font &Font::print(int x, int y, bool top, std::u16string_view text, Alignment align) {
@@ -210,7 +221,7 @@ ITCM_CODE Font &Font::print(int x, int y, bool top, std::u16string_view text, Al
 }
 
 Font &Font::clear(bool top) {
-	toncset(textBuf[top], 0, SCREEN_SIZE);
+	toncset(textBuf[top], 0, SCREEN_WIDTH * SCREEN_HEIGHT);
 	return *this;
 }
 
@@ -218,11 +229,11 @@ Font &Font::update(bool top, bool preserve) {
 	u8 *dst = (u8 *)bgGetGfxPtr(top ? BG(2) : BG_SUB(2));
 
 	if(preserve) {
-		for(int i = 0; i < SCREEN_SIZE; i++)
+		for(int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
 			if(!textBuf[top][i])
 				textBuf[top][i] = dst[i];
 	}
 
-	tonccpy(dst, textBuf[top], SCREEN_SIZE);
+	tonccpy(dst, textBuf[top], SCREEN_WIDTH * SCREEN_HEIGHT);
 	return *this;
 }

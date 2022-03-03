@@ -1,4 +1,6 @@
 #include "config.hpp"
+#include "defines.hpp"
+#include "font.hpp"
 #include "gfx.hpp"
 #include "howto.hpp"
 #include "kbd.hpp"
@@ -8,6 +10,8 @@
 #include "words.hpp"
 
 #include "bgBottom.h"
+#include "bgBottomBox.h"
+#include "main_nftr.h"
 
 #include <algorithm>
 #include <fat.h>
@@ -19,6 +23,10 @@
 
 extern char *fake_heap_end;
 __bootstub *bootstub = (struct __bootstub *)fake_heap_end;
+
+constexpr u16 fontPal[] = {
+	0x39CE, 0xC631, 0xF39C, 0xFFFF
+};
 
 std::vector<TilePalette> check(const std::string &guess, const std::string &answer, Kbd *kbd) {
 	std::vector<TilePalette> res;
@@ -63,7 +71,12 @@ void makeTxt(Config &config, const std::string &answer) {
 
 	if(file) {
 		char str[64];
-		sprintf(str, "Wordle DS %lld %d/%d%s\n\n", config.lastPlayed() - FIRST_DAY, config.boardState().size(), MAX_GUESSES, config.hardMode() ? "*" : "");
+		sprintf(str, "Wordle DS %lld %c/%d%s\n\n",
+			config.lastPlayed() - FIRST_DAY,
+			config.guessCounts().back() > MAX_GUESSES ? 'X' : '0' + config.guessCounts().back(),
+			MAX_GUESSES,
+			config.hardMode() ? "*" : "");
+
 		fwrite(str, 1, strlen(str), file);
 		for(const std::string &guess : config.boardState()) {
 			toncset(str, 0, 64);
@@ -82,7 +95,24 @@ void makeTxt(Config &config, const std::string &answer) {
 
 		fclose(file);
 	}
+}
 
+void drawBgBottom(Font &font, std::string_view msg) {
+	font.clear(false);
+
+	if(msg.size() == 0) {
+		tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
+		tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
+		tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
+	} else {
+		tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomBoxTiles, bgBottomBoxTilesLen);
+		tonccpy(BG_PALETTE_SUB, bgBottomBoxPal, bgBottomBoxPalLen);
+		tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomBoxMap, bgBottomBoxMapLen);
+
+		font.print(0, 56 - font.calcHeight(msg) / 2, false, msg, Alignment::center);
+	}
+
+	font.update(false);
 }
 
 int main(void) {
@@ -96,6 +126,10 @@ int main(void) {
 	Config config("WordleDS.json");
 
 	initGraphics(config.altPalette());
+
+	Font font(main_nftr, main_nftr_size);
+	font.palette(0xFC);
+	tonccpy(BG_PALETTE_SUB + 0xFC, fontPal, sizeof(fontPal));
 
 	// Show howto if first game
 	if(config.gamesPlayed() < 1)
@@ -158,8 +192,10 @@ int main(void) {
 			else
 				key = Kbd::NOKEY;
 
-			if(popupTimeout == 0)
-				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES); // Normal
+			if(popupTimeout == 0) {
+				// Reset to no message box
+				drawBgBottom(font, "");
+			}
 			if(popupTimeout >= 0)
 				popupTimeout--;
 		} while(!pressed && key == Kbd::NOKEY);
@@ -174,22 +210,22 @@ int main(void) {
 				|| std::binary_search(guesses.begin(), guesses.end(), guess)) {
 					// check if meets hard mode requirements
 					if(config.hardMode()) {
-						bool valid = true;
+						char invalidMessage[64] = {0};
 						for(char letter : knownLetters) {
 							if(std::count(knownLetters.begin(), knownLetters.end(), letter) != std::count(guess.begin(), guess.end(), letter)) {
-								valid = false;
+								sprintf(invalidMessage, guessMustContainX, toupper(letter));
 								break;
 							}
 						}
 						for(uint i = 0; i < knownPositions.size(); i++) {
 							if(knownPositions[i] != ' ' && guess[i] != knownPositions[i]) {
-								valid = false;
+								sprintf(invalidMessage, nthMustBeX, i + 1, numberSuffix(i + 1), toupper(knownPositions[i]));
 								break;
 							}
 						}
 
-						if(!valid) {
-							tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 3, SCREEN_SIZE_TILES); // Invalid hard mode guess message
+						if(strlen(invalidMessage) > 0) {
+							drawBgBottom(font, invalidMessage);
 							popupTimeout = 120;
 							break;
 						}
@@ -217,10 +253,7 @@ int main(void) {
 					guess = "";
 					currentGuess++;
 				} else {
-					if(guess.length() < WORD_LEN)
-						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24), SCREEN_SIZE_TILES); // Too short message
-					else
-						tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 2, SCREEN_SIZE_TILES); // Not a word message
+					drawBgBottom(font, guess.length() < WORD_LEN ? tooShortMessage : notWordMessage);
 					popupTimeout = 120;
 				}
 				break;
@@ -285,11 +318,11 @@ int main(void) {
 			makeTxt(config, answer);
 
 			if(won) {
-				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 4, SCREEN_SIZE_TILES); // Win message
+				drawBgBottom(font, victoryMessages[currentGuess - 1]);
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap + (32 * 24) * 5, SCREEN_SIZE_TILES); // Lose message
+				drawBgBottom(font, lossMessage);
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < answer.length(); i++) {
@@ -308,6 +341,7 @@ int main(void) {
 
 				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
+			font.clear(false).update(false);
 
 			// Show stats
 			statsMenu(config, won);

@@ -1,13 +1,13 @@
 #include "stats.hpp"
+#include "defines.hpp"
 #include "font.hpp"
 #include "gfx.hpp"
 #include "tonccpy.h"
 
 #include "bgBottom.h"
+#include "numbers_large_nftr.h"
+#include "numbers_small_nftr.h"
 #include "statsBottom.h"
-
-#include "large_nftr.h"
-#include "small_nftr.h"
 
 #include <array>
 #include <algorithm>
@@ -39,7 +39,7 @@ void statsMenu(const Config &config, bool won) {
 	tonccpy(bgGetMapPtr(BG_SUB(0)), statsBottomMap, statsBottomMapLen);
 
 	// Loat fonts
-	Font largeFont(large_nftr, large_nftr_size), smallFont(small_nftr, small_nftr_size);
+	Font largeFont(numbers_large_nftr, numbers_large_nftr_size), smallFont(numbers_small_nftr, numbers_small_nftr_size);
 	largeFont.palette(TEXT_BLACK);
 	smallFont.palette(TEXT_BLACK);
 	tonccpy(BG_PALETTE_SUB + 0xF0, fontPal[config.altPalette()].data(), fontPal[config.altPalette()].size() * sizeof(u16));
@@ -86,5 +86,5 @@ void statsMenu(const Config &config, bool won) {
 	swiWaitForVBlank();
 	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
 	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
-	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
 }

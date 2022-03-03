@@ -54,7 +54,7 @@ void howtoMenu() {
 
 	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
 	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
-	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
 
 	for(Sprite &sprite : letterSprites)
 		sprite.visible(true);

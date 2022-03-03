@@ -17,7 +17,7 @@ enum class Alignment {
 
 class Font {
 private:
-	static u8 textBuf[2][SCREEN_SIZE];
+	static u8 textBuf[2][SCREEN_WIDTH * SCREEN_HEIGHT];
 
 	u8 tileWidth = 0, tileHeight = 0;
 	u16 tileSize = 0;
@@ -28,7 +28,7 @@ private:
 	u8 *fontWidths = nullptr;
 	u16 *fontMap = nullptr;
 
-	u16 getCharIndex(char16_t c);
+	u16 getCharIndex(char16_t c) const;
 
 public:
 	static std::u16string utf8to16(std::string_view text);
@@ -37,10 +37,13 @@ public:
 
 	~Font(void);
 
-	u8 height(void) { return tileHeight; }
+	u8 height(void) const { return tileHeight; }
 
-	int calcWidth(std::string_view text) { return calcWidth(utf8to16(text)); }
-	int calcWidth(std::u16string_view text);
+	int calcWidth(std::string_view text) const { return calcWidth(utf8to16(text)); }
+	int calcWidth(std::u16string_view text) const;
+
+	int calcHeight(std::string_view text) const { return calcHeight(utf8to16(text)); }
+	int calcHeight(std::u16string_view text) const;
 
 	Font &palette(int palette) { paletteStart = palette; return *this; }
 

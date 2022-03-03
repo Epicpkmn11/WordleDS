@@ -6,21 +6,18 @@
 #include "bgBottom.h"
 #include "settingsBottom.h"
 
-#include "large_nftr.h"
-#include "small_nftr.h"
-
 #include <array>
 #include <algorithm>
 #include <nds.h>
 
 constexpr std::array<std::array<u16, 6>, 2> toggleMap = {{
 	{ // Off
-		0x00BA, 0x00BB, 0x00BC,
-		0x08BA, 0x08BB, 0x08BC
+		0x00B4, 0x00B5, 0x00B6,
+		0x08B4, 0x08B5, 0x08B6
 	},
 	{ // On
-		0x0042, 0x0043, 0x0044,
-		0x0842, 0x0843, 0x0844
+		0x003E, 0x003F, 0x0040,
+		0x083E, 0x083F, 0x0840
 	}
 }};
 
@@ -58,7 +55,7 @@ void settingsMenu(Config &config) {
 	tonccpy(bgGetMapPtr(BG_SUB(0)), settingsBottomMap, settingsBottomMapLen);
 
 	while(1) {
-		tonccpy(BG_PALETTE_SUB + 0xB5, togglePal[config.altPalette()].data(), togglePal[config.altPalette()].size() * sizeof(u16));
+		tonccpy(BG_PALETTE_SUB + 0x1D, togglePal[config.altPalette()].data(), togglePal[config.altPalette()].size() * sizeof(u16));
 		setSpritePalettes(config.altPalette());
 		setToggle(0, config.hardMode());
 		setToggle(1, config.altPalette());
@@ -96,5 +93,5 @@ void settingsMenu(Config &config) {
 	swiWaitForVBlank();
 	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
 	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
-	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, SCREEN_SIZE_TILES);
+	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
 }

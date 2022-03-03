@@ -33,10 +33,20 @@ constexpr std::array<std::array<u16, 16 * 5>, 2> letterPalettes = {{
 	}
 }};
 
-constexpr u16 fontPal[] = {
-	0x0000, 0xEF7B, 0xD6B5, 0xC631, // Gray
-	0x0000, 0xC631, 0xF39C, 0xFFFF  // White
-};
+constexpr std::array<std::array<u16, 16>, 2> fontPal = {{
+	{
+		0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
+		0x0000, 0xEF7B, 0xD6B5, 0xC631, // Gray
+		0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
+		0x32AD, 0xC2D1, 0xDF57, 0xFFFF, // White on green
+	},
+	{
+		0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
+		0x0000, 0xEF7B, 0xD6B5, 0xC631, // Gray
+		0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
+		0x1DFD, 0xB63D, 0xD6DE, 0xFFFF, // White on orange
+	}
+}};
 
 void initGraphics(bool altPalette) {
 	videoSetMode(MODE_5_2D);
@@ -64,7 +74,6 @@ void initGraphics(bool altPalette) {
 
 	oamInit(&oamMain, SpriteMapping_Bmp_1D_128, false);
 	oamInit(&oamSub, SpriteMapping_Bmp_1D_128, false);
-	setSpritePalettes(altPalette);
 
 	constexpr int tileSize = 32 * 32 / 2;
 	for(int i = 0; i < letterTilesTilesLen / tileSize; i++) {
@@ -81,12 +90,17 @@ void initGraphics(bool altPalette) {
 	Sprite::update(true);
 
 	mainFont = std::move(Font(main_nftr, main_nftr_size));
-	tonccpy(BG_PALETTE_SUB + MAIN_FONT_GRAY, fontPal, sizeof(fontPal));
+
+	setPalettes(altPalette);
 }
 
-void setSpritePalettes(bool altPalette) {
+void setPalettes(bool altPalette) {
+	// Sprites
 	tonccpy(SPRITE_PALETTE, letterPalettes[altPalette].data(), letterPalettes[altPalette].size() * sizeof(u16));
 	tonccpy(SPRITE_PALETTE_SUB, letterPalettes[altPalette].data(), letterPalettes[altPalette].size() * sizeof(u16));
+
+	// Fonts
+	tonccpy(BG_PALETTE_SUB + 0xF0, fontPal[altPalette].data(), fontPal[altPalette].size() * sizeof(u16));
 }
 
 void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option) {

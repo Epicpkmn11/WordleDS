@@ -93,6 +93,8 @@ void makeTxt(Config &config, std::u16string_view answer) {
 }
 
 void drawBgBottom(std::string_view msg) {
+	swiWaitForVBlank();
+
 	mainFont.clear(false);
 
 	if(msg.size() == 0) {
@@ -104,7 +106,7 @@ void drawBgBottom(std::string_view msg) {
 		tonccpy(BG_PALETTE_SUB, bgBottomBoxPal, bgBottomBoxPalLen);
 		tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomBoxMap, bgBottomBoxMapLen);
 
-		mainFont.palette(MAIN_FONT_WHITE).print(0, 56 - mainFont.calcHeight(msg) / 2, false, msg, Alignment::center);
+		mainFont.palette(TEXT_WHITE).print(0, 56 - mainFont.calcHeight(msg) / 2, false, msg, Alignment::center);
 	}
 
 	mainFont.update(false);

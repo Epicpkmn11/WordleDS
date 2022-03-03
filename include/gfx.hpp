@@ -9,8 +9,10 @@
 #define BG(x) (0 + x)
 #define BG_SUB(x) (4 + x)
 
-#define MAIN_FONT_GRAY 0xF8
-#define MAIN_FONT_WHITE 0xFC
+#define TEXT_BLACK 0xF0
+#define TEXT_GRAY  0xF4
+#define TEXT_WHITE 0xF8
+#define TEXT_GREEN 0xFC
 
 enum TilePalette : int {
 	white = 0,
@@ -32,7 +34,7 @@ extern Font mainFont;
 
 void initGraphics(bool altPalette);
 
-void setSpritePalettes(bool altPalette);
+void setPalettes(bool altPalette);
 
 void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
 

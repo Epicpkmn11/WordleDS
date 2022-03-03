@@ -13,24 +13,6 @@
 #include <algorithm>
 #include <nds.h>
 
-constexpr std::array<std::array<u16, 12>, 2> fontPal = {{
-	{
-		0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
-		0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
-		0x32AD, 0xC2D1, 0xDF57, 0xFFFF, // White on green
-	},
-	{
-		0xFFFF, 0xDEF7, 0xC631, 0x8000, // Black
-		0x39CE, 0xC631, 0xF39C, 0xFFFF, // White on gray
-		0x1DFD, 0xB63D, 0xD6DE, 0xFFFF, // White on orange
-	}
-
-}};
-
-#define TEXT_BLACK 0xF0
-#define TEXT_WHITE 0xF4
-#define TEXT_GREEN 0xF8
-
 void statsMenu(const Config &config, bool won) {
 	// Change to stats menu background
 	swiWaitForVBlank();
@@ -42,7 +24,6 @@ void statsMenu(const Config &config, bool won) {
 	Font largeFont(numbers_large_nftr, numbers_large_nftr_size), smallFont(numbers_small_nftr, numbers_small_nftr_size);
 	largeFont.palette(TEXT_BLACK);
 	smallFont.palette(TEXT_BLACK);
-	tonccpy(BG_PALETTE_SUB + 0xF0, fontPal[config.altPalette()].data(), fontPal[config.altPalette()].size() * sizeof(u16));
 
 	// Print scores
 	largeFont.print(-96, 32, false, config.gamesPlayed(), Alignment::center);

@@ -56,14 +56,14 @@ void settingsMenu(Config &config) {
 	tonccpy(BG_PALETTE_SUB, settingsBottomPal, settingsBottomPalLen);
 	tonccpy(bgGetMapPtr(BG_SUB(0)), settingsBottomMap, settingsBottomMapLen);
 
-	mainFont.palette(MAIN_FONT_GRAY);
+	mainFont.palette(TEXT_GRAY);
 	mainFont.print(4, 192 - 2 - mainFont.calcHeight(creditStr), false, creditStr);
 	mainFont.print(256 - 4, 192 - 2 - mainFont.height(), false, VER_NUMBER, Alignment::right);
 	mainFont.update(false);
 
 	while(1) {
 		tonccpy(BG_PALETTE_SUB + 0x1D, togglePal[config.altPalette()].data(), togglePal[config.altPalette()].size() * sizeof(u16));
-		setSpritePalettes(config.altPalette());
+		setPalettes(config.altPalette());
 		setToggle(0, config.hardMode());
 		setToggle(1, config.altPalette());
 

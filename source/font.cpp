@@ -121,7 +121,7 @@ u16 Font::getCharIndex(char16_t c) const {
 
 std::u16string Font::utf8to16(std::string_view text) {
 	std::u16string out;
-	for(uint i=0;i<text.size();) {
+	for(uint i = 0; i < text.size();) {
 		char16_t c;
 		if(!(text[i] & 0x80)) {
 			c = text[i++];
@@ -138,6 +138,37 @@ std::u16string Font::utf8to16(std::string_view text) {
 		out += c;
 	}
 	return out;
+}
+
+std::string Font::utf16to8(std::u16string_view text) {
+	std::string out;
+	for(char16_t c : text)
+		out += utf16to8(c);
+	return out;
+}
+
+std::string Font::utf16to8(char16_t c) {
+	if(c <= 0x007F) {
+		return {char(c)};
+	} else if(c <= 0x7FF) {
+		return {
+			char(0xC0 | (c >> 6)),
+			char(0x80 | (c & 0x3F))
+		};
+	} else if(c <= 0xFFFF) {
+		return {
+			char(0xE0 | (c >> 12)),
+			char(0x80 | ((c & 0x3F) >> 6)),
+			char(0x80 | (c & 0x3F))
+		};
+	} else {
+		return {
+			char(0xF0 | (c >> 18)),
+			char(0x80 | ((c & 0x3F) >> 12)),
+			char(0x80 | ((c & 0x3F) >> 6)),
+			char(0x80 | (c & 0x3F))
+		};
+	}
 }
 
 int Font::calcWidth(std::u16string_view text) const {

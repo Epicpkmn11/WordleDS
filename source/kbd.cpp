@@ -1,4 +1,5 @@
 #include "kbd.hpp"
+#include "defines.hpp"
 
 #include "backspaceKey.h"
 #include "enterKey.h"
@@ -13,18 +14,18 @@ Kbd::Kbd() {
 		_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_16x16, SpriteColorFormat_16Color));
 		tonccpy(_gfx.back(), kbdKeysTiles + (i * tileSize), tileSize);
 	}
-	_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color));
-	tonccpy(_gfx.back(), backspaceKeyTiles, backspaceKeyTilesLen);
-	_gfx.push_back(oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color));
-	tonccpy(_gfx.back(), enterKeyTiles, enterKeyTilesLen);
+	_backspaceGfx = oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color);
+	tonccpy(_backspaceGfx, backspaceKeyTiles, backspaceKeyTilesLen);
+	_enterGfx = oamAllocateGfx(&oamSub, SpriteSize_32x32, SpriteColorFormat_16Color);
+	tonccpy(_enterGfx, enterKeyTiles, enterKeyTilesLen);
 	for(Key &key : _keys) {
-		_sprites.emplace_back(false, (key.c == '\b' || key.c == '\n') ? SpriteSize_32x32 : SpriteSize_16x16, SpriteColorFormat_16Color);
-		_sprites.back().move(key.x, key.y).gfx(_gfx[key.c == '\b' ? 26 : (key.c == '\n' ? 27 : key.c - 'a')]).visible(false);
+		_sprites.emplace_back(false, (key.c == u'\b' || key.c == u'\n') ? SpriteSize_32x32 : SpriteSize_16x16, SpriteColorFormat_16Color);
+		_sprites.back().move(key.x, key.y).gfx(key.c == u'\b' ? _backspaceGfx : (key.c == u'\n' ? _enterGfx : _gfx[letterIndex(key.c)])).visible(false);
 	}
 	Sprite::update(false);
 }
 
-char Kbd::get() {
+char16_t Kbd::get() {
 	if(!_visible)
 		return SpecialKey::NOKEY;
 
@@ -32,7 +33,7 @@ char Kbd::get() {
 	touchRead(&touch);
 
 	for(const Key &key : _keys) {
-		int size = (key.c == '\b' || key.c == '\n') ? 32 : 16;
+		int size = (key.c == u'\b' || key.c == u'\n') ? 32 : 16;
 		if(touch.px >= key.x && touch.px < key.x + size && touch.py >= key.y && touch.py < key.y + size)
 			return key.c;
 	}
@@ -40,7 +41,7 @@ char Kbd::get() {
 	return SpecialKey::NOKEY;
 }
 
-TilePalette Kbd::palette(char c) {
+TilePalette Kbd::palette(char16_t c) {
 	for(uint i = 0; i < _keys.size(); i++) {
 		if(_keys[i].c == c) {
 			return TilePalette(_sprites[i].paletteAlpha());
@@ -50,7 +51,7 @@ TilePalette Kbd::palette(char c) {
 	return TilePalette::white;
 }
 
-Kbd &Kbd::palette(char c, TilePalette pal) {
+Kbd &Kbd::palette(char16_t c, TilePalette pal) {
 	for(uint i = 0; i < _keys.size(); i++) {
 		if(_keys[i].c == c) {
 			_sprites[i].palette(pal);

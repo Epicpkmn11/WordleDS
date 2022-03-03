@@ -32,6 +32,8 @@ private:
 
 public:
 	static std::u16string utf8to16(std::string_view text);
+	static std::string utf16to8(std::u16string_view text);
+	static std::string utf16to8(char16_t c);
 
 	Font(const u8 *nftr, u32 nftrSize);
 

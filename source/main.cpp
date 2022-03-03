@@ -28,13 +28,13 @@ constexpr u16 fontPal[] = {
 	0x39CE, 0xC631, 0xF39C, 0xFFFF
 };
 
-std::vector<TilePalette> check(const std::string &guess, const std::string &answer, Kbd *kbd) {
+std::vector<TilePalette> check(const std::u16string &guess, std::u16string_view answer, Kbd *kbd) {
 	std::vector<TilePalette> res;
 	res.resize(std::min(guess.size(), answer.size()));
 
 	// Get map of letters for wrong location
-	std::map<char, int> letters;
-	for(char letter : answer) {
+	std::map<char16_t, int> letters;
+	for(char16_t letter : answer) {
 		letters[letter]++;
 	}
 
@@ -66,7 +66,7 @@ std::vector<TilePalette> check(const std::string &guess, const std::string &answ
 	return res;
 }
 
-void makeTxt(Config &config, const std::string &answer) {
+void makeTxt(Config &config, std::u16string_view answer) {
 	FILE *file = fopen("WordleDS.txt", "w");
 
 	if(file) {
@@ -84,7 +84,7 @@ void makeTxt(Config &config, const std::string &answer) {
 			const char *green = config.altPalette() ? "🟧" : "🟩";
 			const char *yellow = config.altPalette() ? "🟦" : "🟨";
 
-			std::vector<TilePalette> colors = check(guess, answer, nullptr);
+			std::vector<TilePalette> colors = check(Font::utf8to16(guess), answer, nullptr);
 			for(uint i = 0; i < colors.size(); i++)
 				strcat(str, colors[i] == TilePalette::green ? green : (colors[i] == TilePalette::yellow ? yellow : "⬜"));
 
@@ -137,28 +137,30 @@ int main(void) {
 
 	// Get random word based on date
 	time_t today = time(NULL) / 24 / 60 / 60;
-	std::string answer = choices[(today - FIRST_DAY) % choices.size()];
+	std::u16string_view answer = choices[(today - FIRST_DAY) % choices.size()];
 	config.lastPlayed(today);
 
 	Kbd kbd;
 
 	u16 pressed, held;
-	s8 key = NOKEY;
+	char16_t key = NOKEY;
 	touchPosition touch;
-	std::string guess = "";
+	std::u16string guess = u"";
 	int currentGuess = 0;
 	int popupTimeout = -1;
 	bool won = false, statsSaved = false;
-	std::string knownLetters, knownPositions; // for hard mode
+	std::u16string knownLetters, knownPositions; // for hard mode
 	for(int i = 0; i < WORD_LEN; i++)
-		knownPositions += ' ';
+		knownPositions += u' ';
 
 	if(config.boardState().size() > 0) {
 		std::vector<TilePalette> palettes;
-		for(const std::string &guess : config.boardState()) {
+		for(const std::string &guess8 : config.boardState()) {
+			std::u16string guess = Font::utf8to16(guess8);
+
 			Sprite *sprite = &letterSprites[currentGuess * WORD_LEN];
 			for(char letter : guess) {
-				(sprite++)->palette(TilePalette::whiteDark).gfx(letterGfx[letter - 'a' + 1]);
+				(sprite++)->palette(TilePalette::whiteDark).gfx(letterGfx[letterIndex(letter) + 1]);
 			}
 			std::vector<TilePalette> newPalettes = check(guess, answer, &kbd);
 			palettes.reserve(palettes.size() + newPalettes.size());
@@ -211,15 +213,15 @@ int main(void) {
 					// check if meets hard mode requirements
 					if(config.hardMode()) {
 						char invalidMessage[64] = {0};
-						for(char letter : knownLetters) {
+						for(char16_t letter : knownLetters) {
 							if(std::count(knownLetters.begin(), knownLetters.end(), letter) != std::count(guess.begin(), guess.end(), letter)) {
-								sprintf(invalidMessage, guessMustContainX, toupper(letter));
+								sprintf(invalidMessage, guessMustContainX, Font::utf16to8(letter).c_str());
 								break;
 							}
 						}
 						for(uint i = 0; i < knownPositions.size(); i++) {
-							if(knownPositions[i] != ' ' && guess[i] != knownPositions[i]) {
-								sprintf(invalidMessage, nthMustBeX, i + 1, numberSuffix(i + 1), toupper(knownPositions[i]));
+							if(knownPositions[i] != u' ' && guess[i] != knownPositions[i]) {
+								sprintf(invalidMessage, nthMustBeX, i + 1, numberSuffix(i + 1), Font::utf16to8(knownPositions[i]).c_str());
 								break;
 							}
 						}
@@ -239,7 +241,7 @@ int main(void) {
 
 					// Save info needed for hard mode
 					if(config.hardMode()) {
-						knownLetters = "";
+						knownLetters = u"";
 						for(uint i = 0; i < guess.size(); i++) {
 							if(newPalettes[i] == TilePalette::yellow)
 								knownLetters += guess[i];
@@ -248,9 +250,9 @@ int main(void) {
 						}
 					}
 
-					config.boardState(guess);
+					config.boardState(Font::utf16to8(guess));
 
-					guess = "";
+					guess = u"";
 					currentGuess++;
 				} else {
 					drawBgBottom(font, guess.length() < WORD_LEN ? tooShortMessage : notWordMessage);
@@ -266,7 +268,7 @@ int main(void) {
 			default: // Letter
 				if(guess.length() < WORD_LEN) {
 					Sprite sprite = letterSprites[currentGuess * WORD_LEN + guess.length()];
-					sprite.palette(TilePalette::whiteDark).gfx(letterGfx[key - 'a' + 1]).affineIndex(0, false);
+					sprite.palette(TilePalette::whiteDark).gfx(letterGfx[letterIndex(key) + 1]).affineIndex(0, false);
 					for(int i = 0; i < 6; i++) {
 						swiWaitForVBlank();
 						sprite.rotateScale(0, 1.1f - .1f / (6 - i), 1.1f - .1f / (6 - i)).update();
@@ -330,7 +332,7 @@ int main(void) {
 					answerSprites.back()
 						.move((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, 96)
 						.palette(TilePalette::white)
-						.gfx(letterGfxSub[answer[i] - 'a' + 1])
+						.gfx(letterGfxSub[letterIndex(answer[i]) + 1])
 						.visible(false);
 				}
 

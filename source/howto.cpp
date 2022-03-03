@@ -1,4 +1,5 @@
 #include "howto.hpp"
+#include "defines.hpp"
 #include "gfx.hpp"
 #include "sprite.hpp"
 
@@ -27,11 +28,11 @@ void howtoMenu() {
 		sprite.visible(false);
 	Sprite::update(true);
 
-	const std::string words = "weary" "pills" "vague";
+	const std::u16string words = u"WEARY" "PILLS" "VAGUE";
 	std::vector<Sprite> howtoSprites;
 	for(uint i = 0; i < words.length(); i++) {
 		howtoSprites.emplace_back(false, SpriteSize_32x32, SpriteColorFormat_16Color);
-		howtoSprites.back().move(1 + (i % 5) * 26, 22 + (i / 5 * 60)).gfx(letterGfxSub[words[i] - 'a' + 1]);
+		howtoSprites.back().move(1 + (i % 5) * 26, 22 + (i / 5 * 60)).gfx(letterGfxSub[letterIndex(words[i]) + 1]);
 	}
 
 	std::array<Sprite, 3> toFlip = {howtoSprites[0], howtoSprites[6], howtoSprites[13]};

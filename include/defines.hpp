@@ -1,7 +1,9 @@
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
+#include <algorithm>
 #include <array>
+#include <map>
 #include <string_view>
 
 #define WORD_LEN 5
@@ -29,10 +31,10 @@ constexpr std::string_view
 	notWordMessage = "Not in word list";
 
 constexpr const char
-	*nthMustBeX = "%d%s letter must be %c",
-	*guessMustContainX = "Guess must contain %c";
+	*nthMustBeX = "%d%s letter must be %s",
+	*guessMustContainX = "Guess must contain %s";
 
-inline const char *numberSuffix(int i) {
+constexpr const char *numberSuffix(int i) {
 	switch(i) {
 		case 1:
 			return "st";
@@ -43,6 +45,43 @@ inline const char *numberSuffix(int i) {
 		default:
 			return "th";
 	}
+}
+
+// Order of the letters in the tile/key images
+// To add more simply increase the array size and add to the end
+constexpr std::array<char16_t, 27> letters = {
+	u'A',
+	u'B',
+	u'C',
+	u'D',
+	u'E',
+	u'F',
+	u'G',
+	u'H',
+	u'I',
+	u'J',
+	u'K',
+	u'L',
+	u'M',
+	u'N',
+	u'O',
+	u'P',
+	u'Q',
+	u'R',
+	u'S',
+	u'T',
+	u'U',
+	u'V',
+	u'W',
+	u'X',
+	u'Y',
+	u'Z'
+};
+
+inline int letterIndex(char16_t c) {
+	const char16_t *out = std::find(letters.begin(), letters.end(), c);
+
+	return out != letters.end() ? std::distance(letters.begin(), out) : 0;
 }
 
 #endif // DEFINES_HPP

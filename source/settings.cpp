@@ -1,7 +1,9 @@
 #include "settings.hpp"
+#include "defines.hpp"
 #include "font.hpp"
 #include "gfx.hpp"
 #include "tonccpy.h"
+#include "version.hpp"
 
 #include "bgBottom.h"
 #include "settingsBottom.h"
@@ -12,12 +14,12 @@
 
 constexpr std::array<std::array<u16, 6>, 2> toggleMap = {{
 	{ // Off
-		0x00B4, 0x00B5, 0x00B6,
-		0x08B4, 0x08B5, 0x08B6
+		0x00B6, 0x00B7, 0x00B8,
+		0x08B6, 0x08B7, 0x08B8
 	},
 	{ // On
-		0x003E, 0x003F, 0x0040,
-		0x083E, 0x083F, 0x0840
+		0x003F, 0x0040, 0x0041,
+		0x083F, 0x0840, 0x0841
 	}
 }};
 
@@ -54,6 +56,11 @@ void settingsMenu(Config &config) {
 	tonccpy(BG_PALETTE_SUB, settingsBottomPal, settingsBottomPalLen);
 	tonccpy(bgGetMapPtr(BG_SUB(0)), settingsBottomMap, settingsBottomMapLen);
 
+	mainFont.palette(MAIN_FONT_GRAY);
+	mainFont.print(4, 192 - 2 - mainFont.calcHeight(creditStr), false, creditStr);
+	mainFont.print(256 - 4, 192 - 2 - mainFont.height(), false, VER_NUMBER, Alignment::right);
+	mainFont.update(false);
+
 	while(1) {
 		tonccpy(BG_PALETTE_SUB + 0x1D, togglePal[config.altPalette()].data(), togglePal[config.altPalette()].size() * sizeof(u16));
 		setSpritePalettes(config.altPalette());
@@ -88,6 +95,8 @@ void settingsMenu(Config &config) {
 	}
 
 	config.save();
+
+	mainFont.clear(false).update(false);
 
 	// Restore normal BG and letterSprites
 	swiWaitForVBlank();

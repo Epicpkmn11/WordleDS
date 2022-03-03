@@ -11,7 +11,6 @@
 
 #include "bgBottom.h"
 #include "bgBottomBox.h"
-#include "main_nftr.h"
 
 #include <algorithm>
 #include <fat.h>
@@ -23,10 +22,6 @@
 
 extern char *fake_heap_end;
 __bootstub *bootstub = (struct __bootstub *)fake_heap_end;
-
-constexpr u16 fontPal[] = {
-	0x39CE, 0xC631, 0xF39C, 0xFFFF
-};
 
 std::vector<TilePalette> check(const std::u16string &guess, std::u16string_view answer, Kbd *kbd) {
 	std::vector<TilePalette> res;
@@ -97,8 +92,8 @@ void makeTxt(Config &config, std::u16string_view answer) {
 	}
 }
 
-void drawBgBottom(Font &font, std::string_view msg) {
-	font.clear(false);
+void drawBgBottom(std::string_view msg) {
+	mainFont.clear(false);
 
 	if(msg.size() == 0) {
 		tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
@@ -109,10 +104,10 @@ void drawBgBottom(Font &font, std::string_view msg) {
 		tonccpy(BG_PALETTE_SUB, bgBottomBoxPal, bgBottomBoxPalLen);
 		tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomBoxMap, bgBottomBoxMapLen);
 
-		font.print(0, 56 - font.calcHeight(msg) / 2, false, msg, Alignment::center);
+		mainFont.palette(MAIN_FONT_WHITE).print(0, 56 - mainFont.calcHeight(msg) / 2, false, msg, Alignment::center);
 	}
 
-	font.update(false);
+	mainFont.update(false);
 }
 
 int main(void) {
@@ -126,10 +121,6 @@ int main(void) {
 	Config config("WordleDS.json");
 
 	initGraphics(config.altPalette());
-
-	Font font(main_nftr, main_nftr_size);
-	font.palette(0xFC);
-	tonccpy(BG_PALETTE_SUB + 0xFC, fontPal, sizeof(fontPal));
 
 	// Show howto if first game
 	if(config.gamesPlayed() < 1)
@@ -196,7 +187,7 @@ int main(void) {
 
 			if(popupTimeout == 0) {
 				// Reset to no message box
-				drawBgBottom(font, "");
+				drawBgBottom("");
 			}
 			if(popupTimeout >= 0)
 				popupTimeout--;
@@ -227,7 +218,7 @@ int main(void) {
 						}
 
 						if(strlen(invalidMessage) > 0) {
-							drawBgBottom(font, invalidMessage);
+							drawBgBottom(invalidMessage);
 							popupTimeout = 120;
 							break;
 						}
@@ -255,7 +246,7 @@ int main(void) {
 					guess = u"";
 					currentGuess++;
 				} else {
-					drawBgBottom(font, guess.length() < WORD_LEN ? tooShortMessage : notWordMessage);
+					drawBgBottom(guess.length() < WORD_LEN ? tooShortMessage : notWordMessage);
 					popupTimeout = 120;
 				}
 				break;
@@ -320,11 +311,11 @@ int main(void) {
 			makeTxt(config, answer);
 
 			if(won) {
-				drawBgBottom(font, victoryMessages[currentGuess - 1]);
+				drawBgBottom(victoryMessages[currentGuess - 1]);
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				drawBgBottom(font, lossMessage);
+				drawBgBottom(lossMessage);
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < answer.length(); i++) {
@@ -343,7 +334,7 @@ int main(void) {
 
 				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
-			font.clear(false).update(false);
+			mainFont.clear(false).update(false);
 
 			// Show stats
 			statsMenu(config, won);

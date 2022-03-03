@@ -1,12 +1,16 @@
 #ifndef GFX_HPP
 #define GFX_HPP
 
+#include "font.hpp"
 #include "sprite.hpp"
 
 #include <vector>
 
 #define BG(x) (0 + x)
 #define BG_SUB(x) (4 + x)
+
+#define MAIN_FONT_GRAY 0xF8
+#define MAIN_FONT_WHITE 0xFC
 
 enum TilePalette : int {
 	white = 0,
@@ -24,6 +28,7 @@ enum class FlipOptions {
 
 extern std::vector<Sprite> letterSprites;
 extern std::vector<u16 *> letterGfx, letterGfxSub;
+extern Font mainFont;
 
 void initGraphics(bool altPalette);
 

@@ -1,6 +1,7 @@
 // Simplified version of TWiLight Menu++'s text rendering
 
 #include "font.hpp"
+#include "gfx.hpp"
 #include "tonccpy.h"
 
 #include <nds/arm9/background.h>
@@ -36,7 +37,7 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 	fontWidths = (u8 *)ptr;
 
 	// Load character maps
-	fontMap = new u16[tileAmount];
+	fontMap = std::make_unique<u16[]>(tileAmount);
 
 	ptr = nftr + 0x28;
 	u32 locPAMC, mapType;
@@ -91,11 +92,6 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 	questionMark = getCharIndex(0xFFFD);
 	if(questionMark == 0)
 		questionMark = getCharIndex('?');
-}
-
-Font::~Font(void) {
-	if(fontMap)
-		delete[] fontMap;
 }
 
 u16 Font::getCharIndex(char16_t c) const {
@@ -234,7 +230,7 @@ ITCM_CODE Font &Font::print(int x, int y, bool top, std::u16string_view text, Al
 		u16 index = getCharIndex(*it);
 
 		// Don't draw off screen chars
-		if(x >= 0 && x + fontWidths[(index * 3) + 2] < 256 && y >= 0 && y + tileHeight < 192) {
+		if(x >= 0 && x + fontWidths[(index * 3) + 2] <= 256 && y >= 0 && y + tileHeight <= 192) {
 			u8 *dst = textBuf[top] + x + fontWidths[(index * 3)];
 			for(int i = 0; i < tileHeight; i++) {
 				for(int j = 0; j < tileWidth; j++) {

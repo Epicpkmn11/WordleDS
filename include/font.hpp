@@ -3,8 +3,8 @@
 #ifndef FONT_HPP
 #define FONT_HPP
 
-#include "gfx.hpp"
-
+#include <memory>
+#include <nds/arm9/video.h>
 #include <nds/ndstypes.h>
 #include <string>
 #include <string_view>
@@ -26,7 +26,7 @@ private:
 	u8 paletteStart = 0;
 	u8 *fontTiles = nullptr;
 	u8 *fontWidths = nullptr;
-	u16 *fontMap = nullptr;
+	std::unique_ptr<u16[]> fontMap;
 
 	u16 getCharIndex(char16_t c) const;
 
@@ -36,8 +36,7 @@ public:
 	static std::string utf16to8(char16_t c);
 
 	Font(const u8 *nftr, u32 nftrSize);
-
-	~Font(void);
+	Font(void) {}
 
 	u8 height(void) const { return tileHeight; }
 

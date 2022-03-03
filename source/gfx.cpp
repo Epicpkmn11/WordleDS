@@ -1,10 +1,11 @@
 #include "gfx.hpp"
 #include "defines.hpp"
+#include "tonccpy.h"
 
 #include "bgBottom.h"
 #include "bgTop.h"
 #include "letterTiles.h"
-#include "tonccpy.h"
+#include "main_nftr.h"
 
 #include <array>
 #include <nds.h>
@@ -12,6 +13,7 @@
 
 std::vector<Sprite> letterSprites;
 std::vector<u16 *> letterGfx, letterGfxSub;
+Font mainFont;
 
 constexpr std::array<std::array<u16, 16 * 5>, 2> letterPalettes = {{
 	{
@@ -30,6 +32,11 @@ constexpr std::array<std::array<u16, 16 * 5>, 2> letterPalettes = {{
 		0x0000, 0x1DFD, 0x1DFD, 0x7FFF, 0x7BDF, 0x739E, 0x6B7E, 0x635E, 0x5B1E, 0x56DE, 0x4EBD, 0x469D, 0x427D, 0x363D, 0x2A1D, 0x21FD  // Orange (Green)
 	}
 }};
+
+constexpr u16 fontPal[] = {
+	0x0000, 0xEF7B, 0xD6B5, 0xC631, // Gray
+	0x0000, 0xC631, 0xF39C, 0xFFFF  // White
+};
 
 void initGraphics(bool altPalette) {
 	videoSetMode(MODE_5_2D);
@@ -72,6 +79,9 @@ void initGraphics(bool altPalette) {
 		letterSprites.back().move((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, (25 + (167 - (MAX_GUESSES * 24 + (MAX_GUESSES - 1) * 2)) / 2 - 4) + (i / WORD_LEN) * 26).gfx(letterGfx[0]);
 	}
 	Sprite::update(true);
+
+	mainFont = std::move(Font(main_nftr, main_nftr_size));
+	tonccpy(BG_PALETTE_SUB + MAIN_FONT_GRAY, fontPal, sizeof(fontPal));
 }
 
 void setSpritePalettes(bool altPalette) {

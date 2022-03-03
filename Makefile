@@ -67,6 +67,18 @@ LIBDIRS := $(LIBNDS) $(PORTLIBS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
+# Get version number from git
+ifneq ($(shell echo $(shell git tag -l --points-at HEAD) | head -c 1),) # If on a tagged commit, use just tag
+GIT_VER := $(shell git tag -l --points-at HEAD)
+else # Otherwise include commit
+GIT_VER := $(shell git describe --abbrev=0 --tags)-$(shell git rev-parse --short=7 HEAD)
+endif
+
+# Print new version if changed
+ifeq (,$(findstring $(GIT_VER), $(shell cat build/version.hpp)))
+$(shell printf "#ifndef VERSION_HPP\n#define VERSION_HPP\n\n#define VER_NUMBER \"$(GIT_VER)\"\n\n#endif\n" > build/version.hpp)
+endif
+
 export OUTPUT := $(CURDIR)/$(TARGET)
 
 export VPATH := $(CURDIR)/$(subst /,,$(dir $(ICON)))\

@@ -2,52 +2,18 @@
 #include "defines.hpp"
 #include "font.hpp"
 #include "gfx.hpp"
+#include "sprite.hpp"
 #include "tonccpy.h"
 #include "version.hpp"
 
 #include "bgBottom.h"
 #include "settingsBottom.h"
+#include "toggleOn.h"
+#include "toggleOff.h"
 
 #include <array>
 #include <algorithm>
 #include <nds.h>
-
-constexpr std::array<std::array<u16, 6>, 2> toggleMap = {{
-	{ // Off
-		0x00B6, 0x00B7, 0x00B8,
-		0x08B6, 0x08B7, 0x08B8
-	},
-	{ // On
-		0x003F, 0x0040, 0x0041,
-		0x083F, 0x0840, 0x0841
-	}
-}};
-
-constexpr std::array<std::array<u16, 3>, 2> togglePal = {{
-	{ // Green
-		0x32AD, 0x42F1, 0x6378
-	},
-	{ // Orange
-		0x1DFD, 0x363D, 0x5B1E
-	}
-}};
-
-void setToggle(int toggle, bool on) {
-	int tile = 0;
-	switch(toggle) {
-		case 0:
-			tile = 0x0BC;
-			break;
-		case 1:
-			tile = 0x19C;
-			break;
-	}
-
-	u16 *ptr = bgGetMapPtr(BG_SUB(0)) + tile;
-	for(uint i = 0; i < toggleMap[on].size(); i++) {
-		ptr[i / 3 * 32 + (i % 3)] = toggleMap[on][i];
-	}
-}
 
 void settingsMenu(Config &config) {
 	// Change to settings menu background
@@ -61,11 +27,25 @@ void settingsMenu(Config &config) {
 	mainFont.print(256 - 4, 192 - 2 - mainFont.height(), false, VER_NUMBER, Alignment::right);
 	mainFont.update(false);
 
+	u16 *toggleOnGfx = oamAllocateGfx(&oamSub, SpriteSize_32x16, SpriteColorFormat_16Color);
+	tonccpy(toggleOnGfx, toggleOnTiles, toggleOnTilesLen);
+	u16 *toggleOffGfx = oamAllocateGfx(&oamSub, SpriteSize_32x16, SpriteColorFormat_16Color);
+	tonccpy(toggleOffGfx, toggleOffTiles, toggleOffTilesLen);
+
+	Sprite hardToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	hardToggle.move(224, 41);
+	Sprite colorToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	colorToggle.move(224, 97);
+
 	while(1) {
-		tonccpy(BG_PALETTE_SUB + 0x1D, togglePal[config.altPalette()].data(), togglePal[config.altPalette()].size() * sizeof(u16));
 		setPalettes(config.altPalette());
-		setToggle(0, config.hardMode());
-		setToggle(1, config.altPalette());
+		hardToggle
+			.gfx(config.hardMode() ? toggleOnGfx : toggleOffGfx)
+			.palette(config.hardMode() ? TilePalette::green : TilePalette::gray);
+		colorToggle
+			.gfx(config.altPalette() ? toggleOnGfx : toggleOffGfx)
+			.palette(config.altPalette() ? TilePalette::green : TilePalette::gray);
+		Sprite::update(false);
 
 		u16 pressed;
 		touchPosition touch;
@@ -97,6 +77,9 @@ void settingsMenu(Config &config) {
 	config.save();
 
 	mainFont.clear(false).update(false);
+
+	oamFreeGfx(&oamSub, toggleOnGfx);
+	oamFreeGfx(&oamSub, toggleOffGfx);
 
 	// Restore normal BG and letterSprites
 	swiWaitForVBlank();

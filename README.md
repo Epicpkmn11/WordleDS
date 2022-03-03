@@ -7,7 +7,7 @@ Follow devkitPro's [Getting Started](https://devkitpro.org/wiki/Getting_Started)
 ### Customizing
 The word lists are defined in `words.cpp`. Any English word list should work as is. To use language that needs letters not in English, add the letters to the `letters` array in `defines.hpp` and the `kbdKeys.png`/`letterTiles.png` images, then add the keyboard keys in `kbd.hpp`.
 
-All graphics are in the `gfx` folder and should mostly work fine if the PNGs are edited. A couple have hardcoded palette or map tweaks at runtime so they may glitch out of edited. The more complex images also have their [GIMP](https://www.gimp.org) files in `resources`, the font used is nintendo_NTLG-DB_001. The fonts are in `data` and can be edited using an [NFTR editor](https://pk11.us/nftr-editor/).
+All graphics are in the `gfx` folder and should mostly work fine if the PNGs are edited. A couple have hardcoded palette tweaks at runtime so they may glitch out if the palettes are changed. The more complex images also have their [GIMP](https://www.gimp.org) files in `resources`, the font used is nintendo_NTLG-DB_001. The fonts are in `data` and can be edited using an [NFTR editor](https://pk11.us/nftr-editor/).
 
 Most other things such as the word length, starting day, and any text strings are defined in `defines.hpp`.
 

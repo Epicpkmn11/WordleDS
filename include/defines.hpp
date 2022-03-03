@@ -29,7 +29,7 @@ constexpr std::string_view
 	lossMessage = "Better luck tomorrow...\nThe answer was:",
 	tooShortMessage = "Not enough letters",
 	notWordMessage = "Not in word list",
-	creditStr = "Wordle DS by Pk11";
+	creditStr = "Wordle DS\nby Pk11";
 
 constexpr const char
 	*nthMustBeX = "%d%s letter must be %s",

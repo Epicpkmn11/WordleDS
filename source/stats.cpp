@@ -59,7 +59,7 @@ void showQr(const Config &config) {
 	do {
 		swiWaitForVBlank();
 		scanKeys();
-	} while(!(keysDown() & (Key_A | KEY_B | KEY_TOUCH)));
+	} while(!(keysDown() & (KEY_A | KEY_B | KEY_TOUCH)));
 }
 
 void statsMenu(const Config &config, bool won) {

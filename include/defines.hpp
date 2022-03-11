@@ -15,6 +15,9 @@ static_assert(MAX_GUESSES > 0 && MAX_GUESSES <= 6, "MAX_GUESSES must be 1-6");
 // Used for the number in the TXT and the index in the word list
 #define FIRST_DAY 18797
 
+// Used in the share message
+#define APP_NAME "Wordle DS"
+
 // If changing the MAX_GUESSES, make sure to edit this array
 constexpr std::array<std::string_view, MAX_GUESSES> victoryMessages = {
 	"Genius",

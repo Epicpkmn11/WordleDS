@@ -23,7 +23,9 @@
 extern char *fake_heap_end;
 __bootstub *bootstub = (struct __bootstub *)fake_heap_end;
 
-std::vector<TilePalette> check(const std::u16string &guess, std::u16string_view answer, Kbd *kbd) {
+static std::u16string_view answer;
+
+std::vector<TilePalette> check(const std::u16string &guess, Kbd *kbd) {
 	std::vector<TilePalette> res;
 	res.resize(std::min(guess.size(), answer.size()));
 
@@ -61,35 +63,27 @@ std::vector<TilePalette> check(const std::u16string &guess, std::u16string_view 
 	return res;
 }
 
-void makeTxt(Config &config, std::u16string_view answer) {
-	FILE *file = fopen("WordleDS.txt", "w");
+std::string shareMessage(const Config &config) {
+	char str[256];
 
-	if(file) {
-		char str[64];
-		sprintf(str, "Wordle DS %lld %c/%d%s\n\n",
-			config.lastPlayed() - FIRST_DAY,
-			config.guessCounts().back() > MAX_GUESSES ? 'X' : '0' + config.guessCounts().back(),
-			MAX_GUESSES,
-			config.hardMode() ? "*" : "");
+	sprintf(str, APP_NAME " %lld %c/%d%s\n\n",
+		config.lastPlayed() - FIRST_DAY,
+		config.guessCounts().back() > MAX_GUESSES ? 'X' : '0' + config.guessCounts().back(),
+		MAX_GUESSES,
+		config.hardMode() ? "*" : "");
 
-		fwrite(str, 1, strlen(str), file);
-		for(const std::string &guess : config.boardState()) {
-			toncset(str, 0, 64);
+	const char *green = config.altPalette() ? "🟧" : "🟩";
+	const char *yellow = config.altPalette() ? "🟦" : "🟨";
 
-			const char *green = config.altPalette() ? "🟧" : "🟩";
-			const char *yellow = config.altPalette() ? "🟦" : "🟨";
+	for(const std::string &guess : config.boardState()) {
+		std::vector<TilePalette> colors = check(Font::utf8to16(guess), nullptr);
+		for(uint i = 0; i < colors.size(); i++)
+			strcat(str, colors[i] == TilePalette::green ? green : (colors[i] == TilePalette::yellow ? yellow : "⬜"));
 
-			std::vector<TilePalette> colors = check(Font::utf8to16(guess), answer, nullptr);
-			for(uint i = 0; i < colors.size(); i++)
-				strcat(str, colors[i] == TilePalette::green ? green : (colors[i] == TilePalette::yellow ? yellow : "⬜"));
-
-			strcat(str, "\n");
-
-			fwrite(str, 1, strlen(str), file);
-		}
-
-		fclose(file);
+		strcat(str, "\n");
 	}
+
+	return str;
 }
 
 void drawBgBottom(std::string_view msg) {
@@ -130,7 +124,7 @@ int main(void) {
 
 	// Get random word based on date
 	time_t today = time(NULL) / 24 / 60 / 60;
-	std::u16string_view answer = choices[(today - FIRST_DAY) % choices.size()];
+	answer = choices[(today - FIRST_DAY) % choices.size()];
 	config.lastPlayed(today);
 
 	Kbd kbd;
@@ -155,7 +149,7 @@ int main(void) {
 			for(char letter : guess) {
 				(sprite++)->palette(TilePalette::whiteDark).gfx(letterGfx[letterIndex(letter) + 1]);
 			}
-			std::vector<TilePalette> newPalettes = check(guess, answer, &kbd);
+			std::vector<TilePalette> newPalettes = check(guess, &kbd);
 			palettes.reserve(palettes.size() + newPalettes.size());
 			palettes.insert(palettes.end(), newPalettes.begin(), newPalettes.end());
 			won = std::find_if_not(newPalettes.begin(), newPalettes.end(), [](TilePalette a) { return a == TilePalette::green; }) == newPalettes.end();
@@ -227,7 +221,7 @@ int main(void) {
 					}
 
 					// Find status of the letters
-					std::vector<TilePalette> newPalettes = check(guess, answer, &kbd);
+					std::vector<TilePalette> newPalettes = check(guess, &kbd);
 					won = std::find_if_not(newPalettes.begin(), newPalettes.end(), [](TilePalette a) { return a == TilePalette::green; }) == newPalettes.end();
 					flipSprites(&letterSprites[currentGuess * WORD_LEN], WORD_LEN, newPalettes);
 					Sprite::update(false);
@@ -310,7 +304,12 @@ int main(void) {
 			config.save();
 
 			// Generate sharable txt
-			makeTxt(config, answer);
+			FILE *file = fopen("WordleDS.txt", "w");
+			if(file) {
+				std::string str = shareMessage(config);
+				fwrite(str.c_str(), 1, str.size(), file);
+				fclose(file);
+			}
 
 			if(won) {
 				drawBgBottom(victoryMessages[currentGuess - 1]);

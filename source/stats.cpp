@@ -3,7 +3,6 @@
 #include "font.hpp"
 #include "gfx.hpp"
 #include "kbd.hpp"
-#include "qrcode.h"
 #include "tonccpy.h"
 
 #include "bgBottom.h"
@@ -14,9 +13,7 @@
 #include <array>
 #include <algorithm>
 #include <nds.h>
-
-#define QR_VERSION 6
-#define QR_SCALE 4
+#include <qrencode.h>
 
 std::vector<TilePalette> check(const std::u16string &guess, Kbd *kbd);
 std::string shareMessage(const Config &config);
@@ -32,28 +29,30 @@ void showQr(const Config &config) {
 
 	std::string str = shareMessage(config);
 
-	QRCode qr;
-	u8 qrBytes[qrcode_getBufferSize(QR_VERSION)];
-	qrcode_initText(&qr, qrBytes, QR_VERSION, ECC_LOW, str.c_str());
+	QRcode *qr = QRcode_encodeString(str.c_str(), 0, QR_ECLEVEL_L, QR_MODE_8, true);
 
 	// Draw QR
-	u8 *dst = (u8 *)bgGetGfxPtr(BG_SUB(2)) + (SCREEN_HEIGHT - qr.size * QR_SCALE) / 2 * SCREEN_WIDTH + (SCREEN_WIDTH - qr.size * QR_SCALE) / 2;
-	for(int y = 0; y < qr.size; y++) {
-		for(int i = 0; i < QR_SCALE; i++) 
-			toncset(dst + (y * QR_SCALE + i) * SCREEN_WIDTH - 4, 0xF0, qr.size * QR_SCALE + 8);
+	int scale = SCREEN_HEIGHT / qr->width;
+	u8 *dst = (u8 *)bgGetGfxPtr(BG_SUB(2)) + (SCREEN_HEIGHT - qr->width * scale) / 2 * SCREEN_WIDTH + (SCREEN_WIDTH - qr->width * scale) / 2;
+	for(int y = 0; y < qr->width; y++) {
+		for(int i = 0; i < scale; i++) // Fill line with white
+			toncset(dst + (y * scale + i) * SCREEN_WIDTH - 4, 0xF0, qr->width * scale + 8);
 
-		for(int x = 0; x < qr.size; x++) {
-			if(qrcode_getModule(&qr, x, y)) {
-				for(int i = 0; i < QR_SCALE; i++) 
-					toncset(dst + (y * QR_SCALE + i) * SCREEN_WIDTH + (x * QR_SCALE), 0xF3, QR_SCALE);
+		for(int x = 0; x < qr->width; x++) {
+			if(qr->data[y * qr->width + x] & 1) { // If black, draw pixel
+				for(int i = 0; i < scale; i++)
+					toncset(dst + (y * scale + i) * SCREEN_WIDTH + (x * scale), 0xF3, scale);
 			}
 		}
 	}
 
+	// Pad above and below with white
 	for(int i = 0; i < 4; i++) {
-		toncset(dst - i * SCREEN_WIDTH - 4, 0xF0, qr.size * QR_SCALE + 8);
-		toncset(dst + ((qr.size * QR_SCALE + i) * SCREEN_WIDTH) - 4, 0xF0, qr.size * QR_SCALE + 8);
+		toncset(dst - (i + 1) * SCREEN_WIDTH - 4, 0xF0, qr->width * scale + 8);
+		toncset(dst + ((qr->width * scale + i) * SCREEN_WIDTH) - 4, 0xF0, qr->width * scale + 8);
 	}
+
+	QRcode_free(qr);
 
 	// Wait for input
 	do {
@@ -69,7 +68,7 @@ void statsMenu(const Config &config, bool won) {
 	tonccpy(BG_PALETTE_SUB, statsBottomPal, statsBottomPalLen);
 	tonccpy(bgGetMapPtr(BG_SUB(0)), statsBottomMap, statsBottomMapLen);
 
-	// Loat fonts
+	// Load fonts
 	Font largeFont(numbers_large_nftr, numbers_large_nftr_size), smallFont(numbers_small_nftr, numbers_small_nftr_size);
 	largeFont.palette(TEXT_BLACK);
 	smallFont.palette(TEXT_BLACK);

@@ -154,6 +154,18 @@ int main(void) {
 			palettes.insert(palettes.end(), newPalettes.begin(), newPalettes.end());
 			won = std::find_if_not(newPalettes.begin(), newPalettes.end(), [](TilePalette a) { return a == TilePalette::green; }) == newPalettes.end();
 			Sprite::update(false);
+
+			// Save info needed for hard mode
+			if(config.hardMode()) {
+				knownLetters = u"";
+				for(uint i = 0; i < guess.size(); i++) {
+					if(newPalettes[i] == TilePalette::yellow)
+						knownLetters += guess[i];
+					else if(newPalettes[i] == TilePalette::green)
+						knownPositions[i] = guess[i];
+				}
+			}
+
 			currentGuess++;
 			if(currentGuess >= MAX_GUESSES)
 				break;

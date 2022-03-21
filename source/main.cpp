@@ -159,9 +159,9 @@ int main(void) {
 			if(config.hardMode()) {
 				knownLetters = u"";
 				for(uint i = 0; i < guess.size(); i++) {
-					if(newPalettes[i] == TilePalette::yellow)
+					if(newPalettes[i] != TilePalette::gray)
 						knownLetters += guess[i];
-					else if(newPalettes[i] == TilePalette::green)
+					if(newPalettes[i] == TilePalette::green)
 						knownPositions[i] = guess[i];
 				}
 			}
@@ -213,7 +213,7 @@ int main(void) {
 					if(config.hardMode()) {
 						char invalidMessage[64] = {0};
 						for(char16_t letter : knownLetters) {
-							if(std::count(knownLetters.begin(), knownLetters.end(), letter) != std::count(guess.begin(), guess.end(), letter)) {
+							if(std::count(knownLetters.begin(), knownLetters.end(), letter) > std::count(guess.begin(), guess.end(), letter)) {
 								sprintf(invalidMessage, guessMustContainX, Font::utf16to8(letter).c_str());
 								break;
 							}
@@ -242,9 +242,9 @@ int main(void) {
 					if(config.hardMode()) {
 						knownLetters = u"";
 						for(uint i = 0; i < guess.size(); i++) {
-							if(newPalettes[i] == TilePalette::yellow)
+							if(newPalettes[i] != TilePalette::gray)
 								knownLetters += guess[i];
-							else if(newPalettes[i] == TilePalette::green)
+							if(newPalettes[i] == TilePalette::green)
 								knownPositions[i] = guess[i];
 						}
 					}

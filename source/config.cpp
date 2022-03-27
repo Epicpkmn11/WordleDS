@@ -70,7 +70,7 @@ void Config::save() {
 
 	FILE *file = fopen(_path.c_str(), "w");
 	if(file) {
-		std::string dump = json.dump(1, '\t');
+		std::string dump = json.dump();
 		fwrite(dump.c_str(), 1, dump.size(), file);
 		fclose(file);
 	}

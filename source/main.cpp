@@ -114,7 +114,7 @@ int main(void) {
 			swiWaitForVBlank();
 	}
 
-	Config config("WordleDS.json");
+	Config config(CONFIG_PATH);
 
 	initGraphics(config.altPalette());
 
@@ -316,7 +316,7 @@ int main(void) {
 			config.save();
 
 			// Generate sharable txt
-			FILE *file = fopen("WordleDS.txt", "w");
+			FILE *file = fopen(SCORE_PATH, "w");
 			if(file) {
 				std::string str = shareMessage(config);
 				fwrite(str.c_str(), 1, str.size(), file);

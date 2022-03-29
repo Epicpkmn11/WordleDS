@@ -312,7 +312,7 @@ int main(void) {
 			// Update stats
 			config.guessCounts(currentGuess);
 			config.gamesPlayed(config.gamesPlayed() + 1);
-			config.streak(config.streak() + 1);
+			config.streak(won ? config.streak() + 1 : 0);
 			config.save();
 
 			// Generate sharable txt

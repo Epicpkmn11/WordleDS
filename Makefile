@@ -6,10 +6,17 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
 
+ifneq (,$(shell which python3))
+PYTHON	:= python3
+else ifneq (,$(shell which python2))
+PYTHON	:= python2
+else ifneq (,$(shell which python))
+PYTHON	:= python
+else
+$(error "Python not found in PATH, please install it.")
+endif
+
 # These set the information text in the nds file
-GAME_TITLE    := Wordle DS
-GAME_SUBTITLE :=
-GAME_AUTHOR   := Pk11
 GAME_CODE     := KWRA
 
 include $(DEVKITARM)/ds_rules
@@ -32,7 +39,7 @@ INCLUDES := include
 DATA     := data
 GRAPHICS := gfx
 AUDIO    :=
-ICON     :=
+BANNER   := ../banner.bin
 
 # specify a directory which contains the nitro filesystem
 # this is relative to the Makefile
@@ -129,30 +136,6 @@ export INCLUDE   := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir))\
 					-I$(CURDIR)/$(BUILD)
 export LIBPATHS  := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-ifeq ($(strip $(ICON)),)
-	icons := $(wildcard *.bmp)
-
-	ifneq (,$(findstring $(TARGET).bmp,$(icons)))
-		export GAME_ICON := $(CURDIR)/$(TARGET).bmp
-	else
-		ifneq (,$(findstring icon.bmp,$(icons)))
-			export GAME_ICON := $(CURDIR)/icon.bmp
-		endif
-	endif
-else
-	ifeq ($(suffix $(ICON)), .grf)
-		export GAME_ICON := $(CURDIR)/$(ICON)
-	else
-		export GAME_ICON := $(CURDIR)/$(BUILD)/$(notdir $(basename $(ICON))).grf
-	endif
-endif
-
-ifeq ($(strip $(GAME_SUBTITLE)),)
-	export GAME_FULL_TITLE := $(GAME_TITLE);$(GAME_AUTHOR)
-else
-	export GAME_FULL_TITLE := $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
-endif
-
 .PHONY: $(BUILD) all clean
 
 #---------------------------------------------------------------------------------
@@ -189,14 +172,14 @@ all: $(OUTPUT).nds $(OUTPUT).dsi
 
 $(OUTPUT).nds: $(OUTPUT).elf $(NITRO_FILES) $(GAME_ICON)
 	$(SILENTCMD)ndstool -c $@ -9 $(OUTPUT).elf $(_ADDFILES) \
-		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
 		-z 80040000
+	$(SILENTCMD)$(PYTHON) ../animatedbannerpatch.py $@ ../banner.bin
 	@echo built ... $(notdir $@)
 
 $(OUTPUT).dsi: $(OUTPUT).elf $(NITRO_FILES) $(GAME_ICON)
 	$(SILENTCMD)ndstool -c $@ -9 $(OUTPUT).elf $(_ADDFILES) \
-		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
 		-g $(GAME_CODE) 00 "WORDLE DS" -z 80040000 -u 00030004
+	$(SILENTCMD)$(PYTHON) ../animatedbannerpatch.py $@ ../banner.bin
 	@echo built ... $(notdir $@)
 
 $(OUTPUT).elf: $(OFILES)
@@ -206,6 +189,9 @@ $(OFILES_SOURCES) : $(HFILES)
 
 # need to build soundbank first
 $(OFILES): $(SOUNDBANK)
+
+banner.bin:
+	@python3
 
 #---------------------------------------------------------------------------------
 # rule to build solution from music files

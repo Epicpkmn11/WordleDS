@@ -19,6 +19,8 @@ jobs:
     container: devkitpro/devkitarm
     name: Build with Docker using devkitARM
     steps:
+      - name: Install Python
+        run: sudo apt-get -y install python
       - name: Checkout repo
         uses: actions/checkout@v1
       - name: Build Wordle DS

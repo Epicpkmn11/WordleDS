@@ -31,6 +31,7 @@ enum class FlipOptions {
 extern std::vector<Sprite> letterSprites;
 extern std::vector<u16 *> letterGfx, letterGfxSub;
 extern Font mainFont;
+extern Sprite *refreshSprite;
 
 void initGraphics(void);
 

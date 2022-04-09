@@ -160,6 +160,8 @@ Game::~Game() {
 		letterSprites[i].palette(TilePalette::white).gfx(letterGfx[0]);
 	Sprite::update(true);
 
+	refreshSprite->visible(false).update();
+
 	_config.save();
 }
 
@@ -186,6 +188,11 @@ bool Game::run() {
 			}
 			if(_popupTimeout >= 0) {
 				_popupTimeout--;
+			}
+
+			if(!_showRefresh && time(NULL) / 24 / 60 / 60 != _today) { // New day, show refresh button
+				_showRefresh = true;
+				refreshSprite->visible(true).update();
 			}
 		} while(!pressed && key == Kbd::NOKEY);
 
@@ -214,6 +221,8 @@ bool Game::run() {
 						}
 
 						if(strlen(invalidMessage) > 0) {
+							if(_showRefresh)
+								refreshSprite->visible(false).update();
 							drawBgBottom(invalidMessage);
 							_popupTimeout = 120;
 							break;
@@ -242,6 +251,8 @@ bool Game::run() {
 					_guess = u"";
 					_currentGuess++;
 				} else {
+					if(_showRefresh)
+						refreshSprite->visible(false).update();
 					drawBgBottom(_guess.length() < WORD_LEN ? tooShortMessage : notWordMessage);
 					_popupTimeout = 120;
 				}
@@ -274,6 +285,8 @@ bool Game::run() {
 				bool showKeyboard = _kbd.visible();
 				if(showKeyboard)
 					_kbd.hide();
+				if(_showRefresh)
+					refreshSprite->visible(false).update();
 
 				if(touch.px < 24)
 					howtoMenu();
@@ -284,6 +297,11 @@ bool Game::run() {
 
 				if(showKeyboard)
 					_kbd.show();
+				if(_showRefresh)
+					refreshSprite->visible(true).update();
+			} else if(_showRefresh && _popupTimeout == -1 && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
+				// Refresh button
+				return true;
 			}
 		}
 
@@ -310,6 +328,8 @@ bool Game::run() {
 				fclose(file);
 			}
 
+			if(_showRefresh)
+				refreshSprite->visible(false).update();
 			if(_won) {
 				drawBgBottom(victoryMessages[_currentGuess - 1]);
 				for(int i = 0; i < 180; i++)
@@ -334,6 +354,8 @@ bool Game::run() {
 
 				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
+			if(_showRefresh)
+				refreshSprite->visible(true).update();
 			mainFont.clear(false).update(false);
 
 			// Show stats

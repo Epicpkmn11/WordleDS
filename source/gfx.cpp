@@ -6,6 +6,7 @@
 #include "bgTop.h"
 #include "letterTiles.h"
 #include "main_nftr.h"
+#include "refreshButton.h"
 
 #include <array>
 #include <nds.h>
@@ -14,6 +15,7 @@
 std::vector<Sprite> letterSprites;
 std::vector<u16 *> letterGfx, letterGfxSub;
 Font mainFont;
+Sprite *refreshSprite = nullptr;
 
 constexpr std::array<std::array<u16, 16 * 5>, 2> letterPalettes = {{
 	{
@@ -88,6 +90,13 @@ void initGraphics() {
 		letterSprites.back().move((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, (25 + (167 - (MAX_GUESSES * 24 + (MAX_GUESSES - 1) * 2)) / 2 - 4) + (i / WORD_LEN) * 26).gfx(letterGfx[0]);
 	}
 	Sprite::update(true);
+
+	if(refreshSprite)
+		delete refreshSprite;
+	refreshSprite = new Sprite(false, SpriteSize_64x64, SpriteColorFormat_16Color);
+	u16 *refreshGfx = oamAllocateGfx(&oamSub, SpriteSize_64x64, SpriteColorFormat_16Color);
+	tonccpy(refreshGfx, refreshButtonTiles, refreshButtonTilesLen);
+	refreshSprite->move(96, 36).visible(false).gfx(refreshGfx);
 
 	mainFont = std::move(Font(main_nftr, main_nftr_size));
 }

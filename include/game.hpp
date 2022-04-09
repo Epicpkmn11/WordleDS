@@ -18,6 +18,7 @@ class Game {
 	int _popupTimeout = -1;
 	bool _won = false;
 	bool _statsSaved = false;
+	bool _showRefresh = false;
 	bool _bootstubExists;
 	std::u16string _knownLetters, _knownPositions; // for hard mode
 

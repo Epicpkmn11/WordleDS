@@ -32,7 +32,7 @@ extern std::vector<Sprite> letterSprites;
 extern std::vector<u16 *> letterGfx, letterGfxSub;
 extern Font mainFont;
 
-void initGraphics(bool altPalette);
+void initGraphics(void);
 
 void setPalettes(bool altPalette);
 

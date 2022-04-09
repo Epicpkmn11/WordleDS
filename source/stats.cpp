@@ -1,6 +1,7 @@
 #include "stats.hpp"
 #include "defines.hpp"
 #include "font.hpp"
+#include "game.hpp"
 #include "gfx.hpp"
 #include "kbd.hpp"
 #include "tonccpy.h"
@@ -15,19 +16,17 @@
 #include <nds.h>
 #include <qrencode.h>
 
-std::vector<TilePalette> check(const std::u16string &guess, Kbd *kbd);
-std::string shareMessage(const Config &config);
-
+extern Game *game;
 
 void showQr(const Config &config) {
 	// Ensure the game is done
 	std::vector<TilePalette> allCorrect;
 	for(int i = 0; i < WORD_LEN; i++)
 		allCorrect.push_back(TilePalette::green);
-	if(config.boardState().size() < MAX_GUESSES && check(Font::utf8to16(config.boardState().back()), nullptr) != allCorrect)
+	if(config.boardState().size() < MAX_GUESSES && game->check(Font::utf8to16(config.boardState().back())) != allCorrect)
 		return;
 
-	std::string str = shareMessage(config);
+	std::string str = game->shareMessage();
 
 	QRcode *qr = QRcode_encodeString(str.c_str(), 0, QR_ECLEVEL_L, QR_MODE_8, true);
 

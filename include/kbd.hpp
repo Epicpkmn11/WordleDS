@@ -34,6 +34,7 @@ public:
 	};
 
 	Kbd(void);
+	~Kbd(void);
 
 	char16_t get(void);
 

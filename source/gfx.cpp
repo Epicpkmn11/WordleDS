@@ -48,7 +48,7 @@ constexpr std::array<std::array<u16, 16>, 2> fontPal = {{
 	}
 }};
 
-void initGraphics(bool altPalette) {
+void initGraphics() {
 	videoSetMode(MODE_5_2D);
 	videoSetModeSub(MODE_5_2D);
 
@@ -90,8 +90,6 @@ void initGraphics(bool altPalette) {
 	Sprite::update(true);
 
 	mainFont = std::move(Font(main_nftr, main_nftr_size));
-
-	setPalettes(altPalette);
 }
 
 void setPalettes(bool altPalette) {

@@ -27,6 +27,14 @@ Kbd::Kbd() {
 	Sprite::update(false);
 }
 
+Kbd::~Kbd() {
+	for(const u16 *gfx : _gfx) {
+		oamFreeGfx(&oamSub, gfx);
+	}
+	oamFreeGfx(&oamSub, _backspaceGfx);
+	oamFreeGfx(&oamSub, _enterGfx);
+}
+
 char16_t Kbd::get() {
 	if(!_visible)
 		return SpecialKey::NOKEY;

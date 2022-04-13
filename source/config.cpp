@@ -49,6 +49,8 @@ Config::Config(const std::string &path) : _path(path) {
 			_hardMode = json["settings"]["hardMode"];
 		if(json["settings"].contains("altPalette") && json["settings"]["altPalette"].is_boolean())
 			_altPalette = json["settings"]["altPalette"];
+		if(json["settings"].contains("music") && json["settings"]["music"].is_boolean())
+			_music = json["settings"]["music"];
 	}
 }
 
@@ -64,7 +66,8 @@ void Config::save() {
 		}},
 		{"settings", {
 			{"hardMode", _hardMode},
-			{"altPalette", _altPalette}
+			{"altPalette", _altPalette},
+			{"music", _music}
 		}}
 	});
 

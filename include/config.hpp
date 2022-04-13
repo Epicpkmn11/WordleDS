@@ -19,6 +19,7 @@ class Config {
 	// Settings
 	bool _hardMode = false;
 	bool _altPalette = false;
+	bool _music = true;
 
 public:
 	Config(const std::string &path);
@@ -46,6 +47,8 @@ public:
 	Config &hardMode(bool hardMode) { _hardMode = hardMode; return *this; }
 	bool altPalette(void) const { return _altPalette; }
 	Config &altPalette(bool altPalette) { _altPalette = altPalette; return *this; }
+	bool music(void) const { return _music; }
+	Config &music(bool music) { _music = music; return *this; }
 };
 
 #endif // CONFIG_HPP

@@ -38,7 +38,7 @@ SOURCES  := source
 INCLUDES := include
 DATA     := data
 GRAPHICS := gfx
-AUDIO    :=
+AUDIO    := audio
 BANNER   := ../banner.bin
 
 # specify a directory which contains the nitro filesystem
@@ -59,7 +59,7 @@ LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project (order is important)
 #---------------------------------------------------------------------------------
-LIBS := -lqrencode -lfat -lnds9
+LIBS := -lqrencode -lfat -lmm9 -lnds9
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

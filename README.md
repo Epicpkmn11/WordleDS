@@ -15,3 +15,4 @@ Most other things such as the word length, starting day, and any text strings ar
 - [Pk11](https://github.com/Epicmn11): This DS port
 - [Josh Wardle](https://github.com/powerlanguage): The original Wordle
 - [lifehackerhansol](https://github.com/lifehackerhansol): animatedbannerpatch.py from [TWiLight Menu++](https://github.com/DS-Homebrew/TWiLightMenu)
+- [Rocket Robz](https://github.com/RocketRobz): Original music composition

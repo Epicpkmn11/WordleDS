@@ -11,6 +11,8 @@ All graphics are in the `gfx` folder and should mostly work fine if the PNGs are
 
 Most other things such as the word length, starting day, and any text strings are defined in `defines.hpp`.
 
+You can use a custom song by converting a module to a maxmod soundbank using `mmutil [module].it -d -oWordleDS.msl` (.mod, .xm, .s3m, and .it supported) and putting WordleDS.msl next to WordleDS.json.
+
 ## Credits
 - [Pk11](https://github.com/Epicmn11): This DS port
 - [Josh Wardle](https://github.com/powerlanguage): The original Wordle

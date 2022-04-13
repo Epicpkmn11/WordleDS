@@ -20,6 +20,7 @@ static_assert(MAX_GUESSES > 0 && MAX_GUESSES <= 6, "MAX_GUESSES must be 1-6");
 
 #define CONFIG_PATH "WordleDS.json"
 #define SCORE_PATH "WordleDS.txt"
+#define MUSIC_PATH "WordleDS.msl"
 
 // If changing the MAX_GUESSES, make sure to edit this array
 constexpr std::array<std::string_view, MAX_GUESSES> victoryMessages = {

@@ -16,7 +16,10 @@ Game *game;
 int main() {
 	bool fatInited = fatInitDefault();
 
-	mmInitDefaultMem((mm_addr)soundbank_bin);
+	if(access(MUSIC_PATH, F_OK) == 0)
+		mmInitDefault((char *)MUSIC_PATH);
+	else
+		mmInitDefaultMem((mm_addr)soundbank_bin);
 	mmLoad(MOD_MUSIC);
 	mmSetModuleVolume(800);
 	mmStart(MOD_MUSIC, MM_PLAY_LOOP);

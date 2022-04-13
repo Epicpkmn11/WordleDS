@@ -10,12 +10,7 @@
 Game *game;
 
 int main() {
-	if(!fatInitDefault()) {
-		consoleDemoInit();
-		printf("FAT init failed.");
-		while(1)
-			swiWaitForVBlank();
-	}
+	bool fatInited = fatInitDefault();
 
 	initGraphics();
 	game = new Game();
@@ -23,6 +18,9 @@ int main() {
 	// Show howto if first game
 	if(game->config().gamesPlayed() < 1)
 		howtoMenu();
+
+	if(!fatInited)
+		game->drawBgBottom("FAT init failed\nStats cannot be saved", 240);
 
 	// Loop game until returns false
 	while(game->run()) {

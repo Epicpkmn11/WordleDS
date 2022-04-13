@@ -22,13 +22,12 @@ class Game {
 	bool _bootstubExists;
 	std::u16string _knownLetters, _knownPositions; // for hard mode
 
-	void drawBgBottom(std::string_view msg) const;
-
 public:
 	Game(void);
 
 	~Game(void);
 
+	void drawBgBottom(std::string_view msg, int timeout);
 	std::vector<TilePalette> check(const std::u16string &guess);
 	std::string shareMessage(void);
 	bool run(void);

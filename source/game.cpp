@@ -17,7 +17,7 @@
 #include <nds.h>
 #include <time.h>
 
-void Game::drawBgBottom(std::string_view msg) const {
+void Game::drawBgBottom(std::string_view msg, int timeout = -1) {
 	swiWaitForVBlank();
 
 	mainFont.clear(false);
@@ -35,6 +35,9 @@ void Game::drawBgBottom(std::string_view msg) const {
 	}
 
 	mainFont.update(false);
+
+	if(timeout != -1)
+		_popupTimeout = timeout;
 }
 
 std::vector<TilePalette> Game::check(const std::u16string &_guess) {
@@ -149,9 +152,7 @@ Game::Game() : _config(CONFIG_PATH) {
 	if(_currentGuess == MAX_GUESSES && !_won)
 		_currentGuess++;
 
-	if(!_won && _currentGuess <= MAX_GUESSES)
-		_kbd.show();
-	else
+	if(_won || _currentGuess > MAX_GUESSES)
 		_statsSaved = true; // an already completed game was loaded, don't re-save
 }
 
@@ -166,6 +167,9 @@ Game::~Game() {
 }
 
 bool Game::run() {
+	if(!_won && _currentGuess <= MAX_GUESSES)
+		_kbd.show();
+
 	u16 pressed, held;
 	char16_t key = NOKEY;
 	touchPosition touch;
@@ -223,8 +227,7 @@ bool Game::run() {
 						if(strlen(invalidMessage) > 0) {
 							if(_showRefresh)
 								refreshSprite->visible(false).update();
-							drawBgBottom(invalidMessage);
-							_popupTimeout = 120;
+							drawBgBottom(invalidMessage, 120);
 							break;
 						}
 					}
@@ -253,8 +256,7 @@ bool Game::run() {
 				} else {
 					if(_showRefresh)
 						refreshSprite->visible(false).update();
-					drawBgBottom(_guess.length() < WORD_LEN ? tooShortMessage : notWordMessage);
-					_popupTimeout = 120;
+					drawBgBottom(_guess.length() < WORD_LEN ? tooShortMessage : notWordMessage, 120);
 				}
 				break;
 			case Kbd::BACKSPACE:
@@ -287,6 +289,7 @@ bool Game::run() {
 					_kbd.hide();
 				if(_showRefresh)
 					refreshSprite->visible(false).update();
+				mainFont.clear(false).update(false);
 
 				if(touch.px < 24)
 					howtoMenu();

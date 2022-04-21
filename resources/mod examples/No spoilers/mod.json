@@ -15,16 +15,18 @@
 		"yellowAlt": "🟦",
 		"white": "⬜"
 	},
-	"howtoWords": [
-		"WEARY",
-		"PILLS",
-		"VAGUE"
-	],
-	"howtoColors": [
-		"green", "white", "white", "white", "white",
-		"white", "yellow", "white", "white", "white",
-		"white", "white", "white", "gray", "white"
-	],
+	"howto": {
+		"words": [
+			"WEARY",
+			"PILLS",
+			"VAGUE"
+		],
+		"colors": [
+			"green", "white", "white", "white", "white",
+			"white", "yellow", "white", "white", "white",
+			"white", "white", "white", "gray", "white"
+		]
+	},
 	"victoryMessages": [
 		"Genius",
 		"Magnificent",

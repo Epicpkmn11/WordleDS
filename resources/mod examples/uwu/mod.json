@@ -15,16 +15,18 @@
 		"yellowAlt": ">_< ",
 		"white": "T_T "
 	},
-	"howtoWords": [
-		"UWU",
-		"WWW",
-		"OWO"
-	],
-	"howtoColors": [
-		"green", "white", "green",
-		"white", "yellow", "white",
-		"white", "white", "white"
-	],
+	"howto": {
+		"words": [
+			"UWU",
+			"WWW",
+			"OWO"
+		],
+		"colors": [
+			"green", "white", "green",
+			"white", "yellow", "white",
+			"white", "white", "white"
+		]
+	},
 	"victoryMessages": [
 		"Genius owo",
 		"Magnifisent q///q-☆",

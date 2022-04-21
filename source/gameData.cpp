@@ -95,34 +95,36 @@ GameData::GameData(const std::string &folder) {
 				_emojiWhite = json["emoji"]["white"];
 		}
 
-		size_t howtoWordsSize = 15;
-		if(json.contains("howtoWords") && json["howtoWords"].is_array() && json["howtoWords"].size() > 0 && json["howtoWords"].size() <= 3) {
-			_howtoWords.clear();
-			howtoWordsSize = 0;
-			for(const auto &howtoWord : json["howtoWords"]) {
-				if(howtoWord.is_string()) {
-					std::u16string u16word = Font::utf8to16(howtoWord.get_ref<const std::string &>());
-					sassert(u16word.size() > 0 && u16word.size() <= 9, "How to words must be between 1\nand 9 (inclusive) characters\n\n%s is %d", howtoWord.get_ref<const std::string &>().c_str(), u16word.size());
-					_howtoWords.push_back(u16word);
-					howtoWordsSize += u16word.size();
+		if(json.contains("howto") && json["howto"].is_object()) {
+			size_t howtoWordsSize = 15;
+			if(json["howto"].contains("words") && json["howto"]["words"].is_array() && json["howto"]["words"].size() > 0 && json["howto"]["words"].size() <= 3) {
+				_howtoWords.clear();
+				howtoWordsSize = 0;
+				for(const auto &howtoWord : json["howto"]["words"]) {
+					if(howtoWord.is_string()) {
+						std::u16string u16word = Font::utf8to16(howtoWord.get_ref<const std::string &>());
+						sassert(u16word.size() > 0 && u16word.size() <= 9, "How to words must be between 1\nand 9 (inclusive) characters\n\n%s is %d", howtoWord.get_ref<const std::string &>().c_str(), u16word.size());
+						_howtoWords.push_back(u16word);
+						howtoWordsSize += u16word.size();
+					}
 				}
 			}
-		}
 
-		if(json.contains("howtoColors") && json["howtoColors"].is_array()) {
-			sassert(json["howtoColors"].size() == howtoWordsSize, "Length of how to colors and\nwords must match\n\n(words is %d, colors is %d)", howtoWordsSize, json["howtoColors"].size());
-			_howtoColors.clear();
-			for(const auto &howtoColor : json["howtoColors"]) {
-				if(howtoColor == "white") {
-					_howtoColors.push_back(TilePalette::whiteDark);
-				} else if(howtoColor == "green") {
-					_howtoColors.push_back(TilePalette::green);
-				} else if(howtoColor == "yellow") {
-					_howtoColors.push_back(TilePalette::yellow);
-				} else if(howtoColor == "gray") {
-					_howtoColors.push_back(TilePalette::gray);
-				} else {
-					sassert(false, "Invalid how to color\n(%s)", howtoColor.get_ref<const std::string &>().c_str());
+			if(json["howto"].contains("colors") && json["howto"]["colors"].is_array()) {
+				sassert(json["howto"]["colors"].size() == howtoWordsSize, "Length of how to colors and\nwords must match\n\n(words is %d, colors is %d)", howtoWordsSize, json["howto"]["colors"].size());
+				_howtoColors.clear();
+				for(const auto &howtoColor : json["howto"]["colors"]) {
+					if(howtoColor == "white") {
+						_howtoColors.push_back(TilePalette::whiteDark);
+					} else if(howtoColor == "green") {
+						_howtoColors.push_back(TilePalette::green);
+					} else if(howtoColor == "yellow") {
+						_howtoColors.push_back(TilePalette::yellow);
+					} else if(howtoColor == "gray") {
+						_howtoColors.push_back(TilePalette::gray);
+					} else {
+						sassert(false, "Invalid how to color\n(%s)", howtoColor.get_ref<const std::string &>().c_str());
+					}
 				}
 			}
 		}

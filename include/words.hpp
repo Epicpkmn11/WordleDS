@@ -1,9 +1,12 @@
 #ifndef WORDS_HPP
 #define WORDS_HPP
 
-#include <array>
+#include <string>
+#include <vector>
 
-extern std::array<const char16_t *, 2309> choices;
-extern std::array<const char16_t *, 10638> guesses;
+namespace Words {
+	extern std::vector<std::u16string> choices;
+	extern std::vector<std::u16string> guesses;
+}
 
 #endif // WORDS_HPP

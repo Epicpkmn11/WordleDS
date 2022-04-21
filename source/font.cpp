@@ -9,9 +9,25 @@
 
 u8 Font::textBuf[2][SCREEN_WIDTH * SCREEN_HEIGHT];
 
-Font::Font(const u8 *nftr, u32 nftrSize) {
+Font::Font(const char *path, const u8 *fallback) {
+	u8 *buffer = nullptr;
+	FILE *file = fopen(path, "rb");
+	if(file) {
+		fseek(file, 0, SEEK_END);
+		size_t fsize = ftell(file);
+		fseek(file, 0, SEEK_SET);
+		buffer = new u8[fsize];
+		fread(buffer, 1, fsize, file);
+		fclose(file);
+	}
+	const u8 *basePtr = buffer != nullptr ? buffer : fallback;
+	const u8 *ptr = basePtr;
+
+	u32 nftrSize;
+	tonccpy(&nftrSize, ptr + 8, 4);
+
 	// Skip font info
-	const u8 *ptr = nftr + 0x14 + nftr[0x14];
+	ptr += 0x14 + ptr[0x14];
 
 	// Load glyph info
 	u32 chunkSize;
@@ -25,27 +41,39 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 	// Load character glyphs
 	tileAmount = (chunkSize - 0x10) / tileSize;
 	ptr += 4;
-	fontTiles = (u8 *)ptr;
+	if(buffer) {
+		fontTilesFile = std::make_unique<u8[]>(tileSize * tileAmount);
+		tonccpy(fontTilesFile.get(), ptr, tileSize * tileAmount);
+		fontTiles = fontTilesFile.get();
+	} else {
+		fontTiles = ptr;
+	}
 
 	// Load character widths
-	ptr = nftr + 0x24;
+	ptr = basePtr + 0x24;
 	u32 locHDWC;
 	tonccpy(&locHDWC, ptr, 4);
-	ptr = nftr + locHDWC - 4;
+	ptr = basePtr + locHDWC - 4;
 	tonccpy(&chunkSize, ptr, 4);
 	ptr += 4 + 8;
-	fontWidths = (u8 *)ptr;
+	if(buffer) {
+		fontWidthsFile = std::make_unique<u8[]>(3 * tileAmount);
+		tonccpy(fontWidthsFile.get(), ptr, 3 * tileAmount);
+		fontWidths = fontWidthsFile.get();
+	} else {
+		fontWidths = ptr;
+	}
 
 	// Load character maps
 	fontMap = std::make_unique<u16[]>(tileAmount);
 
-	ptr = nftr + 0x28;
+	ptr = basePtr + 0x28;
 	u32 locPAMC, mapType;
 	tonccpy(&locPAMC, ptr, 4);
 
 	while(locPAMC < nftrSize && locPAMC != 0) {
 		u16 firstChar, lastChar;
-		ptr = nftr + locPAMC;
+		ptr = basePtr + locPAMC;
 		tonccpy(&firstChar, ptr, 2);
 		ptr += 2;
 		tonccpy(&lastChar, ptr, 2);
@@ -92,6 +120,9 @@ Font::Font(const u8 *nftr, u32 nftrSize) {
 	questionMark = getCharIndex(0xFFFD);
 	if(questionMark == 0)
 		questionMark = getCharIndex('?');
+
+	if(buffer)
+		delete[] buffer;
 }
 
 u16 Font::getCharIndex(char16_t c) const {
@@ -247,12 +278,11 @@ ITCM_CODE Font &Font::print(int x, int y, bool top, std::u16string_view text, Al
 	return *this;
 }
 
-Font &Font::clear(bool top) {
+void Font::clear(bool top) {
 	toncset(textBuf[top], 0, SCREEN_WIDTH * SCREEN_HEIGHT);
-	return *this;
 }
 
-Font &Font::update(bool top, bool preserve) {
+void Font::update(bool top, bool preserve) {
 	u8 *dst = (u8 *)bgGetGfxPtr(top ? BG(2) : BG_SUB(2));
 
 	if(preserve) {
@@ -262,5 +292,4 @@ Font &Font::update(bool top, bool preserve) {
 	}
 
 	tonccpy(dst, textBuf[top], SCREEN_WIDTH * SCREEN_HEIGHT);
-	return *this;
 }

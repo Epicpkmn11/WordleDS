@@ -1,12 +1,8 @@
 #include "howto.hpp"
-#include "defines.hpp"
+#include "game.hpp"
 #include "gfx.hpp"
 #include "sprite.hpp"
 
-#include "bgBottom.h"
-#include "bgTop.h"
-#include "howtoBottom.h"
-#include "howtoTop.h"
 #include "tonccpy.h"
 
 #include <array>
@@ -15,28 +11,39 @@
 
 void howtoMenu() {
 	// Change to howto menu background and hide letterSprites
-	swiWaitForVBlank();
-	tonccpy(bgGetGfxPtr(BG(0)), howtoTopTiles, howtoTopTilesLen);
-	tonccpy(BG_PALETTE, howtoTopPal, howtoTopPalLen);
-	tonccpy(bgGetMapPtr(BG(0)), howtoTopMap, howtoTopMapLen);
+	game->data().howtoTop()
+		.decompressTiles(bgGetGfxPtr(BG(0)))
+		.decompressMap(bgGetMapPtr(BG(0)))
+		.decompressPal(BG_PALETTE);
+	game->data().howtoBottom()
+		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+		.decompressMap(bgGetMapPtr(BG_SUB(0)))
+		.decompressPal(BG_PALETTE_SUB);
 
-	tonccpy(bgGetGfxPtr(BG_SUB(0)), howtoBottomTiles, howtoBottomTilesLen);
-	tonccpy(BG_PALETTE_SUB, howtoBottomPal, howtoBottomPalLen);
-	tonccpy(bgGetMapPtr(BG_SUB(0)), howtoBottomMap, howtoBottomMapLen);
-
-	for(Sprite &sprite : letterSprites)
+	for(Sprite &sprite : game->letterSprites())
 		sprite.visible(false);
 	Sprite::update(true);
 
-	const std::u16string words = u"WEARY" "PILLS" "VAGUE";
 	std::vector<Sprite> howtoSprites;
-	for(uint i = 0; i < words.length(); i++) {
-		howtoSprites.emplace_back(false, SpriteSize_32x32, SpriteColorFormat_16Color);
-		howtoSprites.back().move(1 + (i % 5) * 26, 22 + (i / 5 * 60)).gfx(letterGfxSub[letterIndex(words[i]) + 1]);
+	for(size_t i = 0; i < game->data().howtoWords().size(); i++) {
+		for(size_t j = 0; j < game->data().howtoWords(i).size(); j++) {
+			howtoSprites.emplace_back(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+			howtoSprites.back()
+				.move(1 + j * 26, 22 + i * 60)
+				.gfx(game->data().letterGfxSub(game->kbd().letterIndex(game->data().howtoWords(i)[j]) + 1))
+				.palette(TilePalette::whiteDark);
+		}
 	}
 
-	std::array<Sprite, 3> toFlip = {howtoSprites[0], howtoSprites[6], howtoSprites[13]};
-	flipSprites(toFlip.data(), toFlip.size(), {TilePalette::green, TilePalette::yellow, TilePalette::gray});
+	std::vector<Sprite> toFlip;
+	std::vector<TilePalette> flipColors;
+	for(size_t i = 0; i < game->data().howtoColors().size(); i++) {
+		if(game->data().howtoColors(i) != TilePalette::whiteDark) {
+			toFlip.push_back(howtoSprites[i]);
+			flipColors.push_back(game->data().howtoColors(i));
+		}
+	}
+	Gfx::flipSprites(toFlip.data(), toFlip.size(), flipColors);
 
 	u16 pressed;
 	touchPosition touch;
@@ -47,17 +54,8 @@ void howtoMenu() {
 		touchRead(&touch);
 	} while(!((pressed & (KEY_A | KEY_B)) || ((pressed & KEY_TOUCH) && (touch.px > 232 && touch.py < 24))));
 
-	// Restore normal BG and letterSprites
-	swiWaitForVBlank();
-	tonccpy(bgGetGfxPtr(BG(0)), bgTopTiles, bgTopTilesLen);
-	tonccpy(BG_PALETTE, bgTopPal, bgTopPalLen);
-	tonccpy(bgGetMapPtr(BG(0)), bgTopMap, bgTopMapLen);
-
-	tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
-	tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
-	tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
-
-	for(Sprite &sprite : letterSprites)
+	// Restore letterSprites
+	for(Sprite &sprite : game->letterSprites())
 		sprite.visible(true);
 	Sprite::update(true);
 }

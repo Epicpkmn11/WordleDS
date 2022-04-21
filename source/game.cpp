@@ -1,40 +1,38 @@
 #include "game.hpp"
-#include "defines.hpp"
 #include "font.hpp"
 #include "gfx.hpp"
 #include "howto.hpp"
 #include "kbd.hpp"
 #include "settings.hpp"
-#include "stats.hpp"
 #include "tonccpy.h"
-#include "words.hpp"
-
-#include "bgBottom.h"
-#include "bgBottomBox.h"
 
 #include <algorithm>
 #include <map>
 #include <nds.h>
 #include <time.h>
 
+Game *game;
+
 void Game::drawBgBottom(std::string_view msg, int timeout = -1) {
 	swiWaitForVBlank();
 
-	mainFont.clear(false);
+	Font::clear(false);
 
 	if(msg.size() == 0) {
-		tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomTiles, bgBottomTilesLen);
-		tonccpy(BG_PALETTE_SUB, bgBottomPal, bgBottomPalLen);
-		tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomMap, bgBottomMapLen);
+		_data.bgBottom()
+			.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+			.decompressMap(bgGetMapPtr(BG_SUB(0)))
+			.decompressPal(BG_PALETTE_SUB);
 	} else {
-		tonccpy(bgGetGfxPtr(BG_SUB(0)), bgBottomBoxTiles, bgBottomBoxTilesLen);
-		tonccpy(BG_PALETTE_SUB, bgBottomBoxPal, bgBottomBoxPalLen);
-		tonccpy(bgGetMapPtr(BG_SUB(0)), bgBottomBoxMap, bgBottomBoxMapLen);
+		_data.bgBottomBox()
+			.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+			.decompressMap(bgGetMapPtr(BG_SUB(0)))
+			.decompressPal(BG_PALETTE_SUB);
 
-		mainFont.palette(TEXT_WHITE).print(0, 56 - mainFont.calcHeight(msg) / 2, false, msg, Alignment::center);
+		_data.mainFont().palette(TEXT_WHITE).print(0, 56 - _data.mainFont().calcHeight(msg) / 2, false, msg, Alignment::center);
 	}
 
-	mainFont.update(false);
+	Font::update(false);
 
 	if(timeout != -1)
 		_popupTimeout = timeout;
@@ -77,53 +75,49 @@ std::vector<TilePalette> Game::check(const std::u16string &_guess) {
 	return res;
 }
 
-std::string Game::shareMessage() {
-	char str[256];
-
-	sprintf(str, APP_NAME " %lld %c/%d%s\n\n",
-		_config.lastPlayed() - FIRST_DAY,
-		_config.guessCounts().back() > MAX_GUESSES ? 'X' : '0' + _config.guessCounts().back(),
-		MAX_GUESSES,
-		_config.hardMode() ? "*" : "");
-
-	const char *green = _config.altPalette() ? "🟧" : "🟩";
-	const char *yellow = _config.altPalette() ? "🟦" : "🟨";
-
-	for(const std::string &_guess : _config.boardState()) {
-		std::vector<TilePalette> colors = check(Font::utf8to16(_guess));
-		for(uint i = 0; i < colors.size(); i++)
-			strcat(str, colors[i] == TilePalette::green ? green : (colors[i] == TilePalette::yellow ? yellow : "⬜"));
-
-		strcat(str, "\n");
-	}
-
-	return str;
-}
-
-Game::Game() : _config(CONFIG_PATH) {
+Game::Game() : _stats(DATA_PATH + settings->mod() + STATS_JSON), _data(settings->mod()), _kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()) {
 	// Get random word based on date
 	_today = time(NULL) / 24 / 60 / 60;
-	_answer = choices[(_today - FIRST_DAY) % choices.size()];
+	_answer = _data.choices((_today - _data.firstDay()) % _data.choices().size());
 
-	for(int i = 0; i < WORD_LEN; i++)
+	for(size_t i = 0; i < _answer.size(); i++)
 		_knownPositions += u' ';
 
-	setPalettes(_config.altPalette());
+	// Create sprites
+	for(size_t i = 0; i < _answer.size() * _data.maxGuesses(); i++) {
+		_letterSprites.emplace_back(true, SpriteSize_32x32, SpriteColorFormat_16Color);
+		_letterSprites.back().move(
+			(((256 - (_answer.size() * 24 + (_answer.size() - 1) * 2)) / 2) - 4) + (i % _answer.size()) * 26,
+			(25 + (167 - (_data.maxGuesses() * 24 + (_data.maxGuesses() - 1) * 2)) / 2 - 4) + (i / _answer.size()) * 26
+		).gfx(_data.letterGfx(0));
+	}
+	Sprite::update(true);
+
+	_data.setPalettes(settings->altPalette());
+
+	_data.bgTop()
+		.decompressTiles(bgGetGfxPtr(BG(0)))
+		.decompressMap(bgGetMapPtr(BG(0)))
+		.decompressPal(BG_PALETTE);
+	_data.bgBottom()
+		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+		.decompressMap(bgGetMapPtr(BG_SUB(0)))
+		.decompressPal(BG_PALETTE_SUB);
 
 	// Check if bootstub exists
 	extern char *fake_heap_end;
 	__bootstub *bootstub = (struct __bootstub *)fake_heap_end;
 	_bootstubExists = bootstub->bootsig == BOOTSIG;
 
-	// Reload game state from _config
-	if(_config.boardState().size() > 0) {
+	// Reload game state from config
+	if(_stats.boardState().size() > 0) {
 		std::vector<TilePalette> palettes;
-		for(const std::string &guess8 : _config.boardState()) {
+		for(const std::string &guess8 : _stats.boardState()) {
 			std::u16string _guess = Font::utf8to16(guess8);
 
-			Sprite *sprite = &letterSprites[_currentGuess * WORD_LEN];
+			Sprite *sprite = &_letterSprites[_currentGuess * _answer.size()];
 			for(char letter : _guess) {
-				(sprite++)->palette(TilePalette::whiteDark).gfx(letterGfx[letterIndex(letter) + 1]);
+				(sprite++)->palette(TilePalette::whiteDark).gfx(_data.letterGfx(_kbd.letterIndex(letter) + 1));
 			}
 			std::vector<TilePalette> newPalettes = check(_guess);
 			palettes.reserve(palettes.size() + newPalettes.size());
@@ -132,7 +126,7 @@ Game::Game() : _config(CONFIG_PATH) {
 			Sprite::update(false);
 
 			// Save info needed for hard mode
-			if(_config.hardMode()) {
+			if(settings->hardMode()) {
 				_knownLetters = u"";
 				for(uint i = 0; i < _guess.size(); i++) {
 					if(newPalettes[i] != TilePalette::gray)
@@ -143,31 +137,31 @@ Game::Game() : _config(CONFIG_PATH) {
 			}
 
 			_currentGuess++;
-			if(_currentGuess >= MAX_GUESSES)
+			if(_currentGuess >= _data.maxGuesses())
 				break;
 		}
-		flipSprites(letterSprites.data(), _currentGuess * WORD_LEN, palettes);
+		Gfx::flipSprites(_letterSprites.data(), _currentGuess * _answer.size(), palettes);
 	}
 
-	if(_currentGuess == MAX_GUESSES && !_won)
+	if(_currentGuess == _data.maxGuesses() && !_won)
 		_currentGuess++;
 
-	if(_won || _currentGuess > MAX_GUESSES)
+	if(_won || _currentGuess > _data.maxGuesses())
 		_statsSaved = true; // an already completed game was loaded, don't re-save
 }
 
 Game::~Game() {
-	for(int i = 0; i < WORD_LEN * MAX_GUESSES; i++)
-		letterSprites[i].palette(TilePalette::white).gfx(letterGfx[0]);
+	for(size_t i = 0; i < _answer.size() * _data.maxGuesses(); i++)
+		_letterSprites[i].palette(TilePalette::white).gfx(_data.letterGfx(0));
 	Sprite::update(true);
 
-	refreshSprite->visible(false).update();
+	_data.refreshSprite().visible(false).update();
 
-	_config.save();
+	_stats.save();
 }
 
 bool Game::run() {
-	if(!_won && _currentGuess <= MAX_GUESSES)
+	if(!_won && _currentGuess <= _data.maxGuesses())
 		_kbd.show();
 
 	u16 pressed, held;
@@ -188,7 +182,7 @@ bool Game::run() {
 			if(_popupTimeout == 0) { // Reset to no message box
 				drawBgBottom("");
 				if(_showRefresh)
-					refreshSprite->visible(true).update();
+					_data.refreshSprite().visible(true).update();
 			}
 			if(_popupTimeout >= 0) {
 				_popupTimeout--;
@@ -196,7 +190,7 @@ bool Game::run() {
 
 			if(!_showRefresh && time(NULL) / 24 / 60 / 60 != _today) { // New day, show refresh button
 				_showRefresh = true;
-				refreshSprite->visible(true).update();
+				_data.refreshSprite().visible(true).update();
 			}
 		} while(!pressed && key == Kbd::NOKEY);
 
@@ -204,29 +198,30 @@ bool Game::run() {
 		switch(key) {
 			case Kbd::NOKEY:
 				break;
+
 			case Kbd::ENTER:
 				// Ensure _guess is a choice or valid _guess
-				if(std::find(choices.begin(), choices.end(), _guess) != choices.end()
-				|| std::binary_search(guesses.begin(), guesses.end(), _guess)) {
+				if(std::find(_data.choices().begin(), _data.choices().end(), _guess) != _data.choices().end()
+				|| std::binary_search(_data.guesses().begin(), _data.guesses().end(), _guess)) {
 					// check if meets hard mode requirements
-					if(_config.hardMode()) {
+					if(settings->hardMode()) {
 						char invalidMessage[64] = {0};
 						for(char16_t letter : _knownLetters) {
 							if(std::count(_knownLetters.begin(), _knownLetters.end(), letter) > std::count(_guess.begin(), _guess.end(), letter)) {
-								sprintf(invalidMessage, guessMustContainX, Font::utf16to8(letter).c_str());
+								sprintf(invalidMessage, _data.guessMustContainX().c_str(), Font::utf16to8(letter).c_str());
 								break;
 							}
 						}
 						for(uint i = 0; i < _knownPositions.size(); i++) {
 							if(_knownPositions[i] != u' ' && _guess[i] != _knownPositions[i]) {
-								sprintf(invalidMessage, nthMustBeX, i + 1, numberSuffix(i + 1), Font::utf16to8(_knownPositions[i]).c_str());
+								sprintf(invalidMessage, _data.nthMustBeX().c_str(), i + 1, _data.numberSuffix(i + 1).c_str(), Font::utf16to8(_knownPositions[i]).c_str());
 								break;
 							}
 						}
 
 						if(strlen(invalidMessage) > 0) {
 							if(_showRefresh)
-								refreshSprite->visible(false).update();
+								_data.refreshSprite().visible(false).update();
 							drawBgBottom(invalidMessage, 120);
 							break;
 						}
@@ -235,11 +230,11 @@ bool Game::run() {
 					// Find status of the letters
 					std::vector<TilePalette> newPalettes = check(_guess);
 					_won = std::find_if_not(newPalettes.begin(), newPalettes.end(), [](TilePalette a) { return a == TilePalette::green; }) == newPalettes.end();
-					flipSprites(&letterSprites[_currentGuess * WORD_LEN], WORD_LEN, newPalettes);
+					Gfx::flipSprites(&_letterSprites[_currentGuess * _answer.size()], _answer.size(), newPalettes);
 					Sprite::update(false);
 
 					// Save info needed for hard mode
-					if(_config.hardMode()) {
+					if(settings->hardMode()) {
 						_knownLetters = u"";
 						for(uint i = 0; i < _guess.size(); i++) {
 							if(newPalettes[i] != TilePalette::gray)
@@ -249,26 +244,28 @@ bool Game::run() {
 						}
 					}
 
-					_config.boardState(Font::utf16to8(_guess));
+					_stats.boardState(Font::utf16to8(_guess)).save();
 
 					_guess = u"";
 					_currentGuess++;
 				} else {
 					if(_showRefresh)
-						refreshSprite->visible(false).update();
-					drawBgBottom(_guess.length() < WORD_LEN ? tooShortMessage : notWordMessage, 120);
+						_data.refreshSprite().visible(false).update();
+					drawBgBottom(_guess.size() < _answer.size() ? _data.tooShortMessage() : _data.notWordMessage(), 120);
 				}
 				break;
+
 			case Kbd::BACKSPACE:
-				if(_guess.length() > 0) {
+				if(_guess.size() > 0) {
 					_guess.pop_back();
-					letterSprites[_currentGuess * WORD_LEN + _guess.length()].palette(TilePalette::white).gfx(letterGfx[0]).update();
+					_letterSprites[_currentGuess * _answer.size() + _guess.size()].palette(TilePalette::white).gfx(_data.letterGfx(0)).update();
 				}
 				break;
+
 			default: // Letter
-				if(_guess.length() < WORD_LEN) {
-					Sprite sprite = letterSprites[_currentGuess * WORD_LEN + _guess.length()];
-					sprite.palette(TilePalette::whiteDark).gfx(letterGfx[letterIndex(key) + 1]).affineIndex(0, false);
+				if(_guess.size() < _answer.size()) {
+					Sprite sprite = _letterSprites[_currentGuess * _answer.size() + _guess.size()];
+					sprite.palette(TilePalette::whiteDark).gfx(_data.letterGfx(_kbd.letterIndex(key) + 1)).affineIndex(0, false);
 					for(int i = 0; i < 6; i++) {
 						swiWaitForVBlank();
 						sprite.rotateScale(0, 1.1f - .1f / (6 - i), 1.1f - .1f / (6 - i)).update();
@@ -284,85 +281,107 @@ bool Game::run() {
 
 		if(pressed & KEY_TOUCH) {
 			if(touch.py < 24) { // One of the icons at the top
+				swiWaitForVBlank();
+
 				bool showKeyboard = _kbd.visible();
 				if(showKeyboard)
 					_kbd.hide();
 				if(_showRefresh)
-					refreshSprite->visible(false).update();
-				mainFont.clear(false).update(false);
+					_data.refreshSprite().visible(false).update();
+				Font::clear(false);
+				Font::update(false);
 
 				if(touch.px < 24)
 					howtoMenu();
 				else if(touch.px > 116 && touch.px < 140)
-					statsMenu(_config, _won);
+					_stats.showMenu();
 				else if(touch.px > 232)
-					settingsMenu(_config);
+					settings->showMenu();
 
 				if(showKeyboard)
 					_kbd.show();
 				if(_showRefresh)
-					refreshSprite->visible(true).update();
+					_data.refreshSprite().visible(true).update();
+
+				// Restore normal background
+				swiWaitForVBlank();
+				_data.bgTop()
+					.decompressTiles(bgGetGfxPtr(BG(0)))
+					.decompressMap(bgGetMapPtr(BG(0)))
+					.decompressPal(BG_PALETTE);
+				_data.bgBottom()
+					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+					.decompressMap(bgGetMapPtr(BG_SUB(0)))
+					.decompressPal(BG_PALETTE_SUB);
 			} else if(_showRefresh && _popupTimeout == -1 && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
 				return true;
 			}
 		}
 
-		if(!_statsSaved && (_won || _currentGuess >= MAX_GUESSES)) {
+		if(!_statsSaved && (_won || _currentGuess >= _data.maxGuesses())) {
 			_statsSaved = true;
 
-			if(_currentGuess == MAX_GUESSES && !_won)
+			if(_currentGuess == _data.maxGuesses() && !_won)
 				_currentGuess++;
 
 			_kbd.hide();
 
 			// Update stats
-			_config.lastPlayed(_today);
-			_config.guessCounts(_currentGuess);
-			_config.gamesPlayed(_config.gamesPlayed() + 1);
-			_config.streak(_won ? _config.streak() + 1 : 0);
-			_config.save();
+			_stats.lastPlayed(_today);
+			_stats.guessCounts(_currentGuess);
+			_stats.gamesPlayed(_stats.gamesPlayed() + 1);
+			_stats.streak(_won ? _stats.streak() + 1 : 0);
+			_stats.save();
 
 			// Generate sharable txt
-			FILE *file = fopen(SCORE_PATH, "w");
+			FILE *file = fopen((DATA_PATH + settings->mod() + "/share.txt").c_str(), "w");
 			if(file) {
-				std::string str = shareMessage();
+				std::string str = _stats.shareMessage();
 				fwrite(str.c_str(), 1, str.size(), file);
 				fclose(file);
 			}
 
 			if(_showRefresh)
-				refreshSprite->visible(false).update();
+				_data.refreshSprite().visible(false).update();
 			if(_won) {
-				drawBgBottom(victoryMessages[_currentGuess - 1]);
+				drawBgBottom(_data.victoryMessage(_currentGuess - 1));
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				drawBgBottom(lossMessage);
+				drawBgBottom(_data.lossMessage());
 
 				std::vector<Sprite> answerSprites;
-				for(uint i = 0; i < _answer.length(); i++) {
+				for(uint i = 0; i < _answer.size(); i++) {
 					answerSprites.emplace_back(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 					answerSprites.back()
-						.move((((256 - (WORD_LEN * 24 + (WORD_LEN - 1) * 2)) / 2) - 4) + (i % WORD_LEN) * 26, 96)
+						.move((((256 - (_answer.size() * 24 + (_answer.size() - 1) * 2)) / 2) - 4) + (i % _answer.size()) * 26, 96)
 						.palette(TilePalette::white)
-						.gfx(letterGfxSub[letterIndex(_answer[i]) + 1])
+						.gfx(_data.letterGfxSub(_kbd.letterIndex(_answer[i]) + 1))
 						.visible(false);
 				}
 
-				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::show);
+				Gfx::flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::show);
 
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 
-				flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
+				Gfx::flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
 			if(_showRefresh)
-				refreshSprite->visible(true).update();
-			mainFont.clear(false).update(false);
+				_data.refreshSprite().visible(true).update();
+			Font::clear(false);
+			Font::update(false);
 
 			// Show stats
-			statsMenu(_config, _won);
+			_stats.showMenu();
+
+			// Restore normal background
+			swiWaitForVBlank();
+			_data.bgBottom()
+				.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+				.decompressMap(bgGetMapPtr(BG_SUB(0)))
+				.decompressPal(BG_PALETTE_SUB);
 		}
 	}
 

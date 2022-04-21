@@ -28,15 +28,10 @@ enum class FlipOptions {
 	show // unhide after the first half of the animation
 };
 
-extern std::vector<Sprite> letterSprites;
-extern std::vector<u16 *> letterGfx, letterGfxSub;
-extern Font mainFont;
-extern Sprite *refreshSprite;
+namespace Gfx {
+	void init(void);
 
-void initGraphics(void);
-
-void setPalettes(bool altPalette);
-
-void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
+	void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
+}
 
 #endif // GFX_HPP

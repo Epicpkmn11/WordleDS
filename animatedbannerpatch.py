@@ -47,12 +47,14 @@ if __name__ == "__main__":
     description = "Animated banner injector tool\n\
         This must have a prepared animated banner binary!"
     parser = ArgumentParser(description=description)
-    parser.add_argument("input", metavar="input.nds", type=str, nargs=1, help="DS ROM path")
-    parser.add_argument("banner", metavar="banner.bin", type=str, nargs=1, help="Animated banner path")
+    parser.add_argument("input", metavar="input.nds", type=str, help="DS ROM path")
+    parser.add_argument("banner", metavar="banner.bin", type=str, help="Animated banner path")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     args = parser.parse_args()
-    print(description)
-    path = args.input[0]
-    banner = args.banner[0]
+    if args.verbose:
+        print(description)
+    path = args.input
+    banner = args.banner
 
-    if(patch(path, banner)) == 0:
+    if(patch(path, banner)) == 0 and args.verbose:
         print("\nSuccess.")

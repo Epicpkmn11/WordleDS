@@ -24,8 +24,10 @@ private:
 	int tileAmount = 0;
 	u16 questionMark = 0;
 	u8 paletteStart = 0;
-	u8 *fontTiles = nullptr;
-	u8 *fontWidths = nullptr;
+	const u8 *fontTiles = nullptr;
+	const u8 *fontWidths = nullptr;
+	std::unique_ptr<u8[]> fontTilesFile = nullptr;
+	std::unique_ptr<u8[]> fontWidthsFile = nullptr;
 	std::unique_ptr<u16[]> fontMap;
 
 	u16 getCharIndex(char16_t c) const;
@@ -35,7 +37,7 @@ public:
 	static std::string utf16to8(std::u16string_view text);
 	static std::string utf16to8(char16_t c);
 
-	Font(const u8 *nftr, u32 nftrSize);
+	Font(const char *path, const u8 *fallback);
 	Font(void) {}
 
 	u8 height(void) const { return tileHeight; }
@@ -52,8 +54,8 @@ public:
 	Font &print(int x, int y, bool top, std::string_view text, Alignment align = Alignment::left) { return print(x, y, top, utf8to16(text), align); }
 	Font &print(int x, int y, bool top, std::u16string_view text, Alignment align = Alignment::left);
 
-	Font &clear(bool top);
-	Font &update(bool top, bool preserve = false);
+	static void clear(bool top);
+	static void update(bool top, bool preserve = false);
 };
 
 #endif // FONT_HPP

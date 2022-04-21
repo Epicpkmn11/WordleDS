@@ -1,6 +1,6 @@
 #include "sprite.hpp"
 
-#include <nds.h>
+#include <nds/arm9/sprite.h>
 #include <string>
 
 s8 Sprite::activeIds[2][256] = {{0}, {0}};

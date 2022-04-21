@@ -87,7 +87,7 @@ CFILES   := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES   := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 PNGFILES := $(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
-BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) $(PNGFILES:.png=.grf)
 
 # prepare NitroFS directory
 ifneq ($(strip $(NITRO)),)
@@ -127,9 +127,9 @@ export OFILES_BIN := $(addsuffix .o,$(BINFILES))
 
 export OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 
-export OFILES := $(PNGFILES:.png=.o) $(OFILES_BIN) $(OFILES_SOURCES)
+export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
 
-export HFILES := $(PNGFILES:.png=.h) $(addsuffix .h,$(subst .,_,$(BINFILES)))
+export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE   := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir))\
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include)\
@@ -213,14 +213,19 @@ $(SOUNDBANK) : $(MODFILES)
 	@$(bin2o)
 
 #---------------------------------------------------------------------------------
-# This rule creates assembly source files using grit
+# This rule creates grf files using grit
 # grit takes an image file and a .grit describing how the file is to be processed
 # add additional rules like this for each image extension
 # you use in the graphics folders
 #---------------------------------------------------------------------------------
-%.s %.h: %.png %.grit
+%.grf: %.png %.grit
 #---------------------------------------------------------------------------------
-	grit $< -fts -o$*
+	grit $< -ftr -fh! -o$*
+#---------------------------------------------------------------------------------
+%.grf.o %_grf.h: %.grf
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
 
 #---------------------------------------------------------------------------------
 # Convert non-GRF game icon to GRF if needed

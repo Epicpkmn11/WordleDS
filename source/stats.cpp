@@ -94,7 +94,7 @@ void Stats::showQr() {
 		for(int x = 0; x < qr->width; x++) {
 			if(qr->data[y * qr->width + x] & 1) { // If black, draw pixel
 				for(int i = 0; i < scale; i++)
-					toncset(dst + (y * scale + i) * SCREEN_WIDTH + (x * scale), 0xF3, scale);
+					toncset(dst + (y * scale + i) * SCREEN_WIDTH + (x * scale), TEXT_BLACK + 3, scale);
 			}
 		}
 	}

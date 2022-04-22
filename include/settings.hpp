@@ -4,6 +4,7 @@
 #include "gameData.hpp"
 
 #include <string>
+#include <vector>
 
 class Settings {
 	std::string _path;
@@ -12,6 +13,9 @@ class Settings {
 	bool _altPalette = false;
 	bool _music = true;
 	std::string _mod = DEFAULT_MOD;
+
+	std::vector<std::string> getMods(void);
+	bool selectMod(void);
 
 public:
 	Settings(const std::string &path);

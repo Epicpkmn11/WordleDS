@@ -4,6 +4,7 @@
 #include "gameData.hpp"
 #include "gfx.hpp"
 #include "kbd.hpp"
+#include "music.hpp"
 #include "stats.hpp"
 
 #include <string>
@@ -13,6 +14,7 @@ class Game {
 	Stats _stats;
 	GameData _data;
 	Kbd _kbd;
+	Music _music;
 
 	time_t _today = time(NULL) / 24 / 60 / 60;
 	std::u16string_view _answer;
@@ -39,6 +41,7 @@ public:
 	Stats &stats(void) { return _stats; }
 	GameData &data(void) { return _data; }
 	Kbd &kbd(void) { return _kbd; }
+	Music &music(void) { return _music; }
 
 	std::u16string_view answer(void) const { return _answer; }
 	bool won(void) const { return _won; }

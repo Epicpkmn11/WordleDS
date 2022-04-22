@@ -7,12 +7,11 @@
 #define FLOAT_TO_FIXED(x) (x == 0.0f ? 0 : int((1.0f / x) * 256.0f))
 
 class OamGfx {
-	OamState *_oam;
 	std::shared_ptr<u16> _gfx = nullptr;
 
 public:
 	OamGfx(bool top, SpriteSize size, SpriteColorFormat colorFormat)
-			: _oam(top ? &oamMain : &oamSub), _gfx(std::shared_ptr<u16>(oamAllocateGfx(_oam, size, colorFormat), [this](u16 *p) { oamFreeGfx(_oam, p); })) {}
+			: _gfx(std::shared_ptr<u16>(oamAllocateGfx(top ? &oamMain : &oamSub, size, colorFormat), [top](u16 *p) { oamFreeGfx(top ? &oamMain : &oamSub, p); })) {}
 	OamGfx(void) {}
 
 	u16 *get(void) { return _gfx.get(); }

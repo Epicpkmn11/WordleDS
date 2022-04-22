@@ -13,6 +13,7 @@
 #include "kbdKeys_grf.h"
 #include "letterTiles_grf.h"
 #include "main_nftr.h"
+#include "modsBottom_grf.h"
 #include "numbersLarge_nftr.h"
 #include "numbersSmall_nftr.h"
 #include "refreshButton_grf.h"
@@ -175,18 +176,18 @@ GameData::GameData(const std::string &folder) {
 
 		if(json.contains("palettes") && json["palettes"].is_object()) {
 			if(json["palettes"].contains("letter") && json["palettes"]["letter"].is_object()) {
-				if(json["palettes"]["letter"].contains("regular") && json["palettes"]["letter"]["regular"].is_array())
+				if(json["palettes"]["letter"].contains("regular") && json["palettes"]["letter"]["regular"].is_array() && json["palettes"]["letter"]["regular"].size() == 5)
 					_letterPalettes[0] = getPalette(json["palettes"]["letter"]["regular"], 16);
 
-				if(json["palettes"]["letter"].contains("highContrast") && json["palettes"]["letter"]["highContrast"].is_array())
+				if(json["palettes"]["letter"].contains("highContrast") && json["palettes"]["letter"]["highContrast"].is_array() && json["palettes"]["letter"]["highContrast"].size() == 5)
 					_letterPalettes[1] = getPalette(json["palettes"]["letter"]["highContrast"], 16);
 			}
 
 			if(json["palettes"].contains("font") && json["palettes"]["font"].is_object()) {
-				if(json["palettes"]["font"].contains("regular") && json["palettes"]["font"]["regular"].is_array())
+				if(json["palettes"]["font"].contains("regular") && json["palettes"]["font"]["regular"].is_array() && json["palettes"]["font"]["regular"].size() == 5)
 					_fontPalettes[0] = getPalette(json["palettes"]["font"]["regular"], 4);
 
-				if(json["palettes"]["font"].contains("highContrast") && json["palettes"]["font"]["highContrast"].is_array())
+				if(json["palettes"]["font"].contains("highContrast") && json["palettes"]["font"]["highContrast"].is_array() && json["palettes"]["font"]["highContrast"].size() == 5)
 					_fontPalettes[1] = getPalette(json["palettes"]["font"]["highContrast"], 4);
 			}
 		}
@@ -225,6 +226,7 @@ GameData::GameData(const std::string &folder) {
 	_bgTop = Image((modPath + "/bgTop.grf").c_str(), 256, 192, bgTop_grf);
 	_howtoBottom = Image((modPath + "/howtoBottom.grf").c_str(), 256, 192, howtoBottom_grf);
 	_howtoTop = Image((modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);
+	_modsBottom = Image((modPath + "/modsBottom.grf").c_str(), 256, 192, modsBottom_grf);
 	_settingsBottom = Image((modPath + "/settingsBottom.grf").c_str(), 256, 192, settingsBottom_grf);
 	_statsBottom = Image((modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 
@@ -314,5 +316,5 @@ void GameData::setPalettes(bool altPalette) const {
 	tonccpy(SPRITE_PALETTE_SUB, _letterPalettes[altPalette].data(), _letterPalettes[altPalette].size() * sizeof(u16));
 
 	// Fonts
-	tonccpy(BG_PALETTE_SUB + 0xF0, _fontPalettes[altPalette].data(), _fontPalettes[altPalette].size() * sizeof(u16));
+	tonccpy(BG_PALETTE_SUB + TEXT_BLACK, _fontPalettes[altPalette].data(), _fontPalettes[altPalette].size() * sizeof(u16));
 }

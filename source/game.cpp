@@ -75,13 +75,21 @@ std::vector<TilePalette> Game::check(const std::u16string &_guess) {
 	return res;
 }
 
-Game::Game() : _stats(DATA_PATH + settings->mod() + STATS_JSON), _data(settings->mod()), _kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()) {
+Game::Game() :
+		_stats(DATA_PATH + settings->mod() + STATS_JSON),
+		_data(settings->mod()),
+		_kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()),
+		_music(settings->mod()) {
 	// Get random word based on date
 	_today = time(NULL) / 24 / 60 / 60;
 	_answer = _data.choices((_today - _data.firstDay()) % _data.choices().size());
 
 	for(size_t i = 0; i < _answer.size(); i++)
 		_knownPositions += u' ';
+
+	// Start music
+	if(settings->music())
+		_music.start();
 
 	// Create sprites
 	for(size_t i = 0; i < _answer.size() * _data.maxGuesses(); i++) {
@@ -151,12 +159,6 @@ Game::Game() : _stats(DATA_PATH + settings->mod() + STATS_JSON), _data(settings-
 }
 
 Game::~Game() {
-	for(size_t i = 0; i < _answer.size() * _data.maxGuesses(); i++)
-		_letterSprites[i].palette(TilePalette::white).gfx(_data.letterGfx(0));
-	Sprite::update(true);
-
-	_data.refreshSprite().visible(false).update();
-
 	_stats.save();
 }
 
@@ -291,12 +293,17 @@ bool Game::run() {
 				Font::clear(false);
 				Font::update(false);
 
-				if(touch.px < 24)
+				if(touch.px < 24) {
 					howtoMenu();
-				else if(touch.px > 116 && touch.px < 140)
+				} else if(touch.px > 116 && touch.px < 140) {
 					_stats.showMenu();
-				else if(touch.px > 232)
+				} else if(touch.px > 232) {
+					std::string loadedMod = settings->mod();
 					settings->showMenu();
+
+					if(settings->mod() != loadedMod)
+						return true;
+				}
 
 				if(showKeyboard)
 					_kbd.show();

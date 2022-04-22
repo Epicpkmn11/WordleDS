@@ -120,12 +120,14 @@ class GameData {
 		{
 			0xFFFF, 0xDEF7, 0xC631, 0x8000,
 			0x0000, 0xEF7B, 0xD6B5, 0xC631,
+			0xFFFF, 0xDF57, 0xC2D1, 0x32AD,
 			0x39CE, 0xC631, 0xF39C, 0xFFFF,
 			0x32AD, 0xC2D1, 0xDF57, 0xFFFF
 		},
 		{
 			0xFFFF, 0xDEF7, 0xC631, 0x8000,
 			0x0000, 0xEF7B, 0xD6B5, 0xC631,
+			0xFFFF, 0xD6DE, 0xB63D, 0x1DFD,
 			0x39CE, 0xC631, 0xF39C, 0xFFFF,
 			0x1DFD, 0xB63D, 0xD6DE, 0xFFFF
 		}
@@ -139,6 +141,7 @@ class GameData {
 		_bgTop,
 		_howtoBottom,
 		_howtoTop,
+		_modsBottom,
 		_settingsBottom,
 		_statsBottom;
 
@@ -198,6 +201,7 @@ public:
 	const Image &bgTop(void) const { return _bgTop; };
 	const Image &howtoBottom(void) const { return _howtoBottom; };
 	const Image &howtoTop(void) const { return _howtoTop; };
+	const Image &modsBottom(void) const { return _modsBottom; };
 	const Image &settingsBottom(void) const { return _settingsBottom; };
 	const Image &statsBottom(void) const { return _statsBottom; };
 

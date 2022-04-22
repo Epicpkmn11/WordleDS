@@ -40,6 +40,8 @@ public:
 	Stats &gamesPlayed(int gamesPlayed) { _gamesPlayed = gamesPlayed; return *this; }
 	time_t lastPlayed(void) const { return _lastPlayed; }
 	Stats &lastPlayed(time_t lastPlayed) { _lastPlayed = lastPlayed; return *this; }
+
+	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0; }
 };
 
 #endif // STATS_HPP

@@ -5,16 +5,14 @@
 
 #include <dirent.h>
 #include <fat.h>
-#include <nds/arm9/background.h>
-#include <maxmod9.h>
-#include <stdio.h>
-#include <unistd.h>
+#include <nds.h>
 
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
 int main() {
 	bool fatInited = fatInitDefault();
+	keysSetRepeat(25, 5);
 
 	mkdir("/_nds", 0777);
 	mkdir("/_nds/WordleDS", 0777);
@@ -27,21 +25,10 @@ int main() {
 	Gfx::init();
 	settings = new Settings(SETTINGS_JSON);
 
-	// Load music
-	std::string musicPath = DATA_PATH + settings->mod() + "/music.msl";
-	if(access(musicPath.c_str(), F_OK) == 0)
-		mmInitDefault(musicPath.data());
-	else
-		mmInitDefaultMem((mm_addr)soundbank_bin);
-	mmLoad(MOD_MUSIC);
-	mmSetModuleVolume(800);
-	if(settings->music())
-		mmStart(MOD_MUSIC, MM_PLAY_LOOP);
-
 	game = new Game();
 
 	// Show howto if first game
-	if(game->stats().gamesPlayed() < 1)
+	if(game->stats().firstPlay())
 		howtoMenu();
 
 	game->drawBgBottom(fatInited ? "" : "FAT init failed\nStats cannot be saved", 240);

@@ -16,7 +16,7 @@ struct Key {
 class Kbd {
 	std::vector<Sprite> _sprites;
 	bool _visible = false;
-	std::vector<Key> _keys;
+	const std::vector<Key> &_keys;
 	const std::vector<char16_t> &_letters;
 
 public:

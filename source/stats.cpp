@@ -89,7 +89,7 @@ void Stats::showQr() {
 	u8 *dst = (u8 *)bgGetGfxPtr(BG_SUB(2)) + (SCREEN_HEIGHT - qr->width * scale) / 2 * SCREEN_WIDTH + (SCREEN_WIDTH - qr->width * scale) / 2;
 	for(int y = 0; y < qr->width; y++) {
 		for(int i = 0; i < scale; i++) // Fill line with white
-			toncset(dst + (y * scale + i) * SCREEN_WIDTH - 4, 0xF0, qr->width * scale + 8);
+			toncset(dst + (y * scale + i) * SCREEN_WIDTH - 4, TEXT_BLACK, qr->width * scale + 8);
 
 		for(int x = 0; x < qr->width; x++) {
 			if(qr->data[y * qr->width + x] & 1) { // If black, draw pixel
@@ -101,8 +101,8 @@ void Stats::showQr() {
 
 	// Pad above and below with white
 	for(int i = 0; i < 4; i++) {
-		toncset(dst - (i + 1) * SCREEN_WIDTH - 4, 0xF0, qr->width * scale + 8);
-		toncset(dst + ((qr->width * scale + i) * SCREEN_WIDTH) - 4, 0xF0, qr->width * scale + 8);
+		toncset(dst - (i + 1) * SCREEN_WIDTH - 4, TEXT_BLACK, qr->width * scale + 8);
+		toncset(dst + ((qr->width * scale + i) * SCREEN_WIDTH) - 4, TEXT_BLACK, qr->width * scale + 8);
 	}
 
 	QRcode_free(qr);
@@ -157,7 +157,7 @@ void Stats::showMenu() {
 		for(int i = 1; i <= game->data().maxGuesses(); i++) {
 			int count = std::count(_guessCounts.begin(), _guessCounts.end(), i);
 			int width = (10 + (216 * count / highestCount));
-			u8 palette = (i == _guessCounts.back() && game->won()) ? TEXT_GREEN : TEXT_WHITE;
+			u8 palette = (i == _guessCounts.back() && game->won()) ? TEXT_WHITE_GREEN : TEXT_WHITE;
 			u8 *dst = (u8 *)bgGetGfxPtr(BG_SUB(2)) + ((256 * (90 + (14 * i))) + 20);
 
 			game->data().numbersSmall().print(8, 90 - 1 + i * 14, false, i);

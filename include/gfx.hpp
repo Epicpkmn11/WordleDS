@@ -9,10 +9,11 @@
 #define BG(x) (0 + x)
 #define BG_SUB(x) (4 + x)
 
-#define TEXT_BLACK 0xF0
-#define TEXT_GRAY  0xF4
+#define TEXT_BLACK 0xEC
+#define TEXT_GRAY 0xF0
+#define TEXT_GREEN 0xF4
 #define TEXT_WHITE 0xF8
-#define TEXT_GREEN 0xFC
+#define TEXT_WHITE_GREEN 0xFC
 
 enum TilePalette : int {
 	white = 0,

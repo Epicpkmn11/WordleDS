@@ -5,6 +5,8 @@
 
 class Music {
 public:
+	static Music *music;
+
 	Music(const std::string &folder);
 	~Music(void);
 
@@ -12,4 +14,4 @@ public:
 	void stop(void) const;
 };
 
-#endif // MUSIC_HP
+#endif // MUSIC_HPP

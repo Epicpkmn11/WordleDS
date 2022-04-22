@@ -1,14 +1,12 @@
 #include "game.hpp"
 #include "gfx.hpp"
 #include "howto.hpp"
+#include "music.hpp"
 #include "settings.hpp"
 
 #include <dirent.h>
 #include <fat.h>
 #include <nds.h>
-
-#include "soundbank.h"
-#include "soundbank_bin.h"
 
 int main() {
 	bool fatInited = fatInitDefault();
@@ -24,6 +22,9 @@ int main() {
 
 	Gfx::init();
 	settings = new Settings(SETTINGS_JSON);
+	Music::music = new Music(settings->mod());
+	if(settings->music())
+		Music::music->start();
 
 	game = new Game();
 

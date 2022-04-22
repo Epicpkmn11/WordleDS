@@ -2,12 +2,11 @@
 #include "font.hpp"
 #include "game.hpp"
 #include "gfx.hpp"
+#include "music.hpp"
 #include "sprite.hpp"
 #include "stats.hpp"
 #include "tonccpy.h"
 #include "version.hpp"
-
-#include "soundbank.h"
 
 #include <algorithm>
 #include <array>
@@ -181,9 +180,9 @@ void Settings::showMenu() {
 				} else if(touch.py >= 102 && touch.py <= (102 + 13)) {
 					_music = !_music;
 					if(_music)
-						game->music().start();
+						Music::music->start();
 					else
-						game->music().stop();
+						Music::music->stop();
 				} else if(touch.py >= 127 && touch.py <= (127 + 17)) {
 					// Clear text, hide sprites
 					Font::clear(false);

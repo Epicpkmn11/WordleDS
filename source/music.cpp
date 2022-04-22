@@ -7,7 +7,7 @@
 #include <maxmod9.h>
 #include <unistd.h>
 
-bool playingDefault = false;
+Music *Music::music;
 
 Music::Music(const std::string &folder) {
 	std::string musicPath = DATA_PATH + folder + "/music.msl";

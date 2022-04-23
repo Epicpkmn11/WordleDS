@@ -111,7 +111,13 @@ Game::Game() :
 	extern char *fake_heap_end;
 	__bootstub *bootstub = (struct __bootstub *)fake_heap_end;
 	_bootstubExists = bootstub->bootsig == BOOTSIG;
+}
 
+Game::~Game() {
+	_stats.save();
+}
+
+bool Game::run() {
 	// Reload game state from config
 	if(_stats.boardState().size() > 0) {
 		std::vector<TilePalette> palettes;
@@ -151,13 +157,7 @@ Game::Game() :
 
 	if(_won || _currentGuess > _data.maxGuesses())
 		_statsSaved = true; // an already completed game was loaded, don't re-save
-}
 
-Game::~Game() {
-	_stats.save();
-}
-
-bool Game::run() {
 	if(!_won && _currentGuess <= _data.maxGuesses())
 		_kbd.show();
 

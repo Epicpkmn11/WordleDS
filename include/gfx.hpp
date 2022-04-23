@@ -33,6 +33,9 @@ namespace Gfx {
 	void init(void);
 
 	void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
+
+	void fadeIn(void);
+	void fadeOut(void);
 }
 
 #endif // GFX_HPP

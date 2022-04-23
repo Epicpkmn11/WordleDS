@@ -11,6 +11,7 @@
 int main() {
 	bool fatInited = fatInitDefault();
 	keysSetRepeat(25, 5);
+	setBrightness(3, 16);
 
 	mkdir("/_nds", 0777);
 	mkdir("/_nds/WordleDS", 0777);
@@ -22,11 +23,12 @@ int main() {
 
 	Gfx::init();
 	settings = new Settings(SETTINGS_JSON);
+	game = new Game();
 	Music::music = new Music(settings->mod());
 	if(settings->music())
 		Music::music->start();
 
-	game = new Game();
+	Gfx::fadeIn();
 
 	// Show howto if first game
 	if(game->stats().firstPlay())
@@ -40,7 +42,11 @@ int main() {
 
 	// Loop game until returns false
 	while(game->run()) {
+		Gfx::fadeOut();
 		delete game;
 		game = new Game();
+		Gfx::fadeIn();
 	}
+
+	Gfx::fadeOut();
 }

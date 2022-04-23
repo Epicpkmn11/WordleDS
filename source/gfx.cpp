@@ -56,3 +56,17 @@ void Gfx::flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette>
 			sprite->affineIndex(-1, false).visible(false).update();
 	}
 }
+
+void Gfx::fadeIn() {
+	for(int i = 16; i >= 0; i--) {
+		setBrightness(3, i);
+		swiWaitForVBlank();
+	}
+}
+
+void Gfx::fadeOut() {
+	for(int i = 0; i <= 16; i++) {
+		setBrightness(3, i);
+		swiWaitForVBlank();
+	}
+}

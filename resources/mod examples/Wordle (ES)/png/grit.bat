@@ -1,2 +1,2 @@
-FOR %IMAGE% IN *.png DO
-	grit %IMAGE% -ftr -fh! -o../%IMAGE%
+for %%i in (*.png) do
+	grit %%i --ftr -fh! -o../%%i

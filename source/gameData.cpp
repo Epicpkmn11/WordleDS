@@ -141,7 +141,7 @@ GameData::GameData(const std::string &folder) {
 		if(json.contains("numberSuffixes") && json["numberSuffixes"].is_object()) {
 			_numberSuffixes.clear();
 			for(const auto &numberSuffix : json["numberSuffixes"].items()) {
-				if(numberSuffix.value().is_number()) {
+				if(numberSuffix.value().is_string()) {
 					int key;
 					if(numberSuffix.key() == "default")
 						key = 0xFFFF;

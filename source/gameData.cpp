@@ -252,7 +252,7 @@ GameData::GameData(const std::string &folder) {
 
 	constexpr int tileSize = 32 * 32 / 2;
 
-	Image kbdKeys = Image((modPath + "/kbdKeys.grf").c_str(), 32, 832, kbdKeys_grf);
+	Image kbdKeys = Image((modPath + "/kbdKeys.grf").c_str(), 32, 832, kbdKeys_grf, false);
 	u8 *kbdKeysBuffer = new u8[kbdKeys.tilesLen()];
 	kbdKeys.decompressTiles(kbdKeysBuffer, false);
 	for(size_t i = 0; i < kbdKeys.tilesLen(); i += tileSize) {
@@ -261,7 +261,7 @@ GameData::GameData(const std::string &folder) {
 	}
 	delete[] kbdKeysBuffer;
 
-	Image letterTiles((modPath + "/letterTiles.grf").c_str(), 32, 864, letterTiles_grf);
+	Image letterTiles((modPath + "/letterTiles.grf").c_str(), 32, 864, letterTiles_grf, false);
 	u8 *letterTilesBuffer = new u8[letterTiles.tilesLen()];
 	letterTiles.decompressTiles(letterTilesBuffer, false);
 	for(size_t i = 0; i < letterTiles.tilesLen(); i += tileSize) {

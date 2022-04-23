@@ -35,7 +35,7 @@ bool Image::grfDecompress(const void *src, void *dst, bool vram) {
 	}
 }
 
-Image::Image(const char *path, u32 width, u32 height, const u8 *fallback) : _width(width), _height(height) {
+Image::Image(const char *path, u32 width, u32 height, const u8 *fallback, bool enforceSize) {
 	FILE *file = fopen(path, "rb");
 	if(file) {
 		fread(&_header, 1, sizeof(GrfHeader), file);
@@ -46,8 +46,10 @@ Image::Image(const char *path, u32 width, u32 height, const u8 *fallback) : _wid
 		tonccpy(&_header, fallback, sizeof(GrfHeader));
 	}
 
-	sassert(_header.texWidth == _width, "Invalid image width\n(%ld, should be %ld)\n\n%s", _header.texWidth, _width, path);
-	sassert(_header.texHeight == _height, "Invalid image height\n(%ld, should be %ld)\n\n%s", _header.texHeight, _height, path);
+	if(enforceSize) {
+		sassert(_header.texWidth == width, "Invalid image width\n(%ld, should be %ld)\n\n%s", _header.texWidth, width, path);
+		sassert(_header.texHeight == height, "Invalid image height\n(%ld, should be %ld)\n\n%s", _header.texHeight, height, path);
+	}
 
 	const u8 *src = _buffer != nullptr ? _buffer.get() : (fallback + sizeof(GrfHeader));
 	for(u32 i = 0, size = 0; i < _header.fileSize - 4; i += size + 8) {

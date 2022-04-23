@@ -6,9 +6,6 @@
 #include <string>
 
 class Image {
-	u32 _width;
-	u32 _height;
-
 	std::shared_ptr<u8[]> _buffer = nullptr;
 
 	const u8 *_tiles = nullptr;
@@ -27,13 +24,13 @@ class Image {
 
 public:
 	// width and height are used for sanity checking the GRF
-	Image(const char *path, u32 width, u32 height, const u8 *fallback);
+	Image(const char *path, u32 width, u32 height, const u8 *fallback, bool enforceSize = true);
 	Image() {}
 
-	u32 width(void) const { return _width; }
-	u32 height(void) const { return _height; }
+	u32 width(void) const { return _header.texWidth; }
+	u32 height(void) const { return _header.texHeight; }
 
-	size_t tilesLen(void) const { return _width * _height * _header.gfxAttr / 8; }
+	size_t tilesLen(void) const { return _header.texWidth * _header.texHeight * _header.gfxAttr / 8; }
 
 	const Image &decompressTiles(void *dst, bool vram = true) const { grfDecompress(_tiles, dst, vram); return *this; }
 	const Image &decompressMap(void *dst, bool vram = true) const { grfDecompress(_map, dst, vram); return *this; }

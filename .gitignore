@@ -1,0 +1,13 @@
+*build
+*.d
+*.o
+*.nds
+*.dsi
+*.cia
+*.elf
+
+*.vscode
+*.DS_Store
+*._
+
+unistore/temp

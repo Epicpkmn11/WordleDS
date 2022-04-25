@@ -1,0 +1,47 @@
+{
+	"maxGuesses": 2,
+	"wordleOffset": 305,
+	"shareName": "uwdl DS",
+	"lossMessage": "Beta wuk tomowow..\nda answa was:",
+	"tooShortMessage": "nyot enyo wetews",
+	"notWordMessage": "nyot in uwd wist",
+	"creditStr": "uwdl DS\nby Pk1-chan",
+	"nthMustBeX": "%d%s weta must be %s",
+	"guessMustContainX": "Gyus must contain %s",
+	"emoji": {
+		"green": "^-^ ",
+		"greenAlt": "^_^ ",
+		"yellow": "-_- ",
+		"yellowAlt": ">_< ",
+		"white": "T_T "
+	},
+	"howto": {
+		"words": [
+			"UWU",
+			"WWW",
+			"OWO"
+		],
+		"colors": [
+			"green", "white", "green",
+			"white", "yellow", "white",
+			"white", "white", "white"
+		]
+	},
+	"victoryMessages": [
+		"Genius owo",
+		"Magnifisent q///q-☆"
+	],
+	"numberSuffixes": {
+		"1": "st",
+		"2": "nd",
+		"3": "wd",
+		"default": "d"
+	},
+	"keyboard": [
+		[4, 114, "U"], [29, 114, "W"], [54, 114, "O"], [79, 114, "\b"], [117, 114, "\n"]
+	],
+	"words": {
+		"choices": ["UWU", "OWO"],
+		"guesses": []
+	}
+}

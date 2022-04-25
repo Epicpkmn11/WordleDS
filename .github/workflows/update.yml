@@ -3,7 +3,7 @@ name: Update UniStore
 on:
   push:
     branches: [mods]
-    paths: [generate.py, meta.json, "mods/*", .github/workflows/update.yml]
+    paths: [generate.py, meta.json, requirements.txt, "mods/*", .github/workflows/update.yml]
   workflow_dispatch:
 
 jobs:

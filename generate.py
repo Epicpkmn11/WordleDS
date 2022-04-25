@@ -70,8 +70,8 @@ def downloadScript(mod: str, inFolder: bool) -> list:
 
 # Read version from old unistore
 unistoreOld = {}
-if path.exists(path.join("unistore", "twlmenu-mods.unistore")):
-	with open(path.join("unistore", "twlmenu-mods.unistore"), "r", encoding="utf8") as file:
+if path.exists(path.join("unistore", "wordle-ds.unistore")):
+	with open(path.join("unistore", "wordle-ds.unistore"), "r", encoding="utf8") as file:
 		unistoreOld = json.load(file)
 
 # Output JSON

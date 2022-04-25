@@ -1,0 +1,40 @@
+name: Update UniStore
+
+on:
+  push:
+    branches: [mods]
+    paths: [generate.py, meta.json, "mods/*", .github/workflows/update.yml]
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitarm
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Install packages
+      run: |
+        echo deb http://deb.debian.org/debian stable main contrib non-free >> /etc/apt/sources.list
+        sudo apt-get update
+        sudo apt-get install python3-pip -y
+        pip3 install -r requirements.txt
+
+    - name: Run generate.py
+      run: |
+        export PATH=$PATH:/opt/devkitpro/tools/bin
+        python3 generate.py
+
+    - name: Push changes
+      uses: github-actions-x/commit@v2.9
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        push-branch: 'mods'
+        commit-message: 'Update UniStore'
+        force-add: 'false'
+        files: '*'
+        name: TWLBot
+        email: flamekat54@aol.com 

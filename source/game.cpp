@@ -241,7 +241,10 @@ bool Game::run() {
 						}
 					}
 
-					_stats.boardState(Font::utf16to8(_guess)).save();
+					_stats
+						.boardState(Font::utf16to8(_guess))
+						.lastPlayed(_today)
+						.save();
 
 					_guess = u"";
 					_currentGuess++;
@@ -330,7 +333,7 @@ bool Game::run() {
 			_kbd.hide();
 
 			// Update stats
-			_stats.lastPlayed(_today);
+			_stats.lastWon(_today);
 			_stats.guessCounts(_currentGuess);
 			_stats.gamesPlayed(_stats.gamesPlayed() + 1);
 			_stats.streak(_won ? _stats.streak() + 1 : 0);

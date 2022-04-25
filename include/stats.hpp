@@ -13,7 +13,8 @@ class Stats {
 	int _maxStreak = 0;
 	int _streak = 0;
 	int _gamesPlayed = 0;
-	time_t _lastPlayed = time(nullptr) / 24 / 60 / 60;
+	time_t _lastPlayed = 0;
+	time_t _lastWon = 0;
 
 	void showQr(void);
 
@@ -40,6 +41,8 @@ public:
 	Stats &gamesPlayed(int gamesPlayed) { _gamesPlayed = gamesPlayed; return *this; }
 	time_t lastPlayed(void) const { return _lastPlayed; }
 	Stats &lastPlayed(time_t lastPlayed) { _lastPlayed = lastPlayed; return *this; }
+	time_t lastWon(void) const { return _lastWon; }
+	Stats &lastWon(time_t lastWon) { _lastWon = lastWon; return *this; }
 
 	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0; }
 };

@@ -40,9 +40,13 @@ Stats::Stats(const std::string &path) : _path(path) {
 		_gamesPlayed = json["gamesPlayed"];
 	if(json.contains("lastPlayed") && json["lastPlayed"].is_number())
 		_lastPlayed = json["lastPlayed"];
+	if(json.contains("lastWon") && json["lastWon"].is_number())
+		_lastWon = json["lastWon"];
+	else
+		_lastWon = _lastPlayed;
 
 	time_t today = time(NULL) / 24 / 60 / 60;
-	if(today - _lastPlayed > 1)
+	if(today - 1 != _lastWon)
 		_streak = 0;
 	if(_streak > _maxStreak)
 		_maxStreak = _streak;
@@ -57,7 +61,8 @@ bool Stats::save() {
 		{"streak", _streak},
 		{"maxStreak", _maxStreak},
 		{"gamesPlayed", _gamesPlayed},
-		{"lastPlayed", _lastPlayed}
+		{"lastPlayed", _lastPlayed},
+		{"lastWon", _lastWon}
 	});
 
 	FILE *file = fopen(_path.c_str(), "w");

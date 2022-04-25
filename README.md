@@ -7,6 +7,8 @@ Follow devkitPro's [Getting Started](https://devkitpro.org/wiki/Getting_Started)
 ## Modding
 Wordle DS allows for modding with custom word lists, graphics, music, etc. See [the wiki](https://github.com/Epicpkmn11/WordleDS/wiki/Modding) for details.
 
+To download mods, see the [mod list page](https://github.com/Epicpkmn11/WordleDS/blob/mods/mods.md) on the mods branch of this repository.
+
 ## Credits
 - [Pk11](https://github.com/Epicmn11): This DS port
 - [Josh Wardle](https://github.com/powerlanguage): The original Wordle

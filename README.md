@@ -5,7 +5,7 @@ A clone of [Wordle](https://www.nytimes.com/games/wordle/index.html) for the Nin
 Follow devkitPro's [Getting Started](https://devkitpro.org/wiki/Getting_Started) guide to install libnds, devkitARM, and grit, then simply run `make`.
 
 ## Modding
-Wordle DS allows for modding with custom word lists, graphics, music, etc. See [the wiki](https://github.com/Epicpkmn11/WordleDS/wiki/modding) for details.
+Wordle DS allows for modding with custom word lists, graphics, music, etc. See [the wiki](https://github.com/Epicpkmn11/WordleDS/wiki/Modding) for details.
 
 ## Credits
 - [Pk11](https://github.com/Epicmn11): This DS port

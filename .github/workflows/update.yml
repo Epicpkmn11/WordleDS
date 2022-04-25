@@ -36,5 +36,5 @@ jobs:
         commit-message: 'Update UniStore'
         force-add: 'false'
         files: '*'
-        name: TWLBot
-        email: flamekat54@aol.com 
+        name: GitHub Actions
+        email: actions@github.com

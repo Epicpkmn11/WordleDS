@@ -8,7 +8,7 @@
 
 #define SETTINGS_JSON_OLD "WordleDS.json"
 
-#define DEFAULT_MOD "WordleDS"
+#define DEFAULT_MOD "Wordle DS"
 #define DATA_PATH "/_nds/WordleDS/"
 #define SETTINGS_JSON DATA_PATH "settings.json"
 #define STATS_JSON "/stats.json"

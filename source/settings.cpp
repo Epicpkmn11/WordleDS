@@ -117,8 +117,10 @@ void Settings::legacyImport(const std::string &path) {
 		good = stats.save();
 	}
 
-	if(good)
+	if(good) {
 		remove(SETTINGS_JSON_OLD);
+		rename("WordleDS.txt", DATA_PATH DEFAULT_MOD "/share.txt");
+	}
 }
 
 void Settings::showMenu() {

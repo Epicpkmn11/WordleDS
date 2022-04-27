@@ -6,3 +6,10 @@ Wordle DS translated to Spanish, based on Daniel Rodriguez's [Wordle (ES)](https
 Categories: Translation, Spanish
 
 Download: [Wordle (ES)](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Wordle%20%28ES%29.zip)
+
+## ![Icon](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/icons/Numberle%20DS.png) Numberle DS by [ItsSiem](https://www.github.com/itssiem)
+Wordle DS but with numbers instead of letters.
+
+Categories: Alternate Gamemode, Numbers
+
+Download: [Numberle DS](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Numberle%20DS.zip)

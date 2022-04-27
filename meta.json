@@ -4,5 +4,11 @@
 		"author": "[Pk11](https://github.com/Epicpkmn11)",
 		"description": "Wordle DS translated to Spanish, based on Daniel Rodriguez's [Wordle (ES)](https://wordle.danielfrg.com/).",
 		"categories": ["Translation", "Spanish"]
+	},
+	"Numberle DS": {
+		"title": "Numberle DS",
+		"author": "[ItsSiem](https://www.github.com/itssiem)",
+		"description": "Wordle DS but with numbers instead of letters.",
+		"categories": ["Alternate Gamemode", "Numbers"]
 	}
 }

@@ -90,7 +90,7 @@ GameData::GameData(const std::string &folder) {
 				_emojiYellow = json["emoji"]["yellow"];
 
 			if(json["emoji"].contains("yellowAlt") && json["emoji"]["yellowAlt"].is_string())
-				_emojiYellow = json["emoji"]["yellowAlt"];
+				_emojiYellowAlt = json["emoji"]["yellowAlt"];
 
 			if(json["emoji"].contains("white") && json["emoji"]["white"].is_string())
 				_emojiWhite = json["emoji"]["white"];

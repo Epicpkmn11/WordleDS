@@ -1,6 +1,7 @@
 #include "gameData.hpp"
 #include "settings.hpp"
 #include "tonccpy.h"
+#include "version.hpp"
 #include "words.hpp"
 
 #include "backspaceKey_grf.h"
@@ -23,6 +24,10 @@
 #include "toggleOn_grf.h"
 
 #include <algorithm>
+
+// sassert but it fixes the brightness
+#undef sassert
+#define sassert(e,...) ((e) ? (void)0 : (setBrightness(2, 0), __sassert(__FILE__, __LINE__, #e, __VA_ARGS__)))
 
 std::vector<u16> GameData::getPalette(const nlohmann::json &json, size_t size) {
 	std::vector<u16> output;
@@ -50,6 +55,11 @@ GameData::GameData(const std::string &folder) {
 	if(file) {
 		nlohmann::json json = nlohmann::json::parse(file, nullptr, false);
 		fclose(file);
+
+		if(json.contains("minVersion") && json["minVersion"].is_string()) {
+			const std::string &minVer = json["minVersion"].get_ref<const std::string &>().c_str();
+			sassert(VER_NUMBER >= minVer, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer.c_str());
+		}
 
 		if(json.contains("shareName") && json["shareName"].is_string())
 			_shareName = json["shareName"];

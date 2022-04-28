@@ -10,5 +10,11 @@
 		"author": "[ItsSiem](https://www.github.com/itssiem)",
 		"description": "Wordle DS but with numbers instead of letters.",
 		"categories": ["Alternate Gamemode", "Numbers"]
+	},
+	"Wordle (IT)": {
+		"title": "Wordle (IT)",
+		"author": "[brownboi2](https://github.com/brownboi2)",
+		"description": "An Italian translation mod for WordleDS by a brownboi, a non-italian using Google Translate and an Italian word bank.",
+		"categories": ["Translation", "Italian"]
 	}
 }

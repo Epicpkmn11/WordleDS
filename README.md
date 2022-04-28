@@ -10,7 +10,7 @@ Wordle DS allows for modding with custom word lists, graphics, music, etc. See [
 To download mods, see the [mod list page](https://github.com/Epicpkmn11/WordleDS/blob/mods/mods.md) on the mods branch of this repository.
 
 ## Credits
-- [Pk11](https://github.com/Epicmn11): This DS port
+- [Pk11](https://github.com/Epicpkmn11): This DS port
 - [Josh Wardle](https://github.com/powerlanguage): The original Wordle
 - [lifehackerhansol](https://github.com/lifehackerhansol): animatedbannerpatch.py from [TWiLight Menu++](https://github.com/DS-Homebrew/TWiLightMenu)
 - [Rocket Robz](https://github.com/RocketRobz): Original music composition

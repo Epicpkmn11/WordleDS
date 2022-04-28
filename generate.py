@@ -197,7 +197,7 @@ for _, info in zip(range(4), meta):
 		pubDate = info["updated"],
 		extensions = [
 			rfeed.Enclosure(
-				url="https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/" + urllib.parse.quote(iconPath),
+				url="https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/" + urllib.parse.quote(path.join("icons", info["title"] + ".png")),
 				length=path.getsize(path.join("icons", info["title"] + ".png")),
 				type = "image/png"
 			)

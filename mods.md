@@ -13,3 +13,10 @@ Wordle DS but with numbers instead of letters.
 Categories: Alternate Gamemode, Numbers
 
 Download: [Numberle DS](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Numberle%20DS.zip)
+
+## ![Icon](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/icons/Wordle%20%28IT%29.png) Wordle (IT) by [brownboi2](https://github.com/brownboi2)
+An Italian translation mod for WordleDS by a brownboi, a non-italian using Google Translate and an Italian word bank.
+
+Categories: Translation, Italian
+
+Download: [Wordle (IT)](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Wordle%20%28IT%29.zip)

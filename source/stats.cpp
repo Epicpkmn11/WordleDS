@@ -46,7 +46,7 @@ Stats::Stats(const std::string &path) : _path(path) {
 		_lastWon = _lastPlayed;
 
 	time_t today = time(NULL) / 24 / 60 / 60;
-	if(today - 1 != _lastWon)
+	if(_lastWon != today - 1 && _lastWon != today)
 		_streak = 0;
 	if(_streak > _maxStreak)
 		_maxStreak = _streak;

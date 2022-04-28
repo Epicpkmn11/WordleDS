@@ -40,7 +40,7 @@ def downloadScript(mod: str) -> list:
 		{
 			"type": "extractFile",
 			"file": f"/{modName}.zip",
-			"input": folder,
+			"input": re.escape(folder),
 			"output": f"/_nds/WordleDS/{modName}/"
 		},
 		{

@@ -13,6 +13,7 @@
 		"author": "[ItsSiem](https://www.github.com/itssiem)",
 		"description": "Wordle DS but with numbers instead of letters.",
 		"categories": ["Alternate Gamemode", "Numbers"],
+		"version": "v1.1.0",
 		"downloads": [
 			"Numberle DS.zip"
 		]
@@ -27,3 +28,4 @@
 		]
 	}
 ]
+ 

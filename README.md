@@ -14,5 +14,6 @@ To download mods, see the [mod list page](https://github.com/Epicpkmn11/WordleDS
 - [Josh Wardle](https://github.com/powerlanguage): The original Wordle
 - [lifehackerhansol](https://github.com/lifehackerhansol): animatedbannerpatch.py from [TWiLight Menu++](https://github.com/DS-Homebrew/TWiLightMenu)
 - [Rocket Robz](https://github.com/RocketRobz): Original music composition
+- [SombrAbsol](https://github.com/SombrAbsol): Boxart image for TWiLight Menu++
 - [devkitPro](https://github.com/devkitPro), [WinterMute](https://github.com/WinterMute): devkitARM, libnds, and libfat
 - [Kentaro Fukuchi](https://github.com/fukuchi): [libqrencode](https://fukuchi.org/works/qrencode/index.html)

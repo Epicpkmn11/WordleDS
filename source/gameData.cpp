@@ -24,21 +24,22 @@
 #include "toggleOn_grf.h"
 
 #include <algorithm>
+#include <string.h>
 
 // sassert but it fixes the brightness
 #undef sassert
 #define sassert(e,...) ((e) ? (void)0 : (setBrightness(2, 0), __sassert(__FILE__, __LINE__, #e, __VA_ARGS__)))
 
-std::vector<u16> GameData::getPalette(const nlohmann::json &json, size_t size) {
+std::vector<u16> GameData::getPalette(const Json &json, int size) {
 	std::vector<u16> output;
 
-	for(const auto &palette : json) {
-		if(palette.is_array()) {
-			for(const auto &color : palette) {
-				if(color.is_string()) {
-					output.push_back(strtol(color.get_ref<const std::string &>().c_str(), nullptr, 0));
-				} else if(color.is_number()) {
-					output.push_back(color);
+	for(const Json &palette : json) {
+		if(palette.isArray()) {
+			for(const Json &color : palette) {
+				if(color.isString()) {
+					output.push_back(strtol(color.get()->valuestring, nullptr, 0));
+				} else if(color.isNumber()) {
+					output.push_back(color.get()->valueint);
 				}
 			}
 			sassert(palette.size() == size, "Invalid palette (%d colors,\nshould be %d)", output.size(), size);
@@ -51,171 +52,168 @@ std::vector<u16> GameData::getPalette(const nlohmann::json &json, size_t size) {
 GameData::GameData(const std::string &folder) {
 	const std::string modPath(DATA_PATH + folder);
 
-	FILE *file = fopen((modPath + MOD_JSON).c_str(), "r");
-	if(file) {
-		nlohmann::json json = nlohmann::json::parse(file, nullptr, false);
-		fclose(file);
-
-		if(json.contains("minVersion") && json["minVersion"].is_string()) {
-			const std::string &minVer = json["minVersion"].get_ref<const std::string &>().c_str();
-			sassert(VER_NUMBER >= minVer, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer.c_str());
+	Json json((modPath + MOD_JSON).c_str());
+	if(json.get() != nullptr) {
+		if(json.contains("minVersion") && json["minVersion"].isString()) {
+			const char *minVer = json["minVersion"].get()->valuestring;
+			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
-		if(json.contains("shareName") && json["shareName"].is_string())
-			_shareName = json["shareName"];
+		if(json.contains("shareName") && json["shareName"].isString())
+			_shareName = json["shareName"].get()->valuestring;
 
-		if(json.contains("wordleOffset") && json["wordleOffset"].is_number())
-			_firstDay += json["wordleOffset"].get<int>();
+		if(json.contains("wordleOffset") && json["wordleOffset"].isNumber())
+			_firstDay += json["wordleOffset"].get()->valueint;
 
-		if(json.contains("maxGuesses") && json["maxGuesses"].is_number())
-			_maxGuesses = json["maxGuesses"];
+		if(json.contains("maxGuesses") && json["maxGuesses"].isNumber())
+			_maxGuesses = json["maxGuesses"].get()->valueint;
 		sassert(_maxGuesses > 0 && _maxGuesses <= 6, "Max guesses must be between 0\nand 6 (inclusive)\n\n(currently %d)", _maxGuesses);
 
-		if(json.contains("lossMessage") && json["lossMessage"].is_string())
-			_lossMessage = json["lossMessage"];
+		if(json.contains("lossMessage") && json["lossMessage"].isString())
+			_lossMessage = json["lossMessage"].get()->valuestring;
 
-		if(json.contains("tooShortMessage") && json["tooShortMessage"].is_string())
-			_tooShortMessage = json["tooShortMessage"];
+		if(json.contains("tooShortMessage") && json["tooShortMessage"].isString())
+			_tooShortMessage = json["tooShortMessage"].get()->valuestring;
 
-		if(json.contains("notWordMessage") && json["notWordMessage"].is_string())
-			_notWordMessage = json["notWordMessage"];
+		if(json.contains("notWordMessage") && json["notWordMessage"].isString())
+			_notWordMessage = json["notWordMessage"].get()->valuestring;
 
-		if(json.contains("creditStr") && json["creditStr"].is_string())
-			_creditStr = json["creditStr"];
+		if(json.contains("creditStr") && json["creditStr"].isString())
+			_creditStr = json["creditStr"].get()->valuestring;
 
-		if(json.contains("nthMustBeX") && json["nthMustBeX"].is_string())
-			_nthMustBeX = json["nthMustBeX"];
+		if(json.contains("nthMustBeX") && json["nthMustBeX"].isString())
+			_nthMustBeX = json["nthMustBeX"].get()->valuestring;
 
-		if(json.contains("guessMustContainX") && json["guessMustContainX"].is_string())
-			_guessMustContainX = json["guessMustContainX"];
+		if(json.contains("guessMustContainX") && json["guessMustContainX"].isString())
+			_guessMustContainX = json["guessMustContainX"].get()->valuestring;
 
-		if(json.contains("emoji") && json["emoji"].is_object()) {
-			if(json["emoji"].contains("green") && json["emoji"]["green"].is_string())
-				_emojiGreen = json["emoji"]["green"];
+		if(json.contains("emoji") && json["emoji"].isObject()) {
+			if(json["emoji"].contains("green") && json["emoji"]["green"].isString())
+				_emojiGreen = json["emoji"]["green"].get()->valuestring;
 
-			if(json["emoji"].contains("greenAlt") && json["emoji"]["greenAlt"].is_string())
-				_emojiGreenAlt = json["emoji"]["greenAlt"];
+			if(json["emoji"].contains("greenAlt") && json["emoji"]["greenAlt"].isString())
+				_emojiGreenAlt = json["emoji"]["greenAlt"].get()->valuestring;
 
-			if(json["emoji"].contains("yellow") && json["emoji"]["yellow"].is_string())
-				_emojiYellow = json["emoji"]["yellow"];
+			if(json["emoji"].contains("yellow") && json["emoji"]["yellow"].isString())
+				_emojiYellow = json["emoji"]["yellow"].get()->valuestring;
 
-			if(json["emoji"].contains("yellowAlt") && json["emoji"]["yellowAlt"].is_string())
-				_emojiYellowAlt = json["emoji"]["yellowAlt"];
+			if(json["emoji"].contains("yellowAlt") && json["emoji"]["yellowAlt"].isString())
+				_emojiYellowAlt = json["emoji"]["yellowAlt"].get()->valuestring;
 
-			if(json["emoji"].contains("white") && json["emoji"]["white"].is_string())
-				_emojiWhite = json["emoji"]["white"];
+			if(json["emoji"].contains("white") && json["emoji"]["white"].isString())
+				_emojiWhite = json["emoji"]["white"].get()->valuestring;
 		}
 
-		if(json.contains("howto") && json["howto"].is_object()) {
-			size_t howtoWordsSize = 15;
-			if(json["howto"].contains("words") && json["howto"]["words"].is_array() && json["howto"]["words"].size() > 0 && json["howto"]["words"].size() <= 3) {
+		if(json.contains("howto") && json["howto"].isObject()) {
+			int howtoWordsSize = 15;
+			if(json["howto"].contains("words") && json["howto"]["words"].isArray() && json["howto"]["words"].size() > 0 && json["howto"]["words"].size() <= 3) {
 				_howtoWords.clear();
 				howtoWordsSize = 0;
-				for(const auto &howtoWord : json["howto"]["words"]) {
-					if(howtoWord.is_string()) {
-						std::u16string u16word = Font::utf8to16(howtoWord.get_ref<const std::string &>());
-						sassert(u16word.size() > 0 && u16word.size() <= 9, "How to words must be between 1\nand 9 (inclusive) characters\n\n%s is %d", howtoWord.get_ref<const std::string &>().c_str(), u16word.size());
+				for(const Json &howtoWord : json["howto"]["words"]) {
+					if(howtoWord.isString()) {
+						std::u16string u16word = Font::utf8to16(howtoWord.get()->valuestring);
+						sassert(u16word.size() > 0 && u16word.size() <= 9, "How to words must be between 1\nand 9 (inclusive) characters\n\n%s is %d", howtoWord.get()->valuestring, u16word.size());
 						_howtoWords.push_back(u16word);
 						howtoWordsSize += u16word.size();
 					}
 				}
 			}
 
-			if(json["howto"].contains("colors") && json["howto"]["colors"].is_array()) {
+			if(json["howto"].contains("colors") && json["howto"]["colors"].isArray()) {
 				sassert(json["howto"]["colors"].size() == howtoWordsSize, "Length of how to colors and\nwords must match\n\n(words is %d, colors is %d)", howtoWordsSize, json["howto"]["colors"].size());
 				_howtoColors.clear();
-				for(const auto &howtoColor : json["howto"]["colors"]) {
-					if(howtoColor == "white") {
+				for(const Json &howtoColor : json["howto"]["colors"]) {
+					if(strcmp(howtoColor.get()->valuestring, "white") == 0) {
 						_howtoColors.push_back(TilePalette::whiteDark);
-					} else if(howtoColor == "green") {
+					} else if(strcmp(howtoColor.get()->valuestring, "green") == 0) {
 						_howtoColors.push_back(TilePalette::green);
-					} else if(howtoColor == "yellow") {
+					} else if(strcmp(howtoColor.get()->valuestring, "yellow") == 0) {
 						_howtoColors.push_back(TilePalette::yellow);
-					} else if(howtoColor == "gray") {
+					} else if(strcmp(howtoColor.get()->valuestring, "gray") == 0) {
 						_howtoColors.push_back(TilePalette::gray);
 					} else {
-						sassert(false, "Invalid how to color\n(%s)", howtoColor.get_ref<const std::string &>().c_str());
+						sassert(false, "Invalid how to color\n(%s)", howtoColor.get()->valuestring);
 					}
 				}
 			}
 		}
 
-		if(json.contains("victoryMessages") && json["victoryMessages"].is_array() && json["victoryMessages"].size() > 0) {
+		if(json.contains("victoryMessages") && json["victoryMessages"].isArray() && json["victoryMessages"].size() > 0) {
 			_victoryMessages.clear();
-			for(const auto &victoryMessage : json["victoryMessages"]) {
-				if(victoryMessage.is_string())
-					_victoryMessages.push_back(victoryMessage);
+			for(const Json &victoryMessage : json["victoryMessages"]) {
+				if(victoryMessage.isString())
+					_victoryMessages.push_back(victoryMessage.get()->valuestring);
 			}
 		}
 
-		if(json.contains("numberSuffixes") && json["numberSuffixes"].is_object()) {
+		if(json.contains("numberSuffixes") && json["numberSuffixes"].isObject()) {
 			_numberSuffixes.clear();
-			for(const auto &numberSuffix : json["numberSuffixes"].items()) {
-				if(numberSuffix.value().is_string()) {
+			for(const Json &numberSuffix : json["numberSuffixes"]) {
+				if(numberSuffix.isString()) {
 					int key;
-					if(numberSuffix.key() == "default")
+					if(strcmp(numberSuffix.get()->string, "default") == 0)
 						key = 0xFFFF;
 					else
-						key = atoi(numberSuffix.key().c_str());
+						key = atoi(numberSuffix.get()->string);
 
-					_numberSuffixes[key] = numberSuffix.value();
+					_numberSuffixes[key] = numberSuffix.get()->valuestring;
 				}
 			}
 			_numberSuffixes[0xFFFF]; // Ensure default exists
 		}
 
-		if(json.contains("letters") && json["letters"].is_array() && json["letters"].size() > 0) {
+		if(json.contains("letters") && json["letters"].isArray() && json["letters"].size() > 0) {
 			_letters.clear();
-			for(const auto &letter : json["letters"]) {
-				std::u16string u16letter = Font::utf8to16(letter.get_ref<const std::string &>());
-				sassert(u16letter.size() == 1, "Invalid letter (%s), must be\n1 UTF-16 character", letter.get_ref<const std::string &>().c_str());
+			for(const Json &letter : json["letters"]) {
+				std::u16string u16letter = Font::utf8to16(letter.get()->valuestring);
+				sassert(u16letter.size() == 1, "Invalid letter (%s), must be\n1 UTF-16 character", letter.get()->valuestring);
 				_letters.push_back(u16letter[0]);
 			}
 		}
 
-		if(json.contains("keyboard") && json["keyboard"].is_array()) {
+		if(json.contains("keyboard") && json["keyboard"].isArray()) {
 			_keyboard.clear();
-			for(const auto &key : json["keyboard"]) {
-				if(key.is_array() && key.size() == 3 && key[0].is_number() && key[1].is_number() && key[2].is_string()) {
-					std::u16string letter = Font::utf8to16(key[2].get_ref<const std::string &>());
-					sassert(letter.size() == 1, "Invalid key (%s), must be\n1 UTF-16 character", key[2].get_ref<const std::string &>().c_str());
-					_keyboard.emplace_back(key[0], key[1], letter[0]);
+			for(const Json &key : json["keyboard"]) {
+				if(key.isArray() && key.size() == 3 && key[0].isNumber() && key[1].isNumber() && key[2].isString()) {
+					std::u16string letter = Font::utf8to16(key[2].get()->valuestring);
+					sassert(letter.size() == 1, "Invalid key (%s), must be\n1 UTF-16 character", key[2].get()->valuestring);
+					_keyboard.emplace_back(key[0].get()->valueint, key[1].get()->valueint, letter[0]);
 				}
 			}
 		}
 
-		if(json.contains("palettes") && json["palettes"].is_object()) {
-			if(json["palettes"].contains("letter") && json["palettes"]["letter"].is_object()) {
-				if(json["palettes"]["letter"].contains("regular") && json["palettes"]["letter"]["regular"].is_array() && json["palettes"]["letter"]["regular"].size() == 5)
+		if(json.contains("palettes") && json["palettes"].isObject()) {
+			if(json["palettes"].contains("letter") && json["palettes"]["letter"].isObject()) {
+				if(json["palettes"]["letter"].contains("regular") && json["palettes"]["letter"]["regular"].isArray() && json["palettes"]["letter"]["regular"].size() == 5)
 					_letterPalettes[0] = getPalette(json["palettes"]["letter"]["regular"], 16);
 
-				if(json["palettes"]["letter"].contains("highContrast") && json["palettes"]["letter"]["highContrast"].is_array() && json["palettes"]["letter"]["highContrast"].size() == 5)
+				if(json["palettes"]["letter"].contains("highContrast") && json["palettes"]["letter"]["highContrast"].isArray() && json["palettes"]["letter"]["highContrast"].size() == 5)
 					_letterPalettes[1] = getPalette(json["palettes"]["letter"]["highContrast"], 16);
 			}
 
-			if(json["palettes"].contains("font") && json["palettes"]["font"].is_object()) {
-				if(json["palettes"]["font"].contains("regular") && json["palettes"]["font"]["regular"].is_array() && json["palettes"]["font"]["regular"].size() == 5)
+			if(json["palettes"].contains("font") && json["palettes"]["font"].isObject()) {
+				if(json["palettes"]["font"].contains("regular") && json["palettes"]["font"]["regular"].isArray() && json["palettes"]["font"]["regular"].size() == 5)
 					_fontPalettes[0] = getPalette(json["palettes"]["font"]["regular"], 4);
 
-				if(json["palettes"]["font"].contains("highContrast") && json["palettes"]["font"]["highContrast"].is_array() && json["palettes"]["font"]["highContrast"].size() == 5)
+				if(json["palettes"]["font"].contains("highContrast") && json["palettes"]["font"]["highContrast"].isArray() && json["palettes"]["font"]["highContrast"].size() == 5)
 					_fontPalettes[1] = getPalette(json["palettes"]["font"]["highContrast"], 4);
 			}
 		}
 
-		if(json.contains("words") && json["words"].is_object()) {
-			if(json["words"].contains("choices") && json["words"]["choices"].is_array() && json["words"]["choices"].size() > 0) {
-				for(const auto &word : json["words"]["choices"]) {
-					std::u16string u16word = Font::utf8to16(word.get_ref<const std::string &>());
-					sassert(u16word.size() > 0 && u16word.size() <= 9, "Words must be between 1 and 9\n(inclusive) characters\n\n%s is %d", word.get_ref<const std::string &>().c_str(), u16word.size());
+		if(json.contains("words") && json["words"].isObject()) {
+			if(json["words"].contains("choices") && json["words"]["choices"].isArray() && json["words"]["choices"].size() > 0) {
+				for(const Json &word : json["words"]["choices"]) {
+					std::u16string u16word = Font::utf8to16(word.get()->valuestring);
+					sassert(u16word.size() > 0 && u16word.size() <= 9, "Words must be between 1 and 9\n(inclusive) characters\n\n%s is %d", word.get()->valuestring, u16word.size());
 					_choices.push_back(u16word);
 				}
 			} else {
 				_choices = Words::choices;
 			}
 
-			if(json["words"].contains("guesses") && json["words"]["guesses"].is_array()) {
-				for(const auto &word : json["words"]["guesses"]) {
-					std::u16string u16word = Font::utf8to16(word.get_ref<const std::string &>());
+			if(json["words"].contains("guesses") && json["words"]["guesses"].isArray()) {
+				for(const Json &word : json["words"]["guesses"]) {
+					std::u16string u16word = Font::utf8to16(word.get()->valuestring);
 					if(u16word.size() > 0 && u16word.size() <= 9) {
 						_guesses.push_back(u16word);
 					}

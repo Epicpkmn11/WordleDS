@@ -3,6 +3,7 @@
 
 #include "tonccpy.h"
 
+#include <algorithm>
 #include <nds.h>
 
 Kbd::Kbd(const std::vector<Key> &keys, const std::vector<char16_t> &letters, const std::vector<OamGfx> &gfx, const OamGfx &backspaceGfx, const OamGfx &enterGfx) : _keys(keys), _letters(letters) {

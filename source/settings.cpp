@@ -17,33 +17,29 @@
 Settings *settings;
 
 Settings::Settings(const std::string &path) : _path(path) {
-	FILE *file = fopen(_path.c_str(), "r");
-	if(!file)
+	Json json(_path.c_str());
+	if(!json.get())
 		return;
 
-	nlohmann::json json = nlohmann::json::parse(file, nullptr, false);
-	fclose(file);
-
-	if(json.contains("hardMode") && json["hardMode"].is_boolean())
-		_hardMode = json["hardMode"];
-	if(json.contains("altPalette") && json["altPalette"].is_boolean())
-		_altPalette = json["altPalette"];
-	if(json.contains("music") && json["music"].is_boolean())
-		_music = json["music"];
-	if(json.contains("mod") && json["mod"].is_string())
-		_mod = json["mod"];
+	if(json.contains("hardMode") && json["hardMode"].isBool())
+		_hardMode = json["hardMode"].isTrue();
+	if(json.contains("altPalette") && json["altPalette"].isBool())
+		_altPalette = json["altPalette"].isTrue();
+	if(json.contains("music") && json["music"].isBool())
+		_music = json["music"].isTrue();
+	if(json.contains("mod") && json["mod"].isString())
+		_mod = json["mod"].get()->valuestring;
 
 	if(access((DATA_PATH + _mod).c_str(), F_OK) != 0)
 		_mod = DEFAULT_MOD;
 }
 
 bool Settings::save() {
-	nlohmann::json json({
-		{"hardMode", _hardMode},
-		{"altPalette", _altPalette},
-		{"music", _music},
-		{"mod", _mod}
-	});
+	Json json;
+	json.set(_hardMode, "hardMode");
+	json.set(_altPalette, "altPalette");
+	json.set(_music, "music");
+	json.set(_mod.c_str(), "mod");
 
 	FILE *file = fopen(_path.c_str(), "w");
 	if(file) {
@@ -58,53 +54,50 @@ bool Settings::save() {
 }
 
 void Settings::legacyImport(const std::string &path) {
-	FILE *file = fopen(path.c_str(), "r");
-	if(!file)
+	Json json(path.c_str());
+	if(!json.get())
 		return;
-
-	nlohmann::json json = nlohmann::json::parse(file, nullptr, false);
-	fclose(file);
 
 	bool good = true;
 
 	// Settings
-	if(json.contains("settings") && json["settings"].is_object()) {
+	if(json.contains("settings") && json["settings"].isObject()) {
 		Settings settings(SETTINGS_JSON);
 
-		if(json["settings"].contains("hardMode") && json["settings"]["hardMode"].is_boolean())
-			settings.hardMode(json["settings"]["hardMode"]);
-		if(json["settings"].contains("altPalette") && json["settings"]["altPalette"].is_boolean())
-			settings.altPalette(json["settings"]["altPalette"]);
-		if(json["settings"].contains("music") && json["settings"]["music"].is_boolean())
-			settings.music(json["settings"]["music"]);
+		if(json["settings"].contains("hardMode") && json["settings"]["hardMode"].isBool())
+			settings.hardMode(json["settings"]["hardMode"].isTrue());
+		if(json["settings"].contains("altPalette") && json["settings"]["altPalette"].isBool())
+			settings.altPalette(json["settings"]["altPalette"].isTrue());
+		if(json["settings"].contains("music") && json["settings"]["music"].isBool())
+			settings.music(json["settings"]["music"].isTrue());
 
 		good = settings.save();
 	}
 
 	// Stats
-	if(json.contains("stats") && json["stats"].is_object()) {
+	if(json.contains("stats") && json["stats"].isObject()) {
 		Stats stats(DATA_PATH DEFAULT_MOD STATS_JSON);
 
-		if(json["stats"].contains("guessCounts") && json["stats"]["guessCounts"].is_array()) {
-			for(const auto &item : json["stats"]["guessCounts"]) {
-				if(item.is_number())
-					stats.guessCounts(item.get<int>());
+		if(json["stats"].contains("guessCounts") && json["stats"]["guessCounts"].isArray()) {
+			for(const Json &item : json["stats"]["guessCounts"]) {
+				if(item.isNumber())
+					stats.guessCounts(item.get()->valueint);
 			}
 		}
-		if(json["stats"].contains("boardState") && json["stats"]["boardState"].is_array()) {
-			for(const auto &item : json["stats"]["boardState"]) {
-				if(item.is_string())
-					stats.boardState(item.get_ref<const std::string &>());
+		if(json["stats"].contains("boardState") && json["stats"]["boardState"].isArray()) {
+			for(const Json &item : json["stats"]["boardState"]) {
+				if(item.isString())
+					stats.boardState(item.get()->valuestring);
 			}
 		}
-		if(json["stats"].contains("streak") && json["stats"]["streak"].is_number())
-			stats.streak(json["stats"]["streak"]);
-		if(json["stats"].contains("maxStreak") && json["stats"]["maxStreak"].is_number())
-			stats.maxStreak(json["stats"]["maxStreak"]);
-		if(json["stats"].contains("gamesPlayed") && json["stats"]["gamesPlayed"].is_number())
-			stats.gamesPlayed(json["stats"]["gamesPlayed"]);
-		if(json["stats"].contains("lastPlayed") && json["stats"]["lastPlayed"].is_number())
-			stats.lastPlayed(json["stats"]["lastPlayed"]);
+		if(json["stats"].contains("streak") && json["stats"]["streak"].isNumber())
+			stats.streak(json["stats"]["streak"].get()->valueint);
+		if(json["stats"].contains("maxStreak") && json["stats"]["maxStreak"].isNumber())
+			stats.maxStreak(json["stats"]["maxStreak"].get()->valueint);
+		if(json["stats"].contains("gamesPlayed") && json["stats"]["gamesPlayed"].isNumber())
+			stats.gamesPlayed(json["stats"]["gamesPlayed"].get()->valueint);
+		if(json["stats"].contains("lastPlayed") && json["stats"]["lastPlayed"].isNumber())
+			stats.lastPlayed(json["stats"]["lastPlayed"].get()->valueint);
 
 		time_t today = time(NULL) / 24 / 60 / 60;
 		if(today - stats.lastPlayed() > 1)

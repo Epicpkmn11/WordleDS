@@ -159,7 +159,7 @@ class GameData {
 	Font _mainFont, _numbersLarge, _numbersSmall;
 
 	// size is used for sanity checking
-	static std::vector<u16> getPalette(const nlohmann::json &json, size_t size);
+	static std::vector<u16> getPalette(const Json &json, int size);
 
 public:
 	GameData(const std::string &folder);

@@ -12,36 +12,33 @@
 #include <qrencode.h>
 
 Stats::Stats(const std::string &path) : _path(path) {
-	FILE *file = fopen(_path.c_str(), "r");
-	if(!file)
+	Json json(_path.c_str());
+	if(!json.get())
 		return;
 
-	nlohmann::json json = nlohmann::json::parse(file, nullptr, false);
-	fclose(file);
-
 	// Stats
-	if(json.contains("guessCounts") && json["guessCounts"].is_array()) {
-		for(const auto &item : json["guessCounts"]) {
-			if(item.is_number())
-				_guessCounts.push_back(item);
+	if(json.contains("guessCounts") && json["guessCounts"].isArray()) {
+		for(const Json &item : json["guessCounts"]) {
+			if(item.isNumber())
+				_guessCounts.push_back(item.get()->valueint);
 		}
 	}
-	if(json.contains("boardState") && json["boardState"].is_array()) {
-		for(const auto &item : json["boardState"]) {
-			if(item.is_string())
-				_boardState.push_back(item);
+	if(json.contains("boardState") && json["boardState"].isArray()) {
+		for(const Json &item : json["boardState"]) {
+			if(item.isString())
+				_boardState.push_back(item.get()->valuestring);
 		}
 	}
-	if(json.contains("streak") && json["streak"].is_number())
-		_streak = json["streak"];
-	if(json.contains("maxStreak") && json["maxStreak"].is_number())
-		_maxStreak = json["maxStreak"];
-	if(json.contains("gamesPlayed") && json["gamesPlayed"].is_number())
-		_gamesPlayed = json["gamesPlayed"];
-	if(json.contains("lastPlayed") && json["lastPlayed"].is_number())
-		_lastPlayed = json["lastPlayed"];
-	if(json.contains("lastWon") && json["lastWon"].is_number())
-		_lastWon = json["lastWon"];
+	if(json.contains("streak") && json["streak"].isNumber())
+		_streak = json["streak"].get()->valueint;
+	if(json.contains("maxStreak") && json["maxStreak"].isNumber())
+		_maxStreak = json["maxStreak"].get()->valueint;
+	if(json.contains("gamesPlayed") && json["gamesPlayed"].isNumber())
+		_gamesPlayed = json["gamesPlayed"].get()->valueint;
+	if(json.contains("lastPlayed") && json["lastPlayed"].isNumber())
+		_lastPlayed = json["lastPlayed"].get()->valueint;
+	if(json.contains("lastWon") && json["lastWon"].isNumber())
+		_lastWon = json["lastWon"].get()->valueint;
 	else
 		_lastWon = _lastPlayed;
 
@@ -55,15 +52,14 @@ Stats::Stats(const std::string &path) : _path(path) {
 }
 
 bool Stats::save() {
-	nlohmann::json json({
-		{"guessCounts", _guessCounts},
-		{"boardState", _boardState},
-		{"streak", _streak},
-		{"maxStreak", _maxStreak},
-		{"gamesPlayed", _gamesPlayed},
-		{"lastPlayed", _lastPlayed},
-		{"lastWon", _lastWon}
-	});
+	Json json;
+	json.set(_guessCounts, "guessCounts");
+	json.set(_boardState, "boardState");
+	json.set(_streak, "streak");
+	json.set(_maxStreak, "maxStreak");
+	json.set(_gamesPlayed, "gamesPlayed");
+	json.set((double)_lastPlayed, "lastPlayed");
+	json.set((double)_lastWon, "lastWon");
 
 	FILE *file = fopen(_path.c_str(), "w");
 	if(file) {

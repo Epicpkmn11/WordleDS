@@ -244,6 +244,7 @@ bool Game::run() {
 					_stats
 						.boardState(Font::utf16to8(_guess))
 						.lastPlayed(_today)
+						.timeElapsed(time(NULL) - _startTime)
 						.save();
 
 					_guess = u"";
@@ -272,6 +273,10 @@ bool Game::run() {
 					}
 					sprite.affineIndex(-1, false).update();
 					_guess += key;
+
+					// Start timer if not started yet
+					if(!_startTime)
+						_startTime = time(NULL) - _stats.timeElapsed();
 				}
 				break;
 		}
@@ -333,11 +338,14 @@ bool Game::run() {
 			_kbd.hide();
 
 			// Update stats
-			_stats.lastWon(_today);
-			_stats.guessCounts(_currentGuess);
-			_stats.gamesPlayed(_stats.gamesPlayed() + 1);
-			_stats.streak(_won ? _stats.streak() + 1 : 0);
-			_stats.save();
+			_stats
+				.timeElapsed(time(NULL) - _startTime)
+				.completionTimes(_stats.timeElapsed())
+				.lastWon(_today)
+				.guessCounts(_currentGuess)
+				.gamesPlayed(_stats.gamesPlayed() + 1)
+				.streak(_won ? _stats.streak() + 1 : 0)
+				.save();
 
 			// Generate sharable txt
 			FILE *file = fopen((DATA_PATH + settings->mod() + "/share.txt").c_str(), "w");

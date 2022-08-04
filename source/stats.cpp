@@ -23,24 +23,40 @@ Stats::Stats(const std::string &path) : _path(path) {
 				_guessCounts.push_back(item.get()->valueint);
 		}
 	}
+
 	if(json.contains("boardState") && json["boardState"].isArray()) {
 		for(const Json &item : json["boardState"]) {
 			if(item.isString())
 				_boardState.push_back(item.get()->valuestring);
 		}
 	}
+
+	if(json.contains("completionTimes") && json["completionTimes"].isArray()) {
+		for(const Json &item : json["completionTimes"]) {
+			if(item.isNumber())
+				_completionTimes.push_back(item.get()->valueint);
+		}
+	}
+
 	if(json.contains("streak") && json["streak"].isNumber())
 		_streak = json["streak"].get()->valueint;
+
 	if(json.contains("maxStreak") && json["maxStreak"].isNumber())
 		_maxStreak = json["maxStreak"].get()->valueint;
+
 	if(json.contains("gamesPlayed") && json["gamesPlayed"].isNumber())
 		_gamesPlayed = json["gamesPlayed"].get()->valueint;
+
 	if(json.contains("lastPlayed") && json["lastPlayed"].isNumber())
 		_lastPlayed = json["lastPlayed"].get()->valueint;
+
 	if(json.contains("lastWon") && json["lastWon"].isNumber())
 		_lastWon = json["lastWon"].get()->valueint;
 	else
 		_lastWon = _lastPlayed;
+
+	if(json.contains("timeElapsed") && json["timeElapsed"].isNumber())
+		_timeElapsed = json["timeElapsed"].get()->valueint;
 
 	time_t today = time(NULL) / 24 / 60 / 60;
 	if(_lastWon != today - 1 && _lastWon != today)
@@ -55,11 +71,13 @@ bool Stats::save() {
 	Json json;
 	json.set(_guessCounts, "guessCounts");
 	json.set(_boardState, "boardState");
+	json.set(_completionTimes, "completionTimes");
 	json.set(_streak, "streak");
 	json.set(_maxStreak, "maxStreak");
 	json.set(_gamesPlayed, "gamesPlayed");
 	json.set((double)_lastPlayed, "lastPlayed");
 	json.set((double)_lastWon, "lastWon");
+	json.set((double)_timeElapsed, "timeElapsed");
 
 	FILE *file = fopen(_path.c_str(), "w");
 	if(file) {
@@ -118,12 +136,23 @@ void Stats::showQr() {
 std::string Stats::shareMessage() {
 	char str[256];
 
-	sprintf(str, "%s %lld %c/%d%s\n\n",
+	char timeStr[16] = "";
+	if(settings->timer()) {
+		int time = _completionTimes.back();
+		if(time > 60 * 60) {
+			sprintf(timeStr, " %02d:%02d:%02d", time / 60 / 60, (time / 60) % 60, time % 60);
+		} else {
+			sprintf(timeStr, " %02d:%02d", time / 60, time % 60);
+		}
+	}
+
+	sprintf(str, "%s %lld %c/%d%s%s\n\n",
 		game->data().shareName().c_str(),
 		_lastPlayed - game->data().firstDay(),
 		_guessCounts.back() > game->data().maxGuesses() ? 'X' : '0' + _guessCounts.back(),
 		game->data().maxGuesses(),
-		settings->hardMode() ? "*" : "");
+		settings->hardMode() ? "*" : "",
+		timeStr);
 
 	for(const std::string &_guess : _boardState) {
 		std::vector<TilePalette> colors = game->check(Font::utf8to16(_guess));

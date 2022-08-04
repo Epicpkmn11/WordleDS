@@ -23,10 +23,16 @@ Settings::Settings(const std::string &path) : _path(path) {
 
 	if(json.contains("hardMode") && json["hardMode"].isBool())
 		_hardMode = json["hardMode"].isTrue();
+
 	if(json.contains("altPalette") && json["altPalette"].isBool())
 		_altPalette = json["altPalette"].isTrue();
+
 	if(json.contains("music") && json["music"].isBool())
 		_music = json["music"].isTrue();
+
+	if(json.contains("timer") && json["timer"].isBool())
+		_timer = json["timer"].isTrue();
+
 	if(json.contains("mod") && json["mod"].isString())
 		_mod = json["mod"].get()->valuestring;
 
@@ -39,6 +45,7 @@ bool Settings::save() {
 	json.set(_hardMode, "hardMode");
 	json.set(_altPalette, "altPalette");
 	json.set(_music, "music");
+	json.set(_timer, "timer");
 	json.set(_mod.c_str(), "mod");
 
 	FILE *file = fopen(_path.c_str(), "w");

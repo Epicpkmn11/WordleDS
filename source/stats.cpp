@@ -58,13 +58,19 @@ Stats::Stats(const std::string &path) : _path(path) {
 	if(json.contains("timeElapsed") && json["timeElapsed"].isNumber())
 		_timeElapsed = json["timeElapsed"].get()->valueint;
 
+	// Clear the streak if broken
 	time_t today = time(NULL) / 24 / 60 / 60;
 	if(_lastWon != today - 1 && _lastWon != today)
 		_streak = 0;
-	if(_streak > _maxStreak)
+
+	if(_streak > _maxStreak) // Update the max streak if improved
 		_maxStreak = _streak;
-	if(_lastPlayed != today)
+
+	// Clear day-specific variables
+	if(_lastPlayed != today) {
 		_boardState = {};
+		_timeElapsed = 0;
+	}
 }
 
 bool Stats::save() {

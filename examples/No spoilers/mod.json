@@ -1,5 +1,5 @@
 {
-	"minVersion": "v2.0.0",
+	"minVersion": "v2.1.0",
 	"maxGuesses": 6,
 	"wordleOffset": 0,
 	"shareName": "Wordle DS",
@@ -9,12 +9,30 @@
 	"creditStr": "Wordle DS\nby Pk11",
 	"nthMustBeX": "%d%s letter must be %s",
 	"guessMustContainX": "Guess must contain %s",
+	"shareMsg": {
+		"time": " %02d:%02d",
+		"timeHour": " %02d:%02d:%02d",
+		"streak": " 📈%d"
+	},
 	"emoji": {
 		"green": "🟩",
 		"greenAlt":"🟧",
 		"yellow": "🟨",
 		"yellowAlt": "🟦",
 		"white": "⬜"
+	},
+	"settings": {
+		"buttons": {
+			"hardMode": [224, 33, 21, 13],
+			"highContrast": [224, 68, 21, 13],
+			"music": [224, 92, 21, 13],
+			"shareMsg": [232, 108, 17, 17],
+			"mod": [232, 131, 17, 17]
+		},
+		"shareMsgButtons": {
+			"timer": [224, 37, 21, 13],
+			"streak": [224, 82, 21, 13]
+		}
 	},
 	"howto": {
 		"words": [

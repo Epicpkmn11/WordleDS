@@ -1,4 +1,5 @@
 {
+	"minVersion": "v2.0.0",
 	"maxGuesses": 2,
 	"wordleOffset": 305,
 	"shareName": "uwdl DS",
@@ -8,6 +9,11 @@
 	"creditStr": "uwdl DS\nby Pk1-chan",
 	"nthMustBeX": "%d%s weta must be %s",
 	"guessMustContainX": "Gyus must contain %s",
+	"shareMsg": {
+		"time": " %d minyutes %d seconds",
+		"timeHour": " %d houws %d minyutes %d seconds",
+		"streak": " OwO %d stweak"
+	},
 	"emoji": {
 		"green": "^-^ ",
 		"greenAlt": "^_^ ",

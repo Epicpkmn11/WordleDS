@@ -30,14 +30,21 @@ Settings::Settings(const std::string &path) : _path(path) {
 	if(json.contains("music") && json["music"].isBool())
 		_music = json["music"].isTrue();
 
-	if(json.contains("timer") && json["timer"].isBool())
-		_timer = json["timer"].isTrue();
-
 	if(json.contains("mod") && json["mod"].isString())
 		_mod = json["mod"].get()->valuestring;
 
 	if(access((DATA_PATH + _mod).c_str(), F_OK) != 0)
 		_mod = DEFAULT_MOD;
+
+	if(json.contains("shareMsg") && json["shareMsg"].isObject()) {
+		if(json["shareMsg"].contains("timer") && json["shareMsg"]["timer"].isBool())
+			_shareTimer = json["shareMsg"]["timer"].isTrue();
+
+		if(json["shareMsg"].contains("streak") && json["shareMsg"]["streak"].isBool())
+			_shareStreak = json["shareMsg"]["streak"].isTrue();
+	} else if(json.contains("timer") && json["timer"].isBool()) {
+		_shareTimer = json["timer"].isTrue();
+	}
 }
 
 bool Settings::save() {
@@ -45,8 +52,11 @@ bool Settings::save() {
 	json.set(_hardMode, "hardMode");
 	json.set(_altPalette, "altPalette");
 	json.set(_music, "music");
-	json.set(_timer, "timer");
 	json.set(_mod.c_str(), "mod");
+
+	Json shareMsg = json.create(true, "shareMsg");
+	shareMsg.set(_shareTimer, "timer");
+	shareMsg.set(_shareStreak, "streak");
 
 	FILE *file = fopen(_path.c_str(), "w");
 	if(file) {
@@ -138,11 +148,11 @@ void Settings::showMenu() {
 	Font::update(false);
 
 	Sprite hardToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	hardToggle.move(224, 37);
+	hardToggle.move(game->data().hardModeToggle());
 	Sprite colorToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	colorToggle.move(224, 76);
+	colorToggle.move(game->data().highContrastToggle());
 	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	musicToggle.move(224, 102);
+	musicToggle.move(game->data().musicToggle());
 
 	while(1) {
 		game->data().setPalettes(_altPalette);
@@ -174,41 +184,75 @@ void Settings::showMenu() {
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
-			} else if(touch.px >= 224 && touch.px <= (224 + 21)) { // Toggle
-				if(touch.py >= 37 && touch.py <= (37 + 13)) {
-					if(game->stats().boardState().size() == 0) // Can't toggle mid-game
-						_hardMode = !_hardMode;
-				} else if(touch.py >= 76 && touch.py <= (76 + 13)) {
-					_altPalette = !_altPalette;
-				} else if(touch.py >= 102 && touch.py <= (102 + 13)) {
-					_music = !_music;
-					if(_music)
-						Music::music->start();
-					else
-						Music::music->stop();
-				} else if(touch.py >= 127 && touch.py <= (127 + 17)) {
-					// Clear text, hide sprites
-					Font::clear(false);
-					Font::update(false);
+			} else if(game->data().hardModeToggle().touching(touch)) {
+				if(game->stats().boardState().size() == 0) // Can't toggle mid-game
+					_hardMode = !_hardMode;
+			} else if(game->data().highContrastToggle().touching(touch)) {
+				_altPalette = !_altPalette;
+			} else if(game->data().musicToggle().touching(touch)) {
+				_music = !_music;
+				if(_music)
+					Music::music->start();
+				else
+					Music::music->stop();
+			} else if(game->data().shareMsgBtn().touching(touch)) {
+				// Clear text, hide sprites
+				Font::clear(false);
+				Font::update(false);
 
-					hardToggle.visible(false);
-					colorToggle.visible(false);
-					musicToggle.visible(false);
-					Sprite::update(false);
+				hardToggle.visible(false);
+				colorToggle.visible(false);
+				musicToggle.visible(false);
+				Sprite::update(false);
 
-					selectMod();
+				shareMsgSettings();
 
-					// Restore background and sprites
-					swiWaitForVBlank();
-					game->data().settingsBottom()
-						.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-						.decompressMap(bgGetMapPtr(BG_SUB(0)))
-						.decompressPal(BG_PALETTE_SUB);
-					hardToggle.visible(true);
-					colorToggle.visible(true);
-					musicToggle.visible(true);
-					Sprite::update(false);
-				}
+				// Restore background and sprites
+				swiWaitForVBlank();
+				game->data().settingsBottom()
+					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+					.decompressMap(bgGetMapPtr(BG_SUB(0)))
+					.decompressPal(BG_PALETTE_SUB);
+
+				hardToggle.visible(true);
+				colorToggle.visible(true);
+				musicToggle.visible(true);
+				Sprite::update(false);
+
+				game->data().mainFont()
+					.palette(TEXT_GRAY)
+					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
+				Font::update(false);
+			} else if(game->data().modBtn().touching(touch)) {
+				// Clear text, hide sprites
+				Font::clear(false);
+				Font::update(false);
+
+				hardToggle.visible(false);
+				colorToggle.visible(false);
+				musicToggle.visible(false);
+				Sprite::update(false);
+
+				selectMod();
+
+				// Restore background and sprites
+				swiWaitForVBlank();
+				game->data().settingsBottom()
+					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+					.decompressMap(bgGetMapPtr(BG_SUB(0)))
+					.decompressPal(BG_PALETTE_SUB);
+
+				hardToggle.visible(true);
+				colorToggle.visible(true);
+				musicToggle.visible(true);
+				Sprite::update(false);
+
+				game->data().mainFont()
+					.palette(TEXT_GRAY)
+					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
+				Font::update(false);
 			}
 		}
 	}
@@ -217,6 +261,54 @@ void Settings::showMenu() {
 
 	Font::clear(false);
 	Font::update(false);
+}
+
+void Settings::shareMsgSettings() {
+	// Change to share message settings background
+	game->data().shareMsgSettings()
+		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+		.decompressMap(bgGetMapPtr(BG_SUB(0)))
+		.decompressPal(BG_PALETTE_SUB);
+
+	Sprite timerToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	timerToggle.move(game->data().shareTimerToggle());
+	Sprite streakToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	streakToggle.move(game->data().shareStreakToggle());
+
+	while(1) {
+		game->data().setPalettes(_altPalette);
+		timerToggle
+			.gfx(_shareTimer ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+			.palette(_shareTimer ? TilePalette::green : TilePalette::gray);
+		streakToggle
+			.gfx(_shareStreak ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+			.palette(_shareStreak ? TilePalette::green : TilePalette::gray);
+		Sprite::update(false);
+
+		u16 pressed;
+		do {
+			swiWaitForVBlank();
+			scanKeys();
+			pressed = keysDown();
+		} while(!(pressed & (KEY_B | KEY_TOUCH)));
+
+		if(pressed & KEY_B) {
+			break;
+		}
+
+		if(pressed & KEY_TOUCH) {
+			touchPosition touch;
+			touchRead(&touch);
+
+			if(touch.px > 232 && touch.py < 24) { // X
+				break;
+			} else if(game->data().shareTimerToggle().touching(touch)) {
+				_shareTimer = !_shareTimer;
+			} else if(game->data().shareStreakToggle().touching(touch)) {
+				_shareStreak = !_shareStreak;
+			}
+		}
+	}
 }
 
 std::vector<std::string> Settings::getMods() {

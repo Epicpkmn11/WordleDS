@@ -140,25 +140,31 @@ void Stats::showQr() {
 }
 
 std::string Stats::shareMessage() {
-	char str[256];
+	char str[1024];
 
-	char timeStr[16] = "";
-	if(settings->timer()) {
+	char timeStr[256] = "";
+	if(settings->shareTimer()) {
 		int time = _completionTimes.back();
 		if(time > 60 * 60) {
-			sprintf(timeStr, " %02d:%02d:%02d", time / 60 / 60, (time / 60) % 60, time % 60);
+			sprintf(timeStr, game->data().shareTimeHour().c_str(), time / 60 / 60, (time / 60) % 60, time % 60);
 		} else {
-			sprintf(timeStr, " %02d:%02d", time / 60, time % 60);
+			sprintf(timeStr, game->data().shareTime().c_str(), time / 60, time % 60);
 		}
 	}
 
-	sprintf(str, "%s %lld %c/%d%s%s\n\n",
+	char streakStr[256] = "";
+	if(settings->shareStreak()) {
+		sprintf(streakStr, game->data().shareStreak().c_str(), _streak);
+	}
+
+	sprintf(str, "%s %lld %c/%d%s%s%s\n\n",
 		game->data().shareName().c_str(),
 		_lastPlayed - game->data().firstDay(),
 		_guessCounts.back() > game->data().maxGuesses() ? 'X' : '0' + _guessCounts.back(),
 		game->data().maxGuesses(),
 		settings->hardMode() ? "*" : "",
-		timeStr);
+		timeStr,
+		streakStr);
 
 	for(const std::string &_guess : _boardState) {
 		std::vector<TilePalette> colors = game->check(Font::utf8to16(_guess));

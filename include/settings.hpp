@@ -12,8 +12,11 @@ class Settings {
 	bool _hardMode = false;
 	bool _altPalette = false;
 	bool _music = true;
-	bool _timer = false;
+	bool _shareTimer = false;
+	bool _shareStreak = false;
 	std::string _mod = DEFAULT_MOD;
+
+	void shareMsgSettings(void);
 
 	std::vector<std::string> getMods(void);
 	bool selectMod(void);
@@ -36,8 +39,11 @@ public:
 	bool music(void) const { return _music; }
 	Settings &music(bool music) { _music = music; return *this; }
 
-	bool timer(void) const { return _timer; }
-	Settings &timer(bool timer) { _timer = timer; return *this; }
+	bool shareTimer(void) const { return _shareTimer; }
+	Settings &shareTimer(bool shareTimer) { _shareTimer = shareTimer; return *this; }
+
+	bool shareStreak(void) const { return _shareStreak; }
+	Settings &shareStreak(bool shareStreak) { _shareStreak = shareStreak; return *this; }
 
 	const std::string &mod(void) const { return _mod; }
 	Settings &mod(const std::string &mod) { _mod = mod; return *this; }

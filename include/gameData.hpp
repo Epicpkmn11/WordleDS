@@ -1,6 +1,7 @@
 #ifndef GAME_DATA_HPP
 #define GAME_DATA_HPP
 
+#include "button.hpp"
 #include "image.hpp"
 #include "json.hpp"
 #include "kbd.hpp"
@@ -30,11 +31,23 @@ class GameData {
 		_creditStr = "Wordle DS\nby Pk11",
 		_nthMustBeX = "%d%s letter must be %s",
 		_guessMustContainX = "Guess must contain %s",
+		_shareTime = " %02d:%02d",
+		_shareTimeHour = " %02d:%02d:%02d",
+		_shareStreak = " 📈%d",
 		_emojiGreen = "🟩",
 		_emojiGreenAlt = "🟧",
 		_emojiYellow = "🟨",
 		_emojiYellowAlt = "🟦",
 		_emojiWhite = "⬜";
+
+	Button _hardModeToggle = {224, 33, 21, 13};
+	Button _highContrastToggle = {224, 68, 21, 13};
+	Button _musicToggle = {224, 92, 21, 13};
+	Button _shareMsgBtn = {232, 108, 17, 17};
+	Button _modBtn = {232, 131, 17, 17};
+
+	Button _shareTimerToggle = {224, 37, 21, 13};
+	Button _shareStreakToggle = {224, 82, 21, 13};
 
 	std::vector<std::u16string> _howtoWords = {
 		u"WEARY",
@@ -143,6 +156,7 @@ class GameData {
 		_howtoTop,
 		_modsBottom,
 		_settingsBottom,
+		_shareMsgSettings,
 		_statsBottom;
 
 	OamGfx
@@ -179,6 +193,18 @@ public:
 	const std::string &creditStr(void) const { return _creditStr; }
 	const std::string &nthMustBeX(void) const { return _nthMustBeX; }
 	const std::string &guessMustContainX(void) const { return _guessMustContainX; }
+	const std::string &shareTime(void) const { return _shareTime; }
+	const std::string &shareTimeHour(void) const { return _shareTimeHour; }
+	const std::string &shareStreak(void) const { return _shareStreak; }
+
+	const Button &hardModeToggle(void) const { return _hardModeToggle; }
+	const Button &highContrastToggle(void) const { return _highContrastToggle; }
+	const Button &musicToggle(void) const { return _musicToggle; }
+	const Button &shareMsgBtn(void) const { return _shareMsgBtn; }
+	const Button &modBtn(void) const { return _modBtn; }
+
+	const Button &shareTimerToggle(void) const { return _shareTimerToggle; }
+	const Button &shareStreakToggle(void) const { return _shareStreakToggle; }
 
 	const std::vector<char16_t> &letters(void) const { return _letters; }
 	char16_t letters(size_t i) const { return _letters[i]; }
@@ -203,6 +229,7 @@ public:
 	const Image &howtoTop(void) const { return _howtoTop; };
 	const Image &modsBottom(void) const { return _modsBottom; };
 	const Image &settingsBottom(void) const { return _settingsBottom; };
+	const Image &shareMsgSettings(void) const { return _shareMsgSettings; };
 	const Image &statsBottom(void) const { return _statsBottom; };
 
 	const OamGfx &backspaceKeyGfx(void) const { return _backspaceKeyGfx; }

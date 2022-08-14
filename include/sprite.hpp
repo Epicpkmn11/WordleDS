@@ -1,6 +1,8 @@
 #ifndef SPRITE_HPP
 #define SPRITE_HPP
 
+#include "button.hpp"
+
 #include <memory>
 #include <nds/arm9/sprite.h>
 
@@ -64,6 +66,7 @@ public:
 	Sprite &flip(bool hFlip, bool vFlip) { _hFlip = hFlip, _vFlip = vFlip; oamSetFlip(_oam, _id, _hFlip, _vFlip); return *this; }
 	Sprite &gfx(const OamGfx &gfx) { _gfx = gfx; oamSetGfx(_oam, _id, _size, _format, _gfx.get()); return *this; }
 	Sprite &move(int x, int y) { _x = x, _y = y; oamSetXY(_oam, _id, _x, _y); return *this; }
+	Sprite &move(const Button &btn) { _x = btn.x, _y = btn.y; oamSetXY(_oam, _id, _x, _y); return *this; }
 	Sprite &palette(int palette) { _paletteAlpha = palette; oamSetPalette(_oam, _id, _paletteAlpha); return *this; }
 	Sprite &priority(int priority) { _priority = priority; oamSetPriority(_oam, _id, _priority); return *this; }
 	Sprite &rotateScale(int angle, float sx, float sy) { if(_affineIndex >= 0 && _affineIndex <= 31) oamRotateScale(_oam, _affineIndex, angle, FLOAT_TO_FIXED(sx), FLOAT_TO_FIXED(sy)); return *this; }

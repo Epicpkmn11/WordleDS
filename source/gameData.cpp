@@ -19,12 +19,14 @@
 #include "numbersSmall_nftr.h"
 #include "refreshButton_grf.h"
 #include "settingsBottom_grf.h"
+#include "shareMsgSettings_grf.h"
 #include "statsBottom_grf.h"
 #include "toggleOff_grf.h"
 #include "toggleOn_grf.h"
 
 #include <algorithm>
 #include <string.h>
+#include <unistd.h>
 
 // sassert but it fixes the brightness
 #undef sassert
@@ -57,6 +59,15 @@ GameData::GameData(const std::string &folder) {
 		if(json.contains("minVersion") && json["minVersion"].isString()) {
 			const char *minVer = json["minVersion"].get()->valuestring;
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
+
+			// If it supports v2.0.0 and has a custom settings bg, revert to old positions
+			if(strcmp("v2.0.0", minVer) <= 0 && access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+				_hardModeToggle = {224, 37, 21, 13};
+				_highContrastToggle = {224, 76, 21, 13};
+				_musicToggle = {224, 102, 21, 13};
+				_shareMsgBtn = {-1, -1, 0, 0};
+				_modBtn = {224, 127, 21, 13};
+			}
 		}
 
 		if(json.contains("shareName") && json["shareName"].isString())
@@ -87,6 +98,17 @@ GameData::GameData(const std::string &folder) {
 		if(json.contains("guessMustContainX") && json["guessMustContainX"].isString())
 			_guessMustContainX = json["guessMustContainX"].get()->valuestring;
 
+		if(json.contains("shareMsg") && json["shareMsg"].isObject()) {
+			if(json["shareMsg"].contains("time") && json["shareMsg"]["time"].isString())
+				_shareTime = json["shareMsg"]["time"].get()->valuestring;
+
+			if(json["shareMsg"].contains("timeHour") && json["shareMsg"]["timeHour"].isString())
+				_shareTimeHour = json["shareMsg"]["timeHour"].get()->valuestring;
+
+			if(json["shareMsg"].contains("streak") && json["shareMsg"]["streak"].isString())
+				_shareStreak = json["shareMsg"]["streak"].get()->valuestring;
+		}
+
 		if(json.contains("emoji") && json["emoji"].isObject()) {
 			if(json["emoji"].contains("green") && json["emoji"]["green"].isString())
 				_emojiGreen = json["emoji"]["green"].get()->valuestring;
@@ -102,6 +124,35 @@ GameData::GameData(const std::string &folder) {
 
 			if(json["emoji"].contains("white") && json["emoji"]["white"].isString())
 				_emojiWhite = json["emoji"]["white"].get()->valuestring;
+		}
+
+		if(json.contains("settings") && json["settings"].isObject()) {
+			if(json["settings"].contains("buttons") && json["settings"]["buttons"].isObject()) {
+				Json buttons = json["settings"]["buttons"];
+				if(buttons.contains("hardMode") && buttons["hardMode"].isArray() && buttons["hardMode"].size() == 4)
+					_hardModeToggle = Button(buttons["hardMode"]);
+
+				if(buttons.contains("highContrast") && buttons["highContrast"].isArray() && buttons["highContrast"].size() == 4)
+					_highContrastToggle = Button(buttons["highContrast"]);
+
+				if(buttons.contains("music") && buttons["music"].isArray() && buttons["music"].size() == 4)
+					_musicToggle = Button(buttons["music"]);
+
+				if(buttons.contains("shareMsg") && buttons["shareMsg"].isArray() && buttons["shareMsg"].size() == 4)
+					_shareMsgBtn = Button(buttons["shareMsg"]);
+
+				if(buttons.contains("mod") && buttons["mod"].isArray() && buttons["mod"].size() == 4)
+					_modBtn = Button(buttons["mod"]);
+			}
+
+			if(json["settings"].contains("shareMsgButtons") && json["settings"]["shareMsgButtons"].isObject()) {
+				Json buttons = json["settings"]["shareMsgButtons"];
+				if(buttons.contains("timer") && buttons["timer"].isArray() && buttons["timer"].size() == 4)
+					_shareTimerToggle = Button(buttons["timer"]);
+
+				if(buttons.contains("streak") && buttons["streak"].isArray() && buttons["streak"].size() == 4)
+					_shareStreakToggle = Button(buttons["streak"]);
+			}
 		}
 
 		if(json.contains("howto") && json["howto"].isObject()) {
@@ -236,6 +287,7 @@ GameData::GameData(const std::string &folder) {
 	_howtoTop = Image((modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);
 	_modsBottom = Image((modPath + "/modsBottom.grf").c_str(), 256, 192, modsBottom_grf);
 	_settingsBottom = Image((modPath + "/settingsBottom.grf").c_str(), 256, 192, settingsBottom_grf);
+	_shareMsgSettings = Image((modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
 	_statsBottom = Image((modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 
 	Image backspaceKey = Image((modPath + "/backspaceKey.grf").c_str(), 64, 32, backspaceKey_grf);

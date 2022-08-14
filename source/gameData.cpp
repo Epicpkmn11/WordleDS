@@ -56,17 +56,24 @@ GameData::GameData(const std::string &folder) {
 
 	Json json((modPath + MOD_JSON).c_str());
 	if(json.get() != nullptr) {
+		const char *minVer = nullptr;
 		if(json.contains("minVersion") && json["minVersion"].isString()) {
-			const char *minVer = json["minVersion"].get()->valuestring;
+			minVer = json["minVersion"].get()->valuestring;
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
+		}
 
-			// If it supports v2.0.0 and has a custom settings bg, revert to old positions
-			if(strcmp("v2.0.0", minVer) <= 0 && access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+		// If it supports v2.0.0, revert to old defaults
+		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
+			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = {224, 37, 21, 13};
 				_highContrastToggle = {224, 76, 21, 13};
 				_musicToggle = {224, 102, 21, 13};
 				_shareMsgBtn = {-1, -1, 0, 0};
 				_modBtn = {224, 127, 21, 13};
+			}
+
+			if(access((modPath + "/statsBottom.grf").c_str(), F_OK) == 0) {
+				_oldStatsMenu = true;
 			}
 		}
 

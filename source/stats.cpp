@@ -9,6 +9,7 @@
 #include <array>
 #include <algorithm>
 #include <nds.h>
+#include <numeric>
 #include <qrencode.h>
 
 Stats::Stats(const std::string &path) : _path(path) {
@@ -185,11 +186,25 @@ void Stats::showMenu() {
 		.decompressPal(BG_PALETTE_SUB);
 
 	while(1) {
-		// Print scores
-		game->data().numbersLarge().print(-96, 32, false, _gamesPlayed, Alignment::center);
-		game->data().numbersLarge().print(-32, 32, false, std::count_if(_guessCounts.begin(), _guessCounts.end(), [](int a) { return a <= game->data().maxGuesses(); }) * 100 / _gamesPlayed, Alignment::center);
-		game->data().numbersLarge().print(32, 32, false, _streak, Alignment::center);
-		game->data().numbersLarge().print(96, 32, false, _maxStreak, Alignment::center).update(false);
+		// Print stats
+		if(game->data().oldStatsMenu()) {
+			// Old version without the average time
+			game->data().numbersLarge().print(-96, 32, false, _gamesPlayed, Alignment::center);
+			game->data().numbersLarge().print(-32, 32, false, std::count_if(_guessCounts.begin(), _guessCounts.end(), [](int a) { return a <= game->data().maxGuesses(); }) * 100 / _gamesPlayed, Alignment::center);
+			game->data().numbersLarge().print(32, 32, false, _streak, Alignment::center);
+			game->data().numbersLarge().print(96, 32, false, _maxStreak, Alignment::center).update(false);
+		} else {
+			int averageTime = std::accumulate(_completionTimes.begin(), _completionTimes.end(), 0) / _completionTimes.size();
+			char timeStr[16];
+			sprintf(timeStr, "%d:%02d", averageTime / 60, averageTime % 60);
+
+			game->data().numbersLarge().print(-105, 32, false, _gamesPlayed, Alignment::center);
+			game->data().numbersLarge().print(-60, 32, false, std::count_if(_guessCounts.begin(), _guessCounts.end(), [](int a) { return a <= game->data().maxGuesses(); }) * 100 / _gamesPlayed, Alignment::center);
+			game->data().numbersLarge().print(0, 32, false, timeStr, Alignment::center).update(false);
+			game->data().numbersLarge().print(60, 32, false, _streak, Alignment::center);
+			game->data().numbersLarge().print(105, 32, false, _maxStreak, Alignment::center).update(false);
+
+		}
 
 		// Draw guess percentage bars
 		int highestCount = 0;

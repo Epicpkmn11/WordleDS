@@ -49,6 +49,8 @@ class GameData {
 	Button _shareTimerToggle = {224, 37, 21, 13};
 	Button _shareStreakToggle = {224, 82, 21, 13};
 
+	bool _oldStatsMenu = false;
+
 	std::vector<std::u16string> _howtoWords = {
 		u"WEARY",
 		u"PILLS",
@@ -205,6 +207,8 @@ public:
 
 	const Button &shareTimerToggle(void) const { return _shareTimerToggle; }
 	const Button &shareStreakToggle(void) const { return _shareStreakToggle; }
+
+	bool oldStatsMenu(void) const { return _oldStatsMenu; }
 
 	const std::vector<char16_t> &letters(void) const { return _letters; }
 	char16_t letters(size_t i) const { return _letters[i]; }

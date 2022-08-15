@@ -11,7 +11,8 @@
 	"shareMsg": {
 		"time": " %d minyutes %d seconds",
 		"timeHour": " %d houws %d minyutes %d seconds",
-		"streak": " OwO %d stweak"
+		"streak": " OwO %d stweak",
+		"streakLoss": " TwT %d stweak"
 	},
 	"emoji": {
 		"green": "^-^ ",

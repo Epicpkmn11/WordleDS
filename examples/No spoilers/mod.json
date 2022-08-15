@@ -12,7 +12,8 @@
 	"shareMsg": {
 		"time": " %02d:%02d",
 		"timeHour": " %02d:%02d:%02d",
-		"streak": " 📈%d"
+		"streak": " 📈%d",
+		"streakLoss": " 📉%d"
 	},
 	"emoji": {
 		"green": "🟩",

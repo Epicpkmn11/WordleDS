@@ -155,7 +155,10 @@ std::string Stats::shareMessage() {
 
 	char streakStr[256] = "";
 	if(settings->shareStreak()) {
-		sprintf(streakStr, game->data().shareStreak().c_str(), _streak);
+		if(_streak == 0)
+			sprintf(streakStr, game->data().shareStreakLoss().c_str(), _streak);
+		else
+			sprintf(streakStr, game->data().shareStreak().c_str(), _streak);
 	}
 
 	sprintf(str, "%s %lld %c/%d%s%s%s\n\n",

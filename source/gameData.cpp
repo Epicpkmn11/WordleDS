@@ -114,6 +114,9 @@ GameData::GameData(const std::string &folder) {
 
 			if(json["shareMsg"].contains("streak") && json["shareMsg"]["streak"].isString())
 				_shareStreak = json["shareMsg"]["streak"].get()->valuestring;
+
+			if(json["shareMsg"].contains("streakLoss") && json["shareMsg"]["streakLoss"].isString())
+				_shareStreakLoss = json["shareMsg"]["streakLoss"].get()->valuestring;
 		}
 
 		if(json.contains("emoji") && json["emoji"].isObject()) {

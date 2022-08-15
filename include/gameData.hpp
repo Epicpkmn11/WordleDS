@@ -34,6 +34,7 @@ class GameData {
 		_shareTime = " %02d:%02d",
 		_shareTimeHour = " %02d:%02d:%02d",
 		_shareStreak = " 📈%d",
+		_shareStreakLoss = " 📉%d",
 		_emojiGreen = "🟩",
 		_emojiGreenAlt = "🟧",
 		_emojiYellow = "🟨",
@@ -198,6 +199,7 @@ public:
 	const std::string &shareTime(void) const { return _shareTime; }
 	const std::string &shareTimeHour(void) const { return _shareTimeHour; }
 	const std::string &shareStreak(void) const { return _shareStreak; }
+	const std::string &shareStreakLoss(void) const { return _shareStreakLoss; }
 
 	const Button &hardModeToggle(void) const { return _hardModeToggle; }
 	const Button &highContrastToggle(void) const { return _highContrastToggle; }

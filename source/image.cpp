@@ -69,6 +69,7 @@ Image::Image(const char *path, u32 width, u32 height, const u8 *fallback, bool e
 				break;
 		}
 
-		src += ((u32 *)src)[1] + 8;
+		size = ((u32 *)src)[1];
+		src += size + 8;
 	}
 }

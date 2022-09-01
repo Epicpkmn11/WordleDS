@@ -49,6 +49,7 @@ class GameData {
 
 	Button _shareTimerToggle = {224, 37, 21, 13};
 	Button _shareStreakToggle = {224, 82, 21, 13};
+	Button _shareUrlToggle = {224, 128, 21, 13};
 
 	bool _oldStatsMenu = false;
 
@@ -209,6 +210,7 @@ public:
 
 	const Button &shareTimerToggle(void) const { return _shareTimerToggle; }
 	const Button &shareStreakToggle(void) const { return _shareStreakToggle; }
+	const Button &shareUrlToggle(void) const { return _shareUrlToggle; }
 
 	bool oldStatsMenu(void) const { return _oldStatsMenu; }
 

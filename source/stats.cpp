@@ -98,6 +98,11 @@ bool Stats::save() {
 	return false;
 }
 
+void Stats::replaceAll(std::string &data, std::string search, std::string replaceStr) {
+	while(data.find(search) != std::string::npos)
+		data.replace(data.find(search), search.size(), replaceStr);
+}
+
 void Stats::showQr() {
 	// Ensure the game is done
 	std::vector<TilePalette> allCorrect;
@@ -107,6 +112,13 @@ void Stats::showQr() {
 		return;
 
 	std::string str = shareMessage();
+
+	if(settings->shareUrl()) {
+		// URL encode string
+		replaceAll(str, "\n", "%0a");
+		replaceAll(str, " ", "%20");
+		str = "https://xn--rck9c.xn--tckwe/wordle.php?message=" + str;
+	}
 
 	QRcode *qr = QRcode_encodeString(str.c_str(), 0, QR_ECLEVEL_L, QR_MODE_8, true);
 

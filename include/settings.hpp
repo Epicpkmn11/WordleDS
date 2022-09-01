@@ -14,6 +14,7 @@ class Settings {
 	bool _music = true;
 	bool _shareTimer = false;
 	bool _shareStreak = false;
+	bool _shareUrl = false;
 	std::string _mod = DEFAULT_MOD;
 
 	void shareMsgSettings(void);
@@ -44,6 +45,9 @@ public:
 
 	bool shareStreak(void) const { return _shareStreak; }
 	Settings &shareStreak(bool shareStreak) { _shareStreak = shareStreak; return *this; }
+
+	bool shareUrl(void) const { return _shareUrl; }
+	Settings &shareUrl(bool shareUrl) { _shareUrl = shareUrl; return *this; }
 
 	const std::string &mod(void) const { return _mod; }
 	Settings &mod(const std::string &mod) { _mod = mod; return *this; }

@@ -162,6 +162,9 @@ GameData::GameData(const std::string &folder) {
 
 				if(buttons.contains("streak") && buttons["streak"].isArray() && buttons["streak"].size() == 4)
 					_shareStreakToggle = Button(buttons["streak"]);
+
+				if(buttons.contains("url") && buttons["url"].isArray() && buttons["url"].size() == 4)
+					_shareUrlToggle = Button(buttons["url"]);
 			}
 		}
 

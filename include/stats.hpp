@@ -18,6 +18,7 @@ class Stats {
 	time_t _lastWon = 0;
 	int _timeElapsed = 0;
 
+	void replaceAll(std::string &data, std::string search, std::string replaceStr);
 	void showQr(void);
 
 public:

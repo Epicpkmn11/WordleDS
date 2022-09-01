@@ -42,6 +42,9 @@ Settings::Settings(const std::string &path) : _path(path) {
 
 		if(json["shareMsg"].contains("streak") && json["shareMsg"]["streak"].isBool())
 			_shareStreak = json["shareMsg"]["streak"].isTrue();
+
+		if(json["shareMsg"].contains("url") && json["shareMsg"]["url"].isBool())
+			_shareUrl = json["shareMsg"]["url"].isTrue();
 	} else if(json.contains("timer") && json["timer"].isBool()) {
 		_shareTimer = json["timer"].isTrue();
 	}
@@ -57,6 +60,7 @@ bool Settings::save() {
 	Json shareMsg = json.create(true, "shareMsg");
 	shareMsg.set(_shareTimer, "timer");
 	shareMsg.set(_shareStreak, "streak");
+	shareMsg.set(_shareUrl, "url");
 
 	FILE *file = fopen(_path.c_str(), "w");
 	if(file) {
@@ -274,6 +278,8 @@ void Settings::shareMsgSettings() {
 	timerToggle.move(game->data().shareTimerToggle());
 	Sprite streakToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	streakToggle.move(game->data().shareStreakToggle());
+	Sprite urlToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	urlToggle.move(game->data().shareUrlToggle());
 
 	while(1) {
 		game->data().setPalettes(_altPalette);
@@ -283,6 +289,9 @@ void Settings::shareMsgSettings() {
 		streakToggle
 			.gfx(_shareStreak ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_shareStreak ? TilePalette::green : TilePalette::gray);
+		urlToggle
+			.gfx(_shareUrl ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+			.palette(_shareUrl ? TilePalette::green : TilePalette::gray);
 		Sprite::update(false);
 
 		u16 pressed;
@@ -306,6 +315,8 @@ void Settings::shareMsgSettings() {
 				_shareTimer = !_shareTimer;
 			} else if(game->data().shareStreakToggle().touching(touch)) {
 				_shareStreak = !_shareStreak;
+			} else if(game->data().shareUrlToggle().touching(touch)) {
+				_shareUrl = !_shareUrl;
 			}
 		}
 	}

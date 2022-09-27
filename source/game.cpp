@@ -381,13 +381,14 @@ bool Game::run() {
 
 				Gfx::flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
-			if(_showRefresh)
-				_data.refreshSprite().visible(true).update();
 			Font::clear(false);
 			Font::update(false);
 
 			// Show stats
 			_stats.showMenu();
+
+			if(_showRefresh)
+				_data.refreshSprite().visible(true).update();
 
 			// Restore normal background
 			swiWaitForVBlank();

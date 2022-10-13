@@ -59,6 +59,7 @@ public:
 
 	int timeElapsed(void) const { return _timeElapsed; }
 	Stats &timeElapsed(int timeElapsed) { _timeElapsed = timeElapsed; return *this; }
+	void timeElapsedInc(void) { _timeElapsed++; }
 
 	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0; }
 };

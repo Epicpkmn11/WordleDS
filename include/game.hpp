@@ -15,7 +15,6 @@ class Game {
 	Kbd _kbd;
 
 	time_t _today = time(NULL) / 24 / 60 / 60;
-	time_t _startTime = 0;
 	std::u16string_view _answer;
 	std::u16string _guess = u"";
 	int _currentGuess = 0;
@@ -26,6 +25,8 @@ class Game {
 	bool _bootstubExists;
 	std::vector<Sprite> _letterSprites;
 	std::u16string _knownLetters, _knownPositions; // for hard mode
+
+	static void timerHandler(void);
 
 public:
 	Game(void);

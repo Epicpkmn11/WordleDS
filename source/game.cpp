@@ -75,6 +75,11 @@ std::vector<TilePalette> Game::check(const std::u16string &_guess) {
 	return res;
 }
 
+void Game::timerHandler() {
+	if(game)
+		game->stats().timeElapsedInc();
+}
+
 Game::Game() :
 		_stats(DATA_PATH + settings->mod() + STATS_JSON),
 		_data(settings->mod()),
@@ -115,6 +120,7 @@ Game::Game() :
 
 Game::~Game() {
 	_stats.save();
+	timerStop(0);
 }
 
 bool Game::run() {
@@ -244,7 +250,6 @@ bool Game::run() {
 					_stats
 						.boardState(Font::utf16to8(_guess))
 						.lastPlayed(_today)
-						.timeElapsed(time(NULL) - _startTime)
 						.save();
 
 					_guess = u"";
@@ -275,8 +280,9 @@ bool Game::run() {
 					_guess += key;
 
 					// Start timer if not started yet
-					if(!_startTime)
-						_startTime = time(NULL) - _stats.timeElapsed();
+					if(!_stats.timeElapsed()) {
+						timerStart(0, ClockDivider_1024, TIMER_FREQ_1024(1), timerHandler);
+					}
 				}
 				break;
 		}
@@ -337,9 +343,10 @@ bool Game::run() {
 
 			_kbd.hide();
 
+			timerStop(0);
+
 			// Update stats
 			_stats
-				.timeElapsed(time(NULL) - _startTime)
 				.completionTimes(_stats.timeElapsed())
 				.lastWon(_today)
 				.guessCounts(_currentGuess)

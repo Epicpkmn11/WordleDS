@@ -22,6 +22,7 @@ class Game {
 	bool _won = false;
 	bool _statsSaved = false;
 	bool _showRefresh = false;
+	bool _timerStarted = false;
 	bool _bootstubExists;
 	std::vector<Sprite> _letterSprites;
 	std::u16string _knownLetters, _knownPositions; // for hard mode

@@ -280,8 +280,9 @@ bool Game::run() {
 					_guess += key;
 
 					// Start timer if not started yet
-					if(!_stats.timeElapsed()) {
+					if(_timerStarted) {
 						timerStart(0, ClockDivider_1024, TIMER_FREQ_1024(1), timerHandler);
+						_timerStarted = true;
 					}
 				}
 				break;

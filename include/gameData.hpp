@@ -23,6 +23,8 @@ class GameData {
 	int _maxGuesses = 6,
 		_firstDay = 18797; // June 19th 2021
 
+	bool _infinite = false;
+
 	std::string
 		_shareName = "Wordle DS",
 		_lossMessage = "Better luck tomorrow...\nThe answer was:",
@@ -184,6 +186,8 @@ public:
 
 	int maxGuesses(void) const { return _maxGuesses; }
 	int firstDay(void) const { return _firstDay; }
+
+	bool infinite(void) const { return _infinite; }
 
 	const std::vector<std::u16string> &howtoWords(void) const { return _howtoWords; }
 	const std::u16string &howtoWords(size_t i) const { return _howtoWords[i]; }

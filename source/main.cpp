@@ -23,6 +23,8 @@ int main() {
 	if(access(SETTINGS_JSON_OLD, F_OK) == 0)
 		Settings::legacyImport(SETTINGS_JSON_OLD);
 
+	srand(time(NULL));
+
 	Gfx::init();
 	settings = new Settings(SETTINGS_JSON);
 	game = new Game();

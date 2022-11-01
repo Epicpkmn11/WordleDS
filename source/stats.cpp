@@ -12,7 +12,7 @@
 #include <numeric>
 #include <qrencode.h>
 
-Stats::Stats(const std::string &path) : _path(path) {
+Stats::Stats(const std::string &path, bool infinite) : _path(path), _infinite(infinite) {
 	Json json(_path.c_str());
 	if(!json.get())
 		return;
@@ -59,16 +59,18 @@ Stats::Stats(const std::string &path) : _path(path) {
 	if(json.contains("timeElapsed") && json["timeElapsed"].isNumber())
 		_timeElapsed = json["timeElapsed"].get()->valueint;
 
-	// Clear the streak if broken
 	time_t today = time(NULL) / 24 / 60 / 60;
-	if(_lastWon != today - 1 && _lastWon != today)
+
+	// Clear the streak if broken
+	if(_lastWon != today - 1 && _lastWon != today && !_infinite) {
 		_streak = 0;
+	}
 
 	if(_streak > _maxStreak) // Update the max streak if improved
 		_maxStreak = _streak;
 
 	// Clear day-specific variables
-	if(_lastPlayed != today) {
+	if(_lastPlayed != today || game->data().infinite()) {
 		_boardState = {};
 		_timeElapsed = 0;
 	}
@@ -173,14 +175,25 @@ std::string Stats::shareMessage() {
 			sprintf(streakStr, game->data().shareStreak().c_str(), _streak);
 	}
 
-	sprintf(str, "%s %lld %c/%d%s%s%s\n\n",
-		game->data().shareName().c_str(),
-		_lastPlayed - game->data().firstDay(),
-		_guessCounts.back() > game->data().maxGuesses() ? 'X' : '0' + _guessCounts.back(),
-		game->data().maxGuesses(),
-		settings->hardMode() ? "*" : "",
-		timeStr,
-		streakStr);
+	if(game->data().infinite()) {
+		sprintf(str, "%s %s %c/%d%s%s%s\n\n",
+			game->data().shareName().c_str(),
+			Font::utf16to8(game->answer()).c_str(),
+			_guessCounts.back() > game->data().maxGuesses() ? 'X' : '0' + _guessCounts.back(),
+			game->data().maxGuesses(),
+			settings->hardMode() ? "*" : "",
+			timeStr,
+			streakStr);
+	} else {
+		sprintf(str, "%s %lld %c/%d%s%s%s\n\n",
+			game->data().shareName().c_str(),
+			_lastPlayed - game->data().firstDay(),
+			_guessCounts.back() > game->data().maxGuesses() ? 'X' : '0' + _guessCounts.back(),
+			game->data().maxGuesses(),
+			settings->hardMode() ? "*" : "",
+			timeStr,
+			streakStr);
+	}
 
 	for(const std::string &_guess : _boardState) {
 		std::vector<TilePalette> colors = game->check(Font::utf8to16(_guess));

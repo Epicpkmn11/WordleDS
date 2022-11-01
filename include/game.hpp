@@ -10,11 +10,11 @@
 #include <vector>
 
 class Game {
-	Stats _stats;
 	GameData _data;
+	Stats _stats;
 	Kbd _kbd;
 
-	time_t _today = time(NULL) / 24 / 60 / 60;
+	time_t _today;
 	std::u16string_view _answer;
 	std::u16string _guess = u"";
 	int _currentGuess = 0;

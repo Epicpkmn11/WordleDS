@@ -62,6 +62,10 @@ GameData::GameData(const std::string &folder) {
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
+		if(json.contains("infinite") && json["infinite"].isTrue()) {
+			_infinite = true;
+		}
+
 		// If it supports v2.0.0, revert to old defaults
 		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {

@@ -97,7 +97,7 @@ void Settings::legacyImport(const std::string &path) {
 
 	// Stats
 	if(json.contains("stats") && json["stats"].isObject()) {
-		Stats stats(DATA_PATH DEFAULT_MOD STATS_JSON);
+		Stats stats(DATA_PATH DEFAULT_MOD STATS_JSON, false);
 
 		if(json["stats"].contains("guessCounts") && json["stats"]["guessCounts"].isArray()) {
 			for(const Json &item : json["stats"]["guessCounts"]) {

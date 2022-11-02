@@ -23,7 +23,6 @@ class GameData {
 	int _maxGuesses = 6,
 		_firstDay = 18797; // June 19th 2021
 
-	bool _infinite = false;
 
 	std::string
 		_shareName = "Wordle DS",
@@ -44,6 +43,7 @@ class GameData {
 		_emojiWhite = "⬜";
 
 	Button _hardModeToggle = {224, 33, 21, 13};
+	Button _infiniteModeToggle = { 224, 55, 21, 13 };
 	Button _highContrastToggle = {224, 68, 21, 13};
 	Button _musicToggle = {224, 92, 21, 13};
 	Button _shareMsgBtn = {232, 108, 17, 17};
@@ -187,7 +187,6 @@ public:
 	int maxGuesses(void) const { return _maxGuesses; }
 	int firstDay(void) const { return _firstDay; }
 
-	bool infinite(void) const { return _infinite; }
 
 	const std::vector<std::u16string> &howtoWords(void) const { return _howtoWords; }
 	const std::u16string &howtoWords(size_t i) const { return _howtoWords[i]; }
@@ -207,6 +206,7 @@ public:
 	const std::string &shareStreakLoss(void) const { return _shareStreakLoss; }
 
 	const Button &hardModeToggle(void) const { return _hardModeToggle; }
+	const Button &infiniteModeToggle(void) const { return _infiniteModeToggle; }
 	const Button &highContrastToggle(void) const { return _highContrastToggle; }
 	const Button &musicToggle(void) const { return _musicToggle; }
 	const Button &shareMsgBtn(void) const { return _shareMsgBtn; }

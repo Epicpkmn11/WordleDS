@@ -62,10 +62,6 @@ GameData::GameData(const std::string &folder) {
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
-		if(json.contains("infinite") && json["infinite"].isTrue()) {
-			_infinite = true;
-		}
-
 		// If it supports v2.0.0, revert to old defaults
 		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
@@ -145,6 +141,9 @@ GameData::GameData(const std::string &folder) {
 				Json buttons = json["settings"]["buttons"];
 				if(buttons.contains("hardMode") && buttons["hardMode"].isArray() && buttons["hardMode"].size() == 4)
 					_hardModeToggle = Button(buttons["hardMode"]);
+
+				if (buttons.contains("infiniteMode") && buttons["infiniteMode"].isArray() && buttons["infiniteMode"].size() == 4)
+					_infiniteModeToggle = Button(buttons["infiniteMode"]);
 
 				if(buttons.contains("highContrast") && buttons["highContrast"].isArray() && buttons["highContrast"].size() == 4)
 					_highContrastToggle = Button(buttons["highContrast"]);

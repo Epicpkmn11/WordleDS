@@ -17,13 +17,12 @@ class Stats {
 	time_t _lastPlayed = 0;
 	time_t _lastWon = 0;
 	int _timeElapsed = 0;
-	bool _infinite;
 
 	void replaceAll(std::string &data, std::string search, std::string replaceStr);
 	void showQr(void);
 
 public:
-	Stats(const std::string &path, bool infinite);
+	Stats(const std::string &path);
 
 	bool save(void);
 

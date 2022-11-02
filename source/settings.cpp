@@ -14,38 +14,42 @@
 #include <maxmod9.h>
 #include <nds.h>
 
-Settings *settings;
+Settings* settings;
 
-Settings::Settings(const std::string &path) : _path(path) {
+Settings::Settings(const std::string& path) : _path(path) {
 	Json json(_path.c_str());
-	if(!json.get())
+	if (!json.get())
 		return;
 
-	if(json.contains("hardMode") && json["hardMode"].isBool())
+	if (json.contains("hardMode") && json["hardMode"].isBool())
 		_hardMode = json["hardMode"].isTrue();
 
-	if(json.contains("altPalette") && json["altPalette"].isBool())
+	if (json.contains("infiniteMode") && json["infiniteMode"].isBool())
+		_infiniteMode = json["infiniteMode"].isTrue();
+
+	if (json.contains("altPalette") && json["altPalette"].isBool())
 		_altPalette = json["altPalette"].isTrue();
 
-	if(json.contains("music") && json["music"].isBool())
+	if (json.contains("music") && json["music"].isBool())
 		_music = json["music"].isTrue();
 
-	if(json.contains("mod") && json["mod"].isString())
+	if (json.contains("mod") && json["mod"].isString())
 		_mod = json["mod"].get()->valuestring;
 
-	if(access((DATA_PATH + _mod).c_str(), F_OK) != 0)
+	if (access((DATA_PATH + _mod).c_str(), F_OK) != 0)
 		_mod = DEFAULT_MOD;
 
-	if(json.contains("shareMsg") && json["shareMsg"].isObject()) {
-		if(json["shareMsg"].contains("timer") && json["shareMsg"]["timer"].isBool())
+	if (json.contains("shareMsg") && json["shareMsg"].isObject()) {
+		if (json["shareMsg"].contains("timer") && json["shareMsg"]["timer"].isBool())
 			_shareTimer = json["shareMsg"]["timer"].isTrue();
 
-		if(json["shareMsg"].contains("streak") && json["shareMsg"]["streak"].isBool())
+		if (json["shareMsg"].contains("streak") && json["shareMsg"]["streak"].isBool())
 			_shareStreak = json["shareMsg"]["streak"].isTrue();
 
-		if(json["shareMsg"].contains("url") && json["shareMsg"]["url"].isBool())
+		if (json["shareMsg"].contains("url") && json["shareMsg"]["url"].isBool())
 			_shareUrl = json["shareMsg"]["url"].isTrue();
-	} else if(json.contains("timer") && json["timer"].isBool()) {
+	}
+	else if (json.contains("timer") && json["timer"].isBool()) {
 		_shareTimer = json["timer"].isTrue();
 	}
 }
@@ -53,6 +57,7 @@ Settings::Settings(const std::string &path) : _path(path) {
 bool Settings::save() {
 	Json json;
 	json.set(_hardMode, "hardMode");
+	json.set(_infiniteMode, "infiniteMode");
 	json.set(_altPalette, "altPalette");
 	json.set(_music, "music");
 	json.set(_mod.c_str(), "mod");
@@ -62,8 +67,8 @@ bool Settings::save() {
 	shareMsg.set(_shareStreak, "streak");
 	shareMsg.set(_shareUrl, "url");
 
-	FILE *file = fopen(_path.c_str(), "w");
-	if(file) {
+	FILE* file = fopen(_path.c_str(), "w");
+	if (file) {
 		std::string dump = json.dump();
 		size_t bytesWritten = fwrite(dump.c_str(), 1, dump.size(), file);
 		fclose(file);
@@ -74,64 +79,66 @@ bool Settings::save() {
 	return false;
 }
 
-void Settings::legacyImport(const std::string &path) {
+void Settings::legacyImport(const std::string& path) {
 	Json json(path.c_str());
-	if(!json.get())
+	if (!json.get())
 		return;
 
 	bool good = true;
 
 	// Settings
-	if(json.contains("settings") && json["settings"].isObject()) {
+	if (json.contains("settings") && json["settings"].isObject()) {
 		Settings settings(SETTINGS_JSON);
 
-		if(json["settings"].contains("hardMode") && json["settings"]["hardMode"].isBool())
+		if (json["settings"].contains("hardMode") && json["settings"]["hardMode"].isBool())
 			settings.hardMode(json["settings"]["hardMode"].isTrue());
-		if(json["settings"].contains("altPalette") && json["settings"]["altPalette"].isBool())
+		if (json["settings"].contains("infiniteMode") && json["settings"]["infiniteMode"].isBool())
+			settings.infiniteMode(json["settings"]["infiniteMode"].isTrue());
+		if (json["settings"].contains("altPalette") && json["settings"]["altPalette"].isBool())
 			settings.altPalette(json["settings"]["altPalette"].isTrue());
-		if(json["settings"].contains("music") && json["settings"]["music"].isBool())
+		if (json["settings"].contains("music") && json["settings"]["music"].isBool())
 			settings.music(json["settings"]["music"].isTrue());
 
 		good = settings.save();
 	}
 
 	// Stats
-	if(json.contains("stats") && json["stats"].isObject()) {
-		Stats stats(DATA_PATH DEFAULT_MOD STATS_JSON, false);
+	if (json.contains("stats") && json["stats"].isObject()) {
+		Stats stats(DATA_PATH DEFAULT_MOD STATS_JSON);
 
-		if(json["stats"].contains("guessCounts") && json["stats"]["guessCounts"].isArray()) {
-			for(const Json &item : json["stats"]["guessCounts"]) {
-				if(item.isNumber())
+		if (json["stats"].contains("guessCounts") && json["stats"]["guessCounts"].isArray()) {
+			for (const Json& item : json["stats"]["guessCounts"]) {
+				if (item.isNumber())
 					stats.guessCounts(item.get()->valueint);
 			}
 		}
-		if(json["stats"].contains("boardState") && json["stats"]["boardState"].isArray()) {
-			for(const Json &item : json["stats"]["boardState"]) {
-				if(item.isString())
+		if (json["stats"].contains("boardState") && json["stats"]["boardState"].isArray()) {
+			for (const Json& item : json["stats"]["boardState"]) {
+				if (item.isString())
 					stats.boardState(item.get()->valuestring);
 			}
 		}
-		if(json["stats"].contains("streak") && json["stats"]["streak"].isNumber())
+		if (json["stats"].contains("streak") && json["stats"]["streak"].isNumber())
 			stats.streak(json["stats"]["streak"].get()->valueint);
-		if(json["stats"].contains("maxStreak") && json["stats"]["maxStreak"].isNumber())
+		if (json["stats"].contains("maxStreak") && json["stats"]["maxStreak"].isNumber())
 			stats.maxStreak(json["stats"]["maxStreak"].get()->valueint);
-		if(json["stats"].contains("gamesPlayed") && json["stats"]["gamesPlayed"].isNumber())
+		if (json["stats"].contains("gamesPlayed") && json["stats"]["gamesPlayed"].isNumber())
 			stats.gamesPlayed(json["stats"]["gamesPlayed"].get()->valueint);
-		if(json["stats"].contains("lastPlayed") && json["stats"]["lastPlayed"].isNumber())
+		if (json["stats"].contains("lastPlayed") && json["stats"]["lastPlayed"].isNumber())
 			stats.lastPlayed(json["stats"]["lastPlayed"].get()->valueint);
 
 		time_t today = time(NULL) / 24 / 60 / 60;
-		if(today - stats.lastPlayed() > 1)
+		if (today - stats.lastPlayed() > 1)
 			stats.streak(0);
-		if(stats.streak() > stats.maxStreak())
+		if (stats.streak() > stats.maxStreak())
 			stats.maxStreak(stats.streak());
-		if(stats.lastPlayed() != today)
+		if (stats.lastPlayed() != today)
 			stats.boardState(std::vector<std::string>());
 
 		good = stats.save();
 	}
 
-	if(good) {
+	if (good) {
 		remove(SETTINGS_JSON_OLD);
 		rename("WordleDS.txt", DATA_PATH DEFAULT_MOD "/share.txt");
 		rename("WordleDS.msl", DATA_PATH DEFAULT_MOD "/music.msl");
@@ -153,16 +160,21 @@ void Settings::showMenu() {
 
 	Sprite hardToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	hardToggle.move(game->data().hardModeToggle());
+	Sprite infiniteToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	infiniteToggle.move(game->data().infiniteModeToggle());
 	Sprite colorToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	colorToggle.move(game->data().highContrastToggle());
 	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	musicToggle.move(game->data().musicToggle());
 
-	while(1) {
+	while (1) {
 		game->data().setPalettes(_altPalette);
 		hardToggle
 			.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_hardMode ? TilePalette::green : TilePalette::gray);
+		infiniteToggle
+			.gfx(_infiniteMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+			.palette(_infiniteMode ? TilePalette::green : TilePalette::gray);
 		colorToggle
 			.gfx(_altPalette ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_altPalette ? TilePalette::green : TilePalette::gray);
@@ -176,35 +188,44 @@ void Settings::showMenu() {
 			swiWaitForVBlank();
 			scanKeys();
 			pressed = keysDown();
-		} while(!(pressed & (KEY_B | KEY_TOUCH)));
+		} while (!(pressed & (KEY_B | KEY_TOUCH)));
 
-		if(pressed & KEY_B) {
+		if (pressed & KEY_B) {
 			break;
 		}
 
-		if(pressed & KEY_TOUCH) {
+		if (pressed & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
-			if(touch.px > 232 && touch.py < 24) { // X
+			if (touch.px > 232 && touch.py < 24) { // X
 				break;
-			} else if(game->data().hardModeToggle().touching(touch)) {
-				if(game->stats().boardState().size() == 0) // Can't toggle mid-game
+			}
+			else if (game->data().hardModeToggle().touching(touch)) {
+				if (game->stats().boardState().size() == 0) // Can't toggle mid-game
 					_hardMode = !_hardMode;
-			} else if(game->data().highContrastToggle().touching(touch)) {
+			}
+			else if (game->data().infiniteModeToggle().touching(touch)) {
+				if (game->stats().boardState().size() == 0 || game->won() || game->currentGuess() >= game->data().maxGuesses()) // Only allow changing at the start or end of a game
+					_infiniteMode = !_infiniteMode;
+			}
+			else if (game->data().highContrastToggle().touching(touch)) {
 				_altPalette = !_altPalette;
-			} else if(game->data().musicToggle().touching(touch)) {
+			}
+			else if (game->data().musicToggle().touching(touch)) {
 				_music = !_music;
-				if(_music)
+				if (_music)
 					Music::music->start();
 				else
 					Music::music->stop();
-			} else if(game->data().shareMsgBtn().touching(touch)) {
+			}
+			else if (game->data().shareMsgBtn().touching(touch)) {
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);
 
 				hardToggle.visible(false);
+				infiniteToggle.visible(false);
 				colorToggle.visible(false);
 				musicToggle.visible(false);
 				Sprite::update(false);
@@ -219,6 +240,7 @@ void Settings::showMenu() {
 					.decompressPal(BG_PALETTE_SUB);
 
 				hardToggle.visible(true);
+				infiniteToggle.visible(true);
 				colorToggle.visible(true);
 				musicToggle.visible(true);
 				Sprite::update(false);
@@ -228,12 +250,14 @@ void Settings::showMenu() {
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
-			} else if(game->data().modBtn().touching(touch)) {
+			}
+			else if (game->data().modBtn().touching(touch)) {
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);
 
 				hardToggle.visible(false);
+				infiniteToggle.visible(false);
 				colorToggle.visible(false);
 				musicToggle.visible(false);
 				Sprite::update(false);
@@ -248,6 +272,7 @@ void Settings::showMenu() {
 					.decompressPal(BG_PALETTE_SUB);
 
 				hardToggle.visible(true);
+				infiniteToggle.visible(true);
 				colorToggle.visible(true);
 				musicToggle.visible(true);
 				Sprite::update(false);
@@ -258,13 +283,14 @@ void Settings::showMenu() {
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 			}
+
 		}
+
+		save();
+
+		Font::clear(false);
+		Font::update(false);
 	}
-
-	save();
-
-	Font::clear(false);
-	Font::update(false);
 }
 
 void Settings::shareMsgSettings() {
@@ -281,7 +307,7 @@ void Settings::shareMsgSettings() {
 	Sprite urlToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	urlToggle.move(game->data().shareUrlToggle());
 
-	while(1) {
+	while (1) {
 		game->data().setPalettes(_altPalette);
 		timerToggle
 			.gfx(_shareTimer ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
@@ -299,23 +325,26 @@ void Settings::shareMsgSettings() {
 			swiWaitForVBlank();
 			scanKeys();
 			pressed = keysDown();
-		} while(!(pressed & (KEY_B | KEY_TOUCH)));
+		} while (!(pressed & (KEY_B | KEY_TOUCH)));
 
-		if(pressed & KEY_B) {
+		if (pressed & KEY_B) {
 			break;
 		}
 
-		if(pressed & KEY_TOUCH) {
+		if (pressed & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
-			if(touch.px > 232 && touch.py < 24) { // X
+			if (touch.px > 232 && touch.py < 24) { // X
 				break;
-			} else if(game->data().shareTimerToggle().touching(touch)) {
+			}
+			else if (game->data().shareTimerToggle().touching(touch)) {
 				_shareTimer = !_shareTimer;
-			} else if(game->data().shareStreakToggle().touching(touch)) {
+			}
+			else if (game->data().shareStreakToggle().touching(touch)) {
 				_shareStreak = !_shareStreak;
-			} else if(game->data().shareUrlToggle().touching(touch)) {
+			}
+			else if (game->data().shareUrlToggle().touching(touch)) {
 				_shareUrl = !_shareUrl;
 			}
 		}
@@ -325,23 +354,24 @@ void Settings::shareMsgSettings() {
 std::vector<std::string> Settings::getMods() {
 	std::vector<std::string> dirContents;
 
-	DIR *pdir = opendir(DATA_PATH);
-	if(pdir == nullptr) {
+	DIR* pdir = opendir(DATA_PATH);
+	if (pdir == nullptr) {
 		game->data().mainFont().print(0, 0, false, u"Unable to open directory").update(false);
-	} else {
-		while(true) {
-			dirent *pent = readdir(pdir);
-			if(pent == nullptr)
+	}
+	else {
+		while (true) {
+			dirent* pent = readdir(pdir);
+			if (pent == nullptr)
 				break;
 
-			if(pent->d_type & DT_DIR && pent->d_name[0] != '.') {
+			if (pent->d_type & DT_DIR && pent->d_name[0] != '.') {
 				dirContents.push_back(pent->d_name);
 			}
 		}
 		closedir(pdir);
 	}
 
-	std::sort(dirContents.begin(), dirContents.end(), [](const std::string &a, const std::string &b) { return strcasecmp(a.c_str(), b.c_str()) < 0; });
+	std::sort(dirContents.begin(), dirContents.end(), [](const std::string& a, const std::string& b) { return strcasecmp(a.c_str(), b.c_str()) < 0; });
 
 	return dirContents;
 }
@@ -355,28 +385,28 @@ bool Settings::selectMod() {
 		.decompressPal(BG_PALETTE_SUB);
 
 	std::vector<std::string> mods = getMods();
-	Font &font = game->data().mainFont();
+	Font& font = game->data().mainFont();
 	int modsPerScreen = (192 - 24) / font.height();
 
 	int cursorPos = 0, scrollPos = 0;
 	// Find current mod for initial cursor position
-	for(size_t i = 0; i < mods.size(); i++) {
-		if(mods[i] == _mod) {
+	for (size_t i = 0; i < mods.size(); i++) {
+		if (mods[i] == _mod) {
 			cursorPos = i;
 			break;
 		}
 	}
-	while(1) {
+	while (1) {
 		// Scroll if needed
-		if(cursorPos < scrollPos)
+		if (cursorPos < scrollPos)
 			scrollPos = cursorPos;
-		else if(cursorPos >= scrollPos + modsPerScreen)
+		else if (cursorPos >= scrollPos + modsPerScreen)
 			scrollPos = std::max(0, cursorPos - modsPerScreen + 1);
 
 		Font::clear(false);
-		for(int i = 0; i < modsPerScreen && i < (int)mods.size(); i++)
+		for (int i = 0; i < modsPerScreen && i < (int)mods.size(); i++)
 			font.palette((scrollPos + i) == cursorPos ? TEXT_GREEN : TEXT_GRAY)
-				.print(5, 24 + i * font.height(), false, mods[scrollPos + i]);
+			.print(5, 24 + i * font.height(), false, mods[scrollPos + i]);
 		Font::update(false);
 
 		u16 pressed, held;
@@ -385,40 +415,47 @@ bool Settings::selectMod() {
 			scanKeys();
 			pressed = keysDown();
 			held = keysDownRepeat();
-		} while(!(held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT) || pressed & (KEY_A | KEY_B | KEY_TOUCH)));
+		} while (!(held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT) || pressed & (KEY_A | KEY_B | KEY_TOUCH)));
 
-		if(held & KEY_UP) {
-			if(cursorPos > 0)
+		if (held & KEY_UP) {
+			if (cursorPos > 0)
 				cursorPos--;
 			else
 				cursorPos = mods.size() - 1;
-		} else if(held & KEY_DOWN) {
-			if(cursorPos < (int)mods.size() - 1)
+		}
+		else if (held & KEY_DOWN) {
+			if (cursorPos < (int)mods.size() - 1)
 				cursorPos++;
 			else
 				cursorPos = 0;
-		} else if(held & KEY_LEFT) {
+		}
+		else if (held & KEY_LEFT) {
 			cursorPos -= modsPerScreen;
-			if(cursorPos < 0)
+			if (cursorPos < 0)
 				cursorPos = 0;
-		} else if(held & KEY_RIGHT) {
+		}
+		else if (held & KEY_RIGHT) {
 			cursorPos += modsPerScreen;
-			if(cursorPos > (int)mods.size() - 1)
+			if (cursorPos > (int)mods.size() - 1)
 				cursorPos = mods.size() - 1;
-		} else if(pressed & KEY_A) {
+		}
+		else if (pressed & KEY_A) {
 			_mod = mods[cursorPos];
 			break;
-		} else if(pressed & KEY_B) {
+		}
+		else if (pressed & KEY_B) {
 			break;
-		} else if(pressed & KEY_TOUCH) {
+		}
+		else if (pressed & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
-			if(touch.px > 232 && touch.py < 24) { // X
+			if (touch.px > 232 && touch.py < 24) { // X
 				break;
-			} else if(touch.py >= 24) {
+			}
+			else if (touch.py >= 24) {
 				size_t touched = (touch.py - 24) / font.height();
-				if(touched < mods.size()) {
+				if (touched < mods.size()) {
 					_mod = mods[touched];
 					break;
 				}

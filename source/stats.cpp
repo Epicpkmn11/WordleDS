@@ -12,7 +12,10 @@
 #include <numeric>
 #include <qrencode.h>
 
-Stats::Stats(const std::string &path) : _path(path) {
+Stats::Stats(const std::string &path, bool infinite) : _path(path), _infinite(infinite) {
+	if (_infinite) {
+		_path = "/infiniteStats.json";
+	}
 	Json json(_path.c_str());
 	if(!json.get())
 		return;
@@ -62,7 +65,7 @@ Stats::Stats(const std::string &path) : _path(path) {
 	time_t today = time(NULL) / 24 / 60 / 60;
 
 	// Clear the streak if broken
-	if(_lastWon != today - 1 && _lastWon != today && !settings->infiniteMode()) {
+	if(_lastWon != today - 1 && _lastWon != today && !_infinite) {
 		_streak = 0;
 	}
 

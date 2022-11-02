@@ -12,7 +12,7 @@
 #define DEFAULT_MOD "Wordle DS"
 #define DATA_PATH "/_nds/WordleDS/"
 #define SETTINGS_JSON DATA_PATH "settings.json"
-#define STATS_JSON "/stats.json"
+//#define STATS_JSON "/stats.json"
 #define MOD_JSON "/mod.json"
 
 #include <map>
@@ -186,7 +186,6 @@ public:
 
 	int maxGuesses(void) const { return _maxGuesses; }
 	int firstDay(void) const { return _firstDay; }
-
 
 	const std::vector<std::u16string> &howtoWords(void) const { return _howtoWords; }
 	const std::u16string &howtoWords(size_t i) const { return _howtoWords[i]; }

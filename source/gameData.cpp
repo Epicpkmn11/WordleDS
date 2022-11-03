@@ -63,6 +63,8 @@ GameData::GameData(const std::string &folder) {
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
+		// TODO Something here is screwing up the button placement on versions that dont support the new settings screen
+
 		// If there isn't a minimum version specified, or the minimum version is equal to or less than v2.0.0
 		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
 
@@ -75,6 +77,7 @@ GameData::GameData(const std::string &folder) {
 				_gameSettingsBtn = { -1, -1, 0,0 };
 				_shareMsgBtn = {-1, -1, 0, 0};
 				_modBtn = {224, 127, 21, 13};
+				_oldSettingsMenu = true;
 			}
 
 			// If the mod provided a custom stats screen, use the old statmenu
@@ -95,6 +98,7 @@ GameData::GameData(const std::string &folder) {
 				_gameSettingsBtn = { -1, -1, 0,0 };
 				_shareMsgBtn = { 232, 108, 17, 17 };
 				_modBtn = { 232, 131, 17, 17 };
+				_oldSettingsMenu = true;
 			}
 
 		}

@@ -26,7 +26,7 @@ Settings::Settings(const std::string& path) : _path(path) {
 
 	if (json.contains("infiniteMode") && json["infiniteMode"].isBool()) {
 		_infiniteMode = json["infiniteMode"].isTrue();
-		
+
 	}
 
 
@@ -161,7 +161,32 @@ void Settings::showMenu() {
 		.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 	Font::update(false);
 
+
+	Sprite hardToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	hardToggle.move(game->data().hardModeToggle());
+	Sprite colorToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	colorToggle.move(game->data().highContrastToggle());
+	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	musicToggle.move(game->data().musicToggle());
+
+
 	while (1) {
+
+		game->data().setPalettes(_altPalette); // Does effect anything if there are no sprites being drawn?
+
+		if (game->data().oldSettingsMenu())
+		{
+			hardToggle
+				.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+				.palette(_hardMode ? TilePalette::green : TilePalette::gray);
+			colorToggle
+				.gfx(_altPalette ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+				.palette(_altPalette ? TilePalette::green : TilePalette::gray);
+			musicToggle
+				.gfx(_music ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
+				.palette(_music ? TilePalette::green : TilePalette::gray);
+			Sprite::update(false);
+		}
 
 		u16 pressed;
 		do {
@@ -180,6 +205,22 @@ void Settings::showMenu() {
 
 			if (touch.px > 232 && touch.py < 24) { // X
 				break;
+			}
+			else if (game->data().oldSettingsMenu()) {
+				if (game->data().hardModeToggle().touching(touch)) {
+					if (game->stats().boardState().size() == 0) // Can't toggle mid-game
+						_hardMode = !_hardMode;
+				}
+				else if (game->data().highContrastToggle().touching(touch)) {
+					_altPalette = !_altPalette;
+				}
+				else if (game->data().musicToggle().touching(touch)) {
+					_music = !_music;
+					if (_music)
+						Music::music->start();
+					else
+						Music::music->stop();
+				}
 			}
 
 			else if (game->data().gameSettingsBtn().touching(touch)) {
@@ -207,6 +248,14 @@ void Settings::showMenu() {
 				Font::clear(false);
 				Font::update(false);
 
+				if (game->data().oldSettingsMenu())
+				{
+					hardToggle.visible(false);
+					colorToggle.visible(false);
+					musicToggle.visible(false);
+					Sprite::update(false);
+				}
+
 				shareMsgSettings();
 
 				// Restore background and sprites
@@ -215,6 +264,14 @@ void Settings::showMenu() {
 					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
 					.decompressMap(bgGetMapPtr(BG_SUB(0)))
 					.decompressPal(BG_PALETTE_SUB);
+
+				if (game->data().oldSettingsMenu())
+				{
+					hardToggle.visible(true);
+					colorToggle.visible(true);
+					musicToggle.visible(true);
+					Sprite::update(false);
+				}
 
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
@@ -227,6 +284,14 @@ void Settings::showMenu() {
 				Font::clear(false);
 				Font::update(false);
 
+				if (game->data().oldSettingsMenu())
+				{
+					hardToggle.visible(false);
+					colorToggle.visible(false);
+					musicToggle.visible(false);
+					Sprite::update(false);
+				}
+
 				selectMod();
 
 				// Restore background and sprites
@@ -235,6 +300,14 @@ void Settings::showMenu() {
 					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
 					.decompressMap(bgGetMapPtr(BG_SUB(0)))
 					.decompressPal(BG_PALETTE_SUB);
+
+				if (game->data().oldSettingsMenu())
+				{
+					hardToggle.visible(true);
+					colorToggle.visible(true);
+					musicToggle.visible(true);
+					Sprite::update(false);
+				}
 
 				game->data().mainFont()
 					.palette(TEXT_GRAY)

@@ -43,15 +43,15 @@ class GameData {
 		_emojiWhite = "⬜";
 
 	// Buttons in the setting selector
-	Button _gameSettingsBtn = { 232, 85, 17, 17 }; //TODO Actual good placement, these are placeholder values
-	Button _shareMsgBtn = {232, 108, 17, 17};
-	Button _modBtn = {232, 131, 17, 17};
+	Button _gameSettingsBtn = { 232, 33, 17, 17 };
+	Button _shareMsgBtn = {232, 58, 17, 17};
+	Button _modBtn = {232, 81, 17, 17};
 
 	// Buttons in the game settings
-	Button _hardModeToggle = { 224, 33, 21, 13 };
-	Button _infiniteModeToggle = { 224, 55, 21, 13 };
-	Button _highContrastToggle = { 224, 68, 21, 13 };
-	Button _musicToggle = { 224, 92, 21, 13 };
+	Button _hardModeToggle = { 224, 38, 21, 13 };
+	Button _infiniteModeToggle = { 224, 74, 21, 13 };
+	Button _highContrastToggle = { 224, 109, 21, 13 };
+	Button _musicToggle = { 224, 136, 21, 13 };
 
 	// Buttons in the share message settings
 	Button _shareTimerToggle = {224, 37, 21, 13};
@@ -59,6 +59,7 @@ class GameData {
 	Button _shareUrlToggle = {224, 128, 21, 13};
 
 	bool _oldStatsMenu = false;
+	bool _oldSettingsMenu = false;
 
 	std::vector<std::u16string> _howtoWords = {
 		u"WEARY",
@@ -223,6 +224,7 @@ public:
 	const Button &shareUrlToggle(void) const { return _shareUrlToggle; }
 
 	bool oldStatsMenu(void) const { return _oldStatsMenu; }
+	bool oldSettingsMenu(void) const { return _oldSettingsMenu; }
 
 	const std::vector<char16_t> &letters(void) const { return _letters; }
 	char16_t letters(size_t i) const { return _letters[i]; }

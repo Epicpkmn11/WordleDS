@@ -82,7 +82,7 @@ void Game::timerHandler() {
 
 Game::Game() :
 		_data(settings->mod()),
-		_stats(DATA_PATH + settings->mod() + game->data().statsJson(), settings->infiniteMode()),
+		_stats(DATA_PATH + settings->mod() + STATS_JSON, settings->infiniteMode()),
 		_kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()) {
 	// Get random word based on date
 	_today = settings->infiniteMode() ? rand() : time(NULL) / 24 / 60 / 60;
@@ -191,9 +191,14 @@ bool Game::run() {
 				_popupTimeout--;
 			}
 
-			if(!_showRefresh && (settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today)) { // New day, show refresh button
+			if(settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today) { // New day or infinteMode enabled, show refresh button
 				_showRefresh = true;
 				_data.refreshSprite().visible(true).update();
+			}
+			else
+			{
+				_showRefresh = false;
+				_data.refreshSprite().visible(false).update();
 			}
 		} while(!pressed && key == Kbd::NOKEY);
 

@@ -24,8 +24,11 @@ Settings::Settings(const std::string& path) : _path(path) {
 	if (json.contains("hardMode") && json["hardMode"].isBool())
 		_hardMode = json["hardMode"].isTrue();
 
-	if (json.contains("infiniteMode") && json["infiniteMode"].isBool())
+	if (json.contains("infiniteMode") && json["infiniteMode"].isBool()) {
 		_infiniteMode = json["infiniteMode"].isTrue();
+		
+	}
+
 
 	if (json.contains("altPalette") && json["altPalette"].isBool())
 		_altPalette = json["altPalette"].isTrue();
@@ -104,7 +107,7 @@ void Settings::legacyImport(const std::string& path) {
 
 	// Stats
 	if (json.contains("stats") && json["stats"].isObject()) {
-		Stats stats(DATA_PATH DEFAULT_MOD + game->data().statsJson(), settings->infiniteMode());
+		Stats stats(DATA_PATH DEFAULT_MOD STATS_JSON, settings->infiniteMode());
 
 		if (json["stats"].contains("guessCounts") && json["stats"]["guessCounts"].isArray()) {
 			for (const Json& item : json["stats"]["guessCounts"]) {

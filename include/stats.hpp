@@ -24,7 +24,7 @@ class Stats {
 
 public:
 	Stats(const std::string &path, bool infinite);
-
+	
 	bool save(void);
 
 	void showMenu(void);

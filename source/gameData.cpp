@@ -19,6 +19,7 @@
 #include "numbersSmall_nftr.h"
 #include "refreshButton_grf.h"
 #include "settingsBottom_grf.h"
+#include "gameSettings_grf.h"
 #include "shareMsgSettings_grf.h"
 #include "statsBottom_grf.h"
 #include "toggleOff_grf.h"
@@ -62,19 +63,40 @@ GameData::GameData(const std::string &folder) {
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
-		// If it supports v2.0.0, revert to old defaults
+		// If there isn't a minimum version specified, or the minimum version is equal to or less than v2.0.0
 		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
+
+			// If the mod provided a settings screen, place buttons on old location
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = {224, 37, 21, 13};
+				_infiniteModeToggle = { -1, -1, 0, 0 };
 				_highContrastToggle = {224, 76, 21, 13};
 				_musicToggle = {224, 102, 21, 13};
+				_gameSettingsBtn = { -1, -1, 0,0 };
 				_shareMsgBtn = {-1, -1, 0, 0};
 				_modBtn = {224, 127, 21, 13};
 			}
 
+			// If the mod provided a custom stats screen, use the old statmenu
 			if(access((modPath + "/statsBottom.grf").c_str(), F_OK) == 0) {
 				_oldStatsMenu = true;
 			}
+		}
+
+		// If there isn't a minimum version specified, or the minimum version is equal to or less than v2.1.0
+		if (!minVer || strcmp("v2.1.0", minVer) <= 0) {
+
+			// If the mod provided a settings screen, place buttons on old location
+			if (access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+				_hardModeToggle = { 224, 33, 21, 13 };
+				_infiniteModeToggle = { -1, -1, 0, 0 };
+				_highContrastToggle = { 224, 68, 21, 13 };
+				_musicToggle = { 224, 92, 21, 13 };
+				_gameSettingsBtn = { -1, -1, 0,0 };
+				_shareMsgBtn = { 232, 108, 17, 17 };
+				_modBtn = { 232, 131, 17, 17 };
+			}
+
 		}
 
 		if(json.contains("shareName") && json["shareName"].isString())
@@ -303,6 +325,7 @@ GameData::GameData(const std::string &folder) {
 	_howtoTop = Image((modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);
 	_modsBottom = Image((modPath + "/modsBottom.grf").c_str(), 256, 192, modsBottom_grf);
 	_settingsBottom = Image((modPath + "/settingsBottom.grf").c_str(), 256, 192, settingsBottom_grf);
+	_gameSettings = Image((modPath + "/gameSettings.grf").c_str(), 256, 192, gameSettings_grf);
 	_shareMsgSettings = Image((modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
 	_statsBottom = Image((modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 

@@ -161,24 +161,122 @@ void Settings::showMenu() {
 		.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 	Font::update(false);
 
-	Sprite hardToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	hardToggle.move(game->data().hardModeToggle());
-	Sprite infiniteToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	infiniteToggle.move(game->data().infiniteModeToggle());
-	Sprite colorToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	colorToggle.move(game->data().highContrastToggle());
+	while (1) {
+
+		u16 pressed;
+		do {
+			swiWaitForVBlank();
+			scanKeys();
+			pressed = keysDown();
+		} while (!(pressed & (KEY_B | KEY_TOUCH)));
+
+		if (pressed & KEY_B) {
+			break;
+		}
+
+		if (pressed & KEY_TOUCH) {
+			touchPosition touch;
+			touchRead(&touch);
+
+			if (touch.px > 232 && touch.py < 24) { // X
+				break;
+			}
+
+			else if (game->data().gameSettingsBtn().touching(touch)) {
+				// Clear text, hide sprites
+				Font::clear(false);
+				Font::update(false);
+
+				gameSettings();
+
+				// Restore background and sprites
+				swiWaitForVBlank();
+				game->data().settingsBottom()
+					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+					.decompressMap(bgGetMapPtr(BG_SUB(0)))
+					.decompressPal(BG_PALETTE_SUB);
+
+				game->data().mainFont()
+					.palette(TEXT_GRAY)
+					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
+				Font::update(false);
+			}
+			else if (game->data().shareMsgBtn().touching(touch)) {
+				// Clear text, hide sprites
+				Font::clear(false);
+				Font::update(false);
+
+				shareMsgSettings();
+
+				// Restore background and sprites
+				swiWaitForVBlank();
+				game->data().settingsBottom()
+					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+					.decompressMap(bgGetMapPtr(BG_SUB(0)))
+					.decompressPal(BG_PALETTE_SUB);
+
+				game->data().mainFont()
+					.palette(TEXT_GRAY)
+					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
+				Font::update(false);
+			}
+			else if (game->data().modBtn().touching(touch)) {
+				// Clear text, hide sprites
+				Font::clear(false);
+				Font::update(false);
+
+				selectMod();
+
+				// Restore background and sprites
+				swiWaitForVBlank();
+				game->data().settingsBottom()
+					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+					.decompressMap(bgGetMapPtr(BG_SUB(0)))
+					.decompressPal(BG_PALETTE_SUB);
+
+				game->data().mainFont()
+					.palette(TEXT_GRAY)
+					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
+				Font::update(false);
+			}
+
+		}
+
+		save();
+
+		Font::clear(false);
+		Font::update(false);
+	}
+}
+
+void Settings::gameSettings() {
+	// Change to game settings background
+	game->data().gameSettings()
+		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
+		.decompressMap(bgGetMapPtr(BG_SUB(0)))
+		.decompressPal(BG_PALETTE_SUB);
+
+	Sprite hardModeToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	hardModeToggle.move(game->data().hardModeToggle());
+	Sprite infiniteModeToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	infiniteModeToggle.move(game->data().infiniteModeToggle());
+	Sprite highContrastToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	highContrastToggle.move(game->data().highContrastToggle());
 	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	musicToggle.move(game->data().musicToggle());
 
 	while (1) {
 		game->data().setPalettes(_altPalette);
-		hardToggle
+		hardModeToggle
 			.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_hardMode ? TilePalette::green : TilePalette::gray);
-		infiniteToggle
+		infiniteModeToggle
 			.gfx(_infiniteMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_infiniteMode ? TilePalette::green : TilePalette::gray);
-		colorToggle
+		highContrastToggle
 			.gfx(_altPalette ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_altPalette ? TilePalette::green : TilePalette::gray);
 		musicToggle
@@ -205,12 +303,10 @@ void Settings::showMenu() {
 				break;
 			}
 			else if (game->data().hardModeToggle().touching(touch)) {
-				if (game->stats().boardState().size() == 0) // Can't toggle mid-game
-					_hardMode = !_hardMode;
+				_hardMode = !_hardMode;
 			}
 			else if (game->data().infiniteModeToggle().touching(touch)) {
-				if (game->stats().boardState().size() == 0 || game->won() || game->currentGuess() >= game->data().maxGuesses()) // Only allow changing at the start or end of a game
-					_infiniteMode = !_infiniteMode;
+				_infiniteMode = !_infiniteMode;
 			}
 			else if (game->data().highContrastToggle().touching(touch)) {
 				_altPalette = !_altPalette;
@@ -222,77 +318,7 @@ void Settings::showMenu() {
 				else
 					Music::music->stop();
 			}
-			else if (game->data().shareMsgBtn().touching(touch)) {
-				// Clear text, hide sprites
-				Font::clear(false);
-				Font::update(false);
-
-				hardToggle.visible(false);
-				infiniteToggle.visible(false);
-				colorToggle.visible(false);
-				musicToggle.visible(false);
-				Sprite::update(false);
-
-				shareMsgSettings();
-
-				// Restore background and sprites
-				swiWaitForVBlank();
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
-
-				hardToggle.visible(true);
-				infiniteToggle.visible(true);
-				colorToggle.visible(true);
-				musicToggle.visible(true);
-				Sprite::update(false);
-
-				game->data().mainFont()
-					.palette(TEXT_GRAY)
-					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
-					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
-				Font::update(false);
-			}
-			else if (game->data().modBtn().touching(touch)) {
-				// Clear text, hide sprites
-				Font::clear(false);
-				Font::update(false);
-
-				hardToggle.visible(false);
-				infiniteToggle.visible(false);
-				colorToggle.visible(false);
-				musicToggle.visible(false);
-				Sprite::update(false);
-
-				selectMod();
-
-				// Restore background and sprites
-				swiWaitForVBlank();
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
-
-				hardToggle.visible(true);
-				infiniteToggle.visible(true);
-				colorToggle.visible(true);
-				musicToggle.visible(true);
-				Sprite::update(false);
-
-				game->data().mainFont()
-					.palette(TEXT_GRAY)
-					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
-					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
-				Font::update(false);
-			}
-
 		}
-
-		save();
-
-		Font::clear(false);
-		Font::update(false);
 	}
 }
 

@@ -42,13 +42,18 @@ class GameData {
 		_emojiYellowAlt = "🟦",
 		_emojiWhite = "⬜";
 
-	Button _hardModeToggle = {224, 33, 21, 13};
-	Button _infiniteModeToggle = { 224, 55, 21, 13 };
-	Button _highContrastToggle = {224, 68, 21, 13};
-	Button _musicToggle = {224, 92, 21, 13};
+	// Buttons in the setting selector
+	Button _gameSettingsBtn = { 232, 85, 17, 17 }; //TODO Actual good placement, these are placeholder values
 	Button _shareMsgBtn = {232, 108, 17, 17};
 	Button _modBtn = {232, 131, 17, 17};
 
+	// Buttons in the game settings
+	Button _hardModeToggle = { 224, 33, 21, 13 };
+	Button _infiniteModeToggle = { 224, 55, 21, 13 };
+	Button _highContrastToggle = { 224, 68, 21, 13 };
+	Button _musicToggle = { 224, 92, 21, 13 };
+
+	// Buttons in the share message settings
 	Button _shareTimerToggle = {224, 37, 21, 13};
 	Button _shareStreakToggle = {224, 82, 21, 13};
 	Button _shareUrlToggle = {224, 128, 21, 13};
@@ -162,6 +167,7 @@ class GameData {
 		_howtoTop,
 		_modsBottom,
 		_settingsBottom,
+		_gameSettings,
 		_shareMsgSettings,
 		_statsBottom;
 
@@ -208,6 +214,7 @@ public:
 	const Button &infiniteModeToggle(void) const { return _infiniteModeToggle; }
 	const Button &highContrastToggle(void) const { return _highContrastToggle; }
 	const Button &musicToggle(void) const { return _musicToggle; }
+	const Button &gameSettingsBtn(void) const { return _gameSettingsBtn; }
 	const Button &shareMsgBtn(void) const { return _shareMsgBtn; }
 	const Button &modBtn(void) const { return _modBtn; }
 
@@ -240,6 +247,7 @@ public:
 	const Image &howtoTop(void) const { return _howtoTop; };
 	const Image &modsBottom(void) const { return _modsBottom; };
 	const Image &settingsBottom(void) const { return _settingsBottom; };
+	const Image &gameSettings(void) const { return _gameSettings; };
 	const Image &shareMsgSettings(void) const { return _shareMsgSettings; };
 	const Image &statsBottom(void) const { return _statsBottom; };
 

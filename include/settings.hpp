@@ -18,6 +18,7 @@ class Settings {
 	bool _shareUrl = false;
 	std::string _mod = DEFAULT_MOD;
 
+	void gameSettings(void);
 	void shareMsgSettings(void);
 
 	std::vector<std::string> getMods(void);

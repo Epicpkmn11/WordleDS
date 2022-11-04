@@ -45,7 +45,7 @@ class GameData {
 	// Buttons in the setting selector
 	Button _gameSettingsBtn = { 232, 33, 17, 17 };
 	Button _shareMsgBtn = {232, 64, 17, 17};
-	Button _modBtn = {232, 81, 17, 17};
+	Button _modBtn = {232, 92, 17, 17};
 
 	// Buttons in the game settings
 	Button _hardModeToggle = { 224, 38, 21, 13 };

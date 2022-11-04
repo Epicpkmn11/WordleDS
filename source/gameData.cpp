@@ -63,20 +63,30 @@ GameData::GameData(const std::string &folder) {
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
-		// TODO Something here is screwing up the button placement on versions that dont support the new settings screen
+		// Version backwards compatibility, when there is no minimum version defined by the mod, assume the lowest version.
+		// v2.0.0, The base version uses the old stats menu, no share settings, and also doesn't have the new settings layout
+		// v2.1.0, The sharing update, it features the new statistics screen and the share settings
+		// v2.2.0 (yet to be realeased), Has all the features 
+
+		// TODO		The order of these if statements can probably be optimized using else if's
+		//  		my brain is currently dead so I'll just leave it like this for now
 
 		// If there isn't a minimum version specified, or the minimum version is equal to or less than v2.0.0
 		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
 
 			// If the mod provided a settings screen, place buttons on old location
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+
 				_hardModeToggle = {224, 37, 21, 13};
-				_infiniteModeToggle = { -1, -1, 0, 0 };
 				_highContrastToggle = {224, 76, 21, 13};
 				_musicToggle = {224, 102, 21, 13};
-				_gameSettingsBtn = { -1, -1, 0,0 };
-				_shareMsgBtn = {-1, -1, 0, 0};
 				_modBtn = {224, 127, 21, 13};
+
+				// Not supported in this version
+				_infiniteModeToggle = { -1, -1, 0, 0 };
+				_gameSettingsBtn = { -1, -1, 0,0 };
+				_shareMsgBtn = { -1, -1, 0, 0 };
+
 				_oldSettingsMenu = true;
 			}
 
@@ -86,18 +96,22 @@ GameData::GameData(const std::string &folder) {
 			}
 		}
 
-		// If there isn't a minimum version specified, or the minimum version is equal to or less than v2.1.0
-		if (!minVer || strcmp("v2.1.0", minVer) <= 0) {
+		// If the minimum version is equal to or less than v2.1.0
+		if (strcmp("v2.1.0", minVer) <= 0) {
 
-			// If the mod provided a settings screen, place buttons on old location
+			// If the mod provided a settings screen, place buttons on the v2.1.0 location
 			if (access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+
 				_hardModeToggle = { 224, 33, 21, 13 };
-				_infiniteModeToggle = { -1, -1, 0, 0 };
 				_highContrastToggle = { 224, 68, 21, 13 };
 				_musicToggle = { 224, 92, 21, 13 };
-				_gameSettingsBtn = { -1, -1, 0,0 };
 				_shareMsgBtn = { 232, 108, 17, 17 };
 				_modBtn = { 232, 131, 17, 17 };
+
+				// Not supported in this version
+				_infiniteModeToggle = { -1, -1, 0, 0 };
+				_gameSettingsBtn = { -1, -1, 0,0 };
+
 				_oldSettingsMenu = true;
 			}
 

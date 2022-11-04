@@ -169,6 +169,12 @@ void Settings::showMenu() {
 	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	musicToggle.move(game->data().musicToggle());
 
+	if (!game->data().oldSettingsMenu())
+	{
+		hardToggle.visible(false);
+		colorToggle.visible(false);
+		musicToggle.visible(false);
+	}
 
 	while (1) {
 
@@ -223,7 +229,7 @@ void Settings::showMenu() {
 				}
 			}
 
-			else if (game->data().gameSettingsBtn().touching(touch)) {
+			if (game->data().gameSettingsBtn().touching(touch)) {
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);

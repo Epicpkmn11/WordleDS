@@ -312,9 +312,10 @@ bool Game::run() {
 					_stats.showMenu();
 				} else if(touch.px > 232) {
 					std::string loadedMod = settings->mod();
+					bool loadedInfinite = settings->infiniteMode();
 					settings->showMenu();
 
-					if(settings->mod() != loadedMod)
+					if(settings->mod() != loadedMod || settings->infiniteMode() != loadedInfinite)
 						return true;
 				}
 

@@ -12,7 +12,6 @@
 #include <qrencode.h>
 
 Stats::Stats(const std::string &path) : _path(path) {
-	_path = (settings->infiniteMode()) ? _path.substr(0, _path.find(".")) + "_infinite" + _path.substr(_path.find("."), _path.size()) : _path;
 	Json json(_path.c_str());
 	if(!json.get())
 		return;

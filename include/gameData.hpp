@@ -27,6 +27,7 @@ class GameData {
 	std::string
 		_shareName = "Wordle DS",
 		_lossMessage = "Better luck tomorrow...\nThe answer was:",
+		_lossMessageInfinite = "Better luck next time...\nThe answer was:",
 		_tooShortMessage = "Not enough letters",
 		_notWordMessage = "Not in word list",
 		_creditStr = "Wordle DS\nby Pk11",
@@ -201,6 +202,7 @@ public:
 
 	const std::string &shareName(void) const { return _shareName; }
 	const std::string &lossMessage(void) const { return _lossMessage; }
+	const std::string &lossMessageInfinite(void) const { return _lossMessageInfinite; }
 	const std::string &tooShortMessage(void) const { return _tooShortMessage; }
 	const std::string &notWordMessage(void) const { return _notWordMessage; }
 	const std::string &creditStr(void) const { return _creditStr; }

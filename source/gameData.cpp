@@ -129,6 +129,8 @@ GameData::GameData(const std::string &folder) {
 
 		if(json.contains("lossMessage") && json["lossMessage"].isString())
 			_lossMessage = json["lossMessage"].get()->valuestring;
+		if(json.contains("lossMessageInfinite") && json["lossMessageInfinite"].isString())
+			_lossMessageInfinite = json["lossMessageInfinite"].get()->valuestring;
 
 		if(json.contains("tooShortMessage") && json["tooShortMessage"].isString())
 			_tooShortMessage = json["tooShortMessage"].get()->valuestring;

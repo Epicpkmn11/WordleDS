@@ -379,7 +379,7 @@ bool Game::run() {
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				drawBgBottom(_data.lossMessage());
+				drawBgBottom(settings->infiniteMode() ? _data.lossMessageInfinite() : _data.lossMessage());
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < _answer.size(); i++) {

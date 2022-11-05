@@ -21,7 +21,7 @@ class Game {
 	int _popupTimeout = -1;
 	bool _won = false;
 	bool _statsSaved = false;
-	bool _showRefresh = false;
+	bool _showRefresh = settings->infiniteMode();
 	bool _timerStarted = false;
 	bool _bootstubExists;
 	std::vector<Sprite> _letterSprites;

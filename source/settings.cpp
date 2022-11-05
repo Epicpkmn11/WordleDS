@@ -171,6 +171,8 @@ void Settings::showMenu() {
 		musicToggle.visible(false);
 	}
 
+	Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
+
 	while(1) {
 		if(game->data().oldSettingsMenu()) {
 			hardToggle
@@ -219,14 +221,14 @@ void Settings::showMenu() {
 			}
 
 			if(game->data().gameSettingsBtn().touching(touch)) {
-				// Clear text, hide sprites
+				Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+				// Clear text
 				Font::clear(false);
 				Font::update(false);
 
 				gameSettings();
 
-				// Restore background and sprites
-				swiWaitForVBlank();
+				// Restore background
 				game->data().settingsBottom()
 					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
 					.decompressMap(bgGetMapPtr(BG_SUB(0)))
@@ -237,7 +239,9 @@ void Settings::showMenu() {
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
+				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 			} else if(game->data().shareMsgBtn().touching(touch)) {
+				Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);
@@ -270,7 +274,9 @@ void Settings::showMenu() {
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
+				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 			} else if(game->data().modBtn().touching(touch)) {
+				Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);
@@ -303,14 +309,12 @@ void Settings::showMenu() {
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
+				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 			}
 		}
 	}
 
 	save();
-
-	Font::clear(false);
-	Font::update(false);
 }
 
 void Settings::gameSettings() {
@@ -343,6 +347,7 @@ void Settings::gameSettings() {
 			.gfx(_music ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_music ? TilePalette::green : TilePalette::gray);
 		Sprite::update(false);
+		Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 
 		u16 pressed;
 		do {
@@ -362,7 +367,8 @@ void Settings::gameSettings() {
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
 			} else if(game->data().hardModeToggle().touching(touch)) {
-				_hardMode = !_hardMode;
+				if(game->stats().boardState().size() == 0) // Can't toggle mid-game
+					_hardMode = !_hardMode;
 			} else if(game->data().infiniteModeToggle().touching(touch)) {
 				_infiniteMode = !_infiniteMode;
 			} else if(game->data().highContrastToggle().touching(touch)) {
@@ -377,6 +383,8 @@ void Settings::gameSettings() {
 			}
 		}
 	}
+
+	Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 }
 
 void Settings::shareMsgSettings() {
@@ -404,6 +412,7 @@ void Settings::shareMsgSettings() {
 			.gfx(_shareUrl ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_shareUrl ? TilePalette::green : TilePalette::gray);
 		Sprite::update(false);
+		Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 
 		u16 pressed;
 		do {
@@ -431,6 +440,8 @@ void Settings::shareMsgSettings() {
 			}
 		}
 	}
+
+	Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 }
 
 std::vector<std::string> Settings::getMods() {
@@ -457,7 +468,7 @@ std::vector<std::string> Settings::getMods() {
 	return dirContents;
 }
 
-bool Settings::selectMod() {
+void Settings::selectMod() {
 	// Change to mods menu background
 	swiWaitForVBlank();
 	game->data().modsBottom()
@@ -489,6 +500,7 @@ bool Settings::selectMod() {
 			font.palette((scrollPos + i) == cursorPos ? TEXT_GREEN : TEXT_GRAY)
 			.print(5, 24 + i * font.height(), false, mods[scrollPos + i]);
 		Font::update(false);
+		Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 
 		u16 pressed, held;
 		do {
@@ -537,8 +549,9 @@ bool Settings::selectMod() {
 		}
 	}
 
+	Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 	Font::clear(false);
 	Font::update(false);
 
-	return true;
+	return;
 }

@@ -32,11 +32,11 @@ int main() {
 	if(settings->music())
 		Music::music->start();
 
-	Gfx::fadeIn();
-
 	// Show howto if first game
-	if(game->stats().firstPlay())
+	if(game->stats().firstPlay()) {
+		Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 		howtoMenu();
+	}
 
 	game->drawBgBottom(fatInited ? "" : "FAT init failed\nStats cannot be saved", 240);
 	game->data().bgTop()
@@ -46,11 +46,12 @@ int main() {
 
 	// Loop game until returns false
 	while(game->run()) {
-		Gfx::fadeOut();
+		Gfx::fadeOut(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
+		Font::clear(false);
+		Font::update(false);
 		delete game;
 		game = new Game();
-		Gfx::fadeIn();
 	}
 
-	Gfx::fadeOut();
+	Gfx::fadeOut(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 }

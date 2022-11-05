@@ -104,13 +104,13 @@ void Stats::replaceAll(std::string &data, std::string search, std::string replac
 		data.replace(data.find(search), search.size(), replaceStr);
 }
 
-void Stats::showQr() {
+bool Stats::showQr() {
 	// Ensure the game is done
 	std::vector<TilePalette> allCorrect;
 	for(size_t i = 0; i < game->answer().size(); i++)
 		allCorrect.push_back(TilePalette::green);
 	if((int)_boardState.size() < game->data().maxGuesses() && game->check(Font::utf8to16(_boardState.back())) != allCorrect)
-		return;
+		return false;
 
 	std::string str = shareMessage();
 
@@ -151,6 +151,8 @@ void Stats::showQr() {
 		swiWaitForVBlank();
 		scanKeys();
 	} while(!(keysDown() & (KEY_A | KEY_B | KEY_TOUCH)));
+
+	return true;
 }
 
 std::string Stats::shareMessage() {
@@ -253,6 +255,7 @@ void Stats::showMenu() {
 			game->data().numbersSmall().palette(palette).print(20 + width - 1, 90 - 1 + i * 14, false, count, Alignment::right).palette(TEXT_BLACK);
 		}
 		Font::update(false, true);
+		Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 
 		u16 pressed;
 		touchPosition touch;
@@ -267,15 +270,17 @@ void Stats::showMenu() {
 			break;
 		} else if((pressed & KEY_TOUCH) && touch.py < 24) {
 			if(touch.px < 24) {
-				showQr();
-				Font::clear(false);
-				Font::update(false);
+				if(showQr()) {
+					Font::clear(false);
+					Font::update(false);
+				}
 			} else if(touch.px > 232) {
 				break;
 			}
 		}
 	}
 
+	Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 	Font::clear(false);
 	Font::update(false);
 }

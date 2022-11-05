@@ -6,6 +6,8 @@
 #include <nds.h>
 #include <stdio.h>
 
+static bool fadedOut = true;
+
 void Gfx::init() {
 	videoSetMode(MODE_5_2D);
 	videoSetModeSub(MODE_5_2D);
@@ -57,16 +59,28 @@ void Gfx::flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette>
 	}
 }
 
-void Gfx::fadeIn() {
-	for(int i = 16; i >= 0; i--) {
-		setBrightness(3, i);
+void Gfx::fadeIn(int frames, int screen) {
+	if(!fadedOut)
+		return;
+	else
+		fadedOut = false;
+
+	for(int i = 0; i < frames; i++) {
+		setBrightness(screen, 16 - (i * 16 / frames));
 		swiWaitForVBlank();
 	}
+	setBrightness(screen, 0); // Ensure fully faded in
 }
 
-void Gfx::fadeOut() {
-	for(int i = 0; i <= 16; i++) {
-		setBrightness(3, i);
+void Gfx::fadeOut(int frames, int screen) {
+	if(fadedOut)
+		return;
+	else
+		fadedOut = true;
+
+	for(int i = 0; i < frames; i++) {
+		setBrightness(screen, (i * 16 / frames));
 		swiWaitForVBlank();
 	}
+	setBrightness(screen, 16); // Ensure fully faded out
 }

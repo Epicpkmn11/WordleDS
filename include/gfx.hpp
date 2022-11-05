@@ -15,6 +15,12 @@
 #define TEXT_WHITE 0xF8
 #define TEXT_WHITE_GREEN 0xFC
 
+#define FADE_TOP 1
+#define FADE_BOTTOM 2
+
+#define FADE_FAST 6
+#define FADE_SLOW 30
+
 enum TilePalette : int {
 	white = 0,
 	whiteDark = 1,
@@ -34,8 +40,8 @@ namespace Gfx {
 
 	void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
 
-	void fadeIn(void);
-	void fadeOut(void);
+	void fadeIn(int frames, int screen);
+	void fadeOut(int frames, int screen);
 }
 
 #endif // GFX_HPP

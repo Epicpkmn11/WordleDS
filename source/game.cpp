@@ -155,6 +155,7 @@ bool Game::run() {
 			if(_currentGuess >= _data.maxGuesses())
 				break;
 		}
+		Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 		Gfx::flipSprites(_letterSprites.data(), _currentGuess * _answer.size(), palettes);
 	}
 
@@ -166,6 +167,11 @@ bool Game::run() {
 
 	if(!_won && _currentGuess <= _data.maxGuesses())
 		_kbd.show();
+
+	if(_showRefresh)
+		_data.refreshSprite().visible(true).update();
+
+	Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 
 	u16 pressed, held;
 	char16_t key = NOKEY;
@@ -191,7 +197,7 @@ bool Game::run() {
 				_popupTimeout--;
 			}
 
-			if(!_showRefresh && (settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today)) { // New day or infinite mode enabled, show refresh button
+			if(!_showRefresh && time(NULL) / 24 / 60 / 60 != _today) { // New day or infinite mode enabled, show refresh button
 				_showRefresh = true;
 				_data.refreshSprite().visible(true).update();
 			}
@@ -296,24 +302,47 @@ bool Game::run() {
 				swiWaitForVBlank();
 
 				bool showKeyboard = _kbd.visible();
-				if(showKeyboard)
-					_kbd.hide();
-				if(_showRefresh)
-					_data.refreshSprite().visible(false).update();
-				Font::clear(false);
-				Font::update(false);
 
 				if(touch.px < 24) {
+					Gfx::fadeOut(FADE_FAST, FADE_TOP | FADE_BOTTOM);
+					if(showKeyboard)
+						_kbd.hide();
+					if(_showRefresh)
+						_data.refreshSprite().visible(false).update();
+					Font::clear(false);
+					Font::update(false);
+
 					howtoMenu();
 				} else if(touch.px > 116 && touch.px < 140) {
+					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+					if(showKeyboard)
+						_kbd.hide();
+					if(_showRefresh)
+						_data.refreshSprite().visible(false).update();
+					Font::clear(false);
+					Font::update(false);
+
 					_stats.showMenu();
 				} else if(touch.px > 232) {
+					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+					if(showKeyboard)
+						_kbd.hide();
+					if(_showRefresh)
+						_data.refreshSprite().visible(false).update();
+					Font::clear(false);
+					Font::update(false);
+
 					std::string loadedMod = settings->mod();
 					bool loadedInfinite = settings->infiniteMode();
 					settings->showMenu();
 
-					if(settings->mod() != loadedMod || settings->infiniteMode() != loadedInfinite)
+					if(settings->mod() != loadedMod || settings->infiniteMode() != loadedInfinite) {
 						return true;
+					}
+
+					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+					Font::clear(false);
+					Font::update(false);
 				}
 
 				if(showKeyboard)
@@ -331,6 +360,7 @@ bool Game::run() {
 					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
 					.decompressMap(bgGetMapPtr(BG_SUB(0)))
 					.decompressPal(BG_PALETTE_SUB);
+				Gfx::fadeIn(FADE_FAST, (touch.px < 24) ? FADE_TOP | FADE_BOTTOM : FADE_BOTTOM);
 			} else if(_showRefresh && _popupTimeout == -1 && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
 				if(settings->infiniteMode()) {
@@ -395,6 +425,8 @@ bool Game::run() {
 
 				Gfx::flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
+
+			Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 			Font::clear(false);
 			Font::update(false);
 
@@ -410,6 +442,7 @@ bool Game::run() {
 				.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
 				.decompressMap(bgGetMapPtr(BG_SUB(0)))
 				.decompressPal(BG_PALETTE_SUB);
+			Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 		}
 	}
 

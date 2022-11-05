@@ -35,6 +35,9 @@ void howtoMenu() {
 		}
 	}
 
+	Sprite::update(false);
+	Gfx::fadeIn(FADE_FAST, FADE_TOP | FADE_BOTTOM);
+
 	std::vector<Sprite> toFlip;
 	std::vector<TilePalette> flipColors;
 	for(size_t i = 0; i < game->data().howtoColors().size(); i++) {
@@ -53,6 +56,8 @@ void howtoMenu() {
 		pressed = keysDown();
 		touchRead(&touch);
 	} while(!((pressed & (KEY_A | KEY_B)) || ((pressed & KEY_TOUCH) && (touch.px > 232 && touch.py < 24))));
+
+	Gfx::fadeOut(FADE_FAST, FADE_TOP | FADE_BOTTOM);
 
 	// Restore letterSprites
 	for(Sprite &sprite : game->letterSprites())

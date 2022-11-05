@@ -21,7 +21,7 @@ class Stats {
 	int _timeElapsed = 0;
 
 	void replaceAll(std::string &data, std::string search, std::string replaceStr);
-	void showQr(void);
+	bool showQr(void);
 
 public:
 	Stats(const std::string &path);

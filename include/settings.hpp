@@ -22,7 +22,7 @@ class Settings {
 	void shareMsgSettings(void);
 
 	std::vector<std::string> getMods(void);
-	bool selectMod(void);
+	void selectMod(void);
 
 public:
 	Settings(const std::string &path);

@@ -172,8 +172,6 @@ void Settings::showMenu() {
 	}
 
 	while(1) {
-		game->data().setPalettes(_altPalette); // Does effect anything if there are no sprites being drawn?
-
 		if(game->data().oldSettingsMenu()) {
 			hardToggle
 				.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
@@ -210,6 +208,7 @@ void Settings::showMenu() {
 						_hardMode = !_hardMode;
 				} else if(game->data().highContrastToggle().touching(touch)) {
 					_altPalette = !_altPalette;
+					game->data().setPalettes(_altPalette);
 				} else if(game->data().musicToggle().touching(touch)) {
 					_music = !_music;
 					if(_music)
@@ -331,7 +330,6 @@ void Settings::gameSettings() {
 	musicToggle.move(game->data().musicToggle());
 
 	while(1) {
-		game->data().setPalettes(_altPalette);
 		hardModeToggle
 			.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_hardMode ? TilePalette::green : TilePalette::gray);
@@ -369,6 +367,7 @@ void Settings::gameSettings() {
 				_infiniteMode = !_infiniteMode;
 			} else if(game->data().highContrastToggle().touching(touch)) {
 				_altPalette = !_altPalette;
+				game->data().setPalettes(_altPalette);
 			} else if(game->data().musicToggle().touching(touch)) {
 				_music = !_music;
 				if(_music)
@@ -395,7 +394,6 @@ void Settings::shareMsgSettings() {
 	urlToggle.move(game->data().shareUrlToggle());
 
 	while(1) {
-		game->data().setPalettes(_altPalette);
 		timerToggle
 			.gfx(_shareTimer ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_shareTimer ? TilePalette::green : TilePalette::gray);

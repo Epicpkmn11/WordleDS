@@ -1,6 +1,8 @@
 #ifndef STATS_HPP
 #define STATS_HPP
 
+#include "settings.hpp"
+
 #include <string>
 #include <time.h>
 #include <vector>
@@ -61,7 +63,7 @@ public:
 	Stats &timeElapsed(int timeElapsed) { _timeElapsed = timeElapsed; return *this; }
 	void timeElapsedInc(void) { _timeElapsed++; }
 
-	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0; }
+	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0 && !settings->infiniteMode(); }
 };
 
 #endif // STATS_HPP

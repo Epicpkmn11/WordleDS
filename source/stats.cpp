@@ -3,7 +3,6 @@
 #include "game.hpp"
 #include "gfx.hpp"
 #include "kbd.hpp"
-#include "settings.hpp"
 #include "tonccpy.h"
 
 #include <array>

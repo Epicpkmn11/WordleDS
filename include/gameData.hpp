@@ -13,6 +13,7 @@
 #define DATA_PATH "/_nds/WordleDS/"
 #define SETTINGS_JSON DATA_PATH "settings.json"
 #define STATS_JSON "/stats.json"
+#define STATS_JSON_INFINITE "/stats_infinite.json"
 #define MOD_JSON "/mod.json"
 
 #include <map>

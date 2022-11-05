@@ -82,7 +82,7 @@ void Game::timerHandler() {
 
 Game::Game() :
 		_data(settings->mod()),
-		_stats(DATA_PATH + settings->mod() + STATS_JSON, settings->infiniteMode()),
+		_stats(DATA_PATH + settings->mod() + (settings->infiniteMode() ? STATS_JSON_INFINITE : STATS_JSON)),
 		_kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()) {
 	// Get random word based on date
 	_today = settings->infiniteMode() ? rand() : time(NULL) / 24 / 60 / 60;

@@ -10,6 +10,7 @@ class Settings {
 	std::string _path;
 
 	bool _hardMode = false;
+	bool _infiniteMode = false;
 	bool _altPalette = false;
 	bool _music = true;
 	bool _shareTimer = false;
@@ -17,6 +18,7 @@ class Settings {
 	bool _shareUrl = false;
 	std::string _mod = DEFAULT_MOD;
 
+	void gameSettings(void);
 	void shareMsgSettings(void);
 
 	std::vector<std::string> getMods(void);
@@ -33,6 +35,9 @@ public:
 
 	bool hardMode(void) const { return _hardMode; }
 	Settings &hardMode(bool hardMode) { _hardMode = hardMode; return *this; }
+
+	bool infiniteMode(void) const { return _infiniteMode; }
+	Settings &infiniteMode(bool infiniteMode) { _infiniteMode = infiniteMode; return *this; }
 
 	bool altPalette(void) const { return _altPalette; }
 	Settings &altPalette(bool altPalette) { _altPalette = altPalette; return *this; }

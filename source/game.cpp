@@ -82,10 +82,10 @@ void Game::timerHandler() {
 
 Game::Game() :
 		_data(settings->mod()),
-		_stats(DATA_PATH + settings->mod() + STATS_JSON, _data.infinite()),
+		_stats(DATA_PATH + settings->mod() + (settings->infiniteMode() ? STATS_JSON_INFINITE : STATS_JSON)),
 		_kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()) {
 	// Get random word based on date
-	_today = _data.infinite() ? rand() : time(NULL) / 24 / 60 / 60;
+	_today = settings->infiniteMode() ? rand() : time(NULL) / 24 / 60 / 60;
 	_answer = _data.choices((unsigned int)(_today - _data.firstDay()) % _data.choices().size());
 
 	for(size_t i = 0; i < _answer.size(); i++)
@@ -191,7 +191,7 @@ bool Game::run() {
 				_popupTimeout--;
 			}
 
-			if(!_showRefresh && (_data.infinite() || time(NULL) / 24 / 60 / 60 != _today)) { // New day, show refresh button
+			if(!_showRefresh && (settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today)) { // New day or infinite mode enabled, show refresh button
 				_showRefresh = true;
 				_data.refreshSprite().visible(true).update();
 			}
@@ -309,9 +309,10 @@ bool Game::run() {
 					_stats.showMenu();
 				} else if(touch.px > 232) {
 					std::string loadedMod = settings->mod();
+					bool loadedInfinite = settings->infiniteMode();
 					settings->showMenu();
 
-					if(settings->mod() != loadedMod)
+					if(settings->mod() != loadedMod || settings->infiniteMode() != loadedInfinite)
 						return true;
 				}
 
@@ -332,7 +333,7 @@ bool Game::run() {
 					.decompressPal(BG_PALETTE_SUB);
 			} else if(_showRefresh && _popupTimeout == -1 && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
-				if(_data.infinite()) {
+				if(settings->infiniteMode()) {
 					if(!_won)
 						_stats.streak(0);
 					_stats.save();
@@ -375,7 +376,7 @@ bool Game::run() {
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				drawBgBottom(_data.lossMessage());
+				drawBgBottom(settings->infiniteMode() ? _data.lossMessageInfinite() : _data.lossMessage());
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < _answer.size(); i++) {

@@ -5,7 +5,7 @@
 *.dsi
 *.cia
 *.elf
-
+*.vs
 *.vscode
 *.DS_Store
 *._

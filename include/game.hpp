@@ -45,6 +45,7 @@ public:
 
 	std::u16string_view answer(void) const { return _answer; }
 	bool won(void) const { return _won; }
+	int currentGuess(void) const { return _currentGuess; }
 
 	std::vector<Sprite> &letterSprites(void) { return _letterSprites; }
 	Sprite &letterSprites(size_t i) { return _letterSprites[i]; }

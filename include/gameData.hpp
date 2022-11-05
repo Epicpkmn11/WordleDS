@@ -13,6 +13,7 @@
 #define DATA_PATH "/_nds/WordleDS/"
 #define SETTINGS_JSON DATA_PATH "settings.json"
 #define STATS_JSON "/stats.json"
+#define STATS_JSON_INFINITE "/stats_infinite.json"
 #define MOD_JSON "/mod.json"
 
 #include <map>
@@ -23,11 +24,10 @@ class GameData {
 	int _maxGuesses = 6,
 		_firstDay = 18797; // June 19th 2021
 
-	bool _infinite = false;
-
 	std::string
 		_shareName = "Wordle DS",
 		_lossMessage = "Better luck tomorrow...\nThe answer was:",
+		_lossMessageInfinite = "Better luck next time...\nThe answer was:",
 		_tooShortMessage = "Not enough letters",
 		_notWordMessage = "Not in word list",
 		_creditStr = "Wordle DS\nby Pk11",
@@ -43,17 +43,24 @@ class GameData {
 		_emojiYellowAlt = "🟦",
 		_emojiWhite = "⬜";
 
-	Button _hardModeToggle = {224, 33, 21, 13};
-	Button _highContrastToggle = {224, 68, 21, 13};
-	Button _musicToggle = {224, 92, 21, 13};
-	Button _shareMsgBtn = {232, 108, 17, 17};
-	Button _modBtn = {232, 131, 17, 17};
+	// Buttons in the setting selector
+	Button _gameSettingsBtn = { 232, 33, 17, 17 };
+	Button _shareMsgBtn = {232, 64, 17, 17};
+	Button _modBtn = {232, 92, 17, 17};
 
+	// Buttons in the game settings
+	Button _hardModeToggle = { 224, 38, 21, 13 };
+	Button _infiniteModeToggle = { 224, 74, 21, 13 };
+	Button _highContrastToggle = { 224, 109, 21, 13 };
+	Button _musicToggle = { 224, 136, 21, 13 };
+
+	// Buttons in the share message settings
 	Button _shareTimerToggle = {224, 37, 21, 13};
 	Button _shareStreakToggle = {224, 82, 21, 13};
 	Button _shareUrlToggle = {224, 128, 21, 13};
 
 	bool _oldStatsMenu = false;
+	bool _oldSettingsMenu = false;
 
 	std::vector<std::u16string> _howtoWords = {
 		u"WEARY",
@@ -162,6 +169,7 @@ class GameData {
 		_howtoTop,
 		_modsBottom,
 		_settingsBottom,
+		_gameSettings,
 		_shareMsgSettings,
 		_statsBottom;
 
@@ -187,8 +195,6 @@ public:
 	int maxGuesses(void) const { return _maxGuesses; }
 	int firstDay(void) const { return _firstDay; }
 
-	bool infinite(void) const { return _infinite; }
-
 	const std::vector<std::u16string> &howtoWords(void) const { return _howtoWords; }
 	const std::u16string &howtoWords(size_t i) const { return _howtoWords[i]; }
 	const std::vector<TilePalette> &howtoColors(void) const { return _howtoColors; }
@@ -196,6 +202,7 @@ public:
 
 	const std::string &shareName(void) const { return _shareName; }
 	const std::string &lossMessage(void) const { return _lossMessage; }
+	const std::string &lossMessageInfinite(void) const { return _lossMessageInfinite; }
 	const std::string &tooShortMessage(void) const { return _tooShortMessage; }
 	const std::string &notWordMessage(void) const { return _notWordMessage; }
 	const std::string &creditStr(void) const { return _creditStr; }
@@ -207,8 +214,10 @@ public:
 	const std::string &shareStreakLoss(void) const { return _shareStreakLoss; }
 
 	const Button &hardModeToggle(void) const { return _hardModeToggle; }
+	const Button &infiniteModeToggle(void) const { return _infiniteModeToggle; }
 	const Button &highContrastToggle(void) const { return _highContrastToggle; }
 	const Button &musicToggle(void) const { return _musicToggle; }
+	const Button &gameSettingsBtn(void) const { return _gameSettingsBtn; }
 	const Button &shareMsgBtn(void) const { return _shareMsgBtn; }
 	const Button &modBtn(void) const { return _modBtn; }
 
@@ -217,6 +226,7 @@ public:
 	const Button &shareUrlToggle(void) const { return _shareUrlToggle; }
 
 	bool oldStatsMenu(void) const { return _oldStatsMenu; }
+	bool oldSettingsMenu(void) const { return _oldSettingsMenu; }
 
 	const std::vector<char16_t> &letters(void) const { return _letters; }
 	char16_t letters(size_t i) const { return _letters[i]; }
@@ -241,6 +251,7 @@ public:
 	const Image &howtoTop(void) const { return _howtoTop; };
 	const Image &modsBottom(void) const { return _modsBottom; };
 	const Image &settingsBottom(void) const { return _settingsBottom; };
+	const Image &gameSettings(void) const { return _gameSettings; };
 	const Image &shareMsgSettings(void) const { return _shareMsgSettings; };
 	const Image &statsBottom(void) const { return _statsBottom; };
 

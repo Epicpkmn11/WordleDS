@@ -1,6 +1,8 @@
 #ifndef STATS_HPP
 #define STATS_HPP
 
+#include "settings.hpp"
+
 #include <string>
 #include <time.h>
 #include <vector>
@@ -17,13 +19,12 @@ class Stats {
 	time_t _lastPlayed = 0;
 	time_t _lastWon = 0;
 	int _timeElapsed = 0;
-	bool _infinite;
 
 	void replaceAll(std::string &data, std::string search, std::string replaceStr);
 	void showQr(void);
 
 public:
-	Stats(const std::string &path, bool infinite);
+	Stats(const std::string &path);
 
 	bool save(void);
 
@@ -62,7 +63,7 @@ public:
 	Stats &timeElapsed(int timeElapsed) { _timeElapsed = timeElapsed; return *this; }
 	void timeElapsedInc(void) { _timeElapsed++; }
 
-	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0; }
+	bool firstPlay(void) const { return _gamesPlayed == 0 && _boardState.size() == 0 && !settings->infiniteMode(); }
 };
 
 #endif // STATS_HPP

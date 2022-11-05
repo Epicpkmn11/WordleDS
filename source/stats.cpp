@@ -3,7 +3,6 @@
 #include "game.hpp"
 #include "gfx.hpp"
 #include "kbd.hpp"
-#include "settings.hpp"
 #include "tonccpy.h"
 
 #include <array>
@@ -12,7 +11,7 @@
 #include <numeric>
 #include <qrencode.h>
 
-Stats::Stats(const std::string &path, bool infinite) : _path(path), _infinite(infinite) {
+Stats::Stats(const std::string &path) : _path(path) {
 	Json json(_path.c_str());
 	if(!json.get())
 		return;
@@ -62,7 +61,7 @@ Stats::Stats(const std::string &path, bool infinite) : _path(path), _infinite(in
 	time_t today = time(NULL) / 24 / 60 / 60;
 
 	// Clear the streak if broken
-	if(_lastWon != today - 1 && _lastWon != today && !_infinite) {
+	if(_lastWon != today - 1 && _lastWon != today && !settings->infiniteMode()) {
 		_streak = 0;
 	}
 
@@ -70,7 +69,7 @@ Stats::Stats(const std::string &path, bool infinite) : _path(path), _infinite(in
 		_maxStreak = _streak;
 
 	// Clear day-specific variables
-	if(_lastPlayed != today || game->data().infinite()) {
+	if(_lastPlayed != today || settings->infiniteMode()) {
 		_boardState = {};
 		_timeElapsed = 0;
 	}
@@ -175,7 +174,7 @@ std::string Stats::shareMessage() {
 			sprintf(streakStr, game->data().shareStreak().c_str(), _streak);
 	}
 
-	if(game->data().infinite()) {
+	if(settings->infiniteMode()) {
 		sprintf(str, "%s %s %c/%d%s%s%s\n\n",
 			game->data().shareName().c_str(),
 			Font::utf16to8(game->answer()).c_str(),

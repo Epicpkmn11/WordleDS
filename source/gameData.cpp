@@ -19,6 +19,7 @@
 #include "numbersSmall_nftr.h"
 #include "refreshButton_grf.h"
 #include "settingsBottom_grf.h"
+#include "gameSettings_grf.h"
 #include "shareMsgSettings_grf.h"
 #include "statsBottom_grf.h"
 #include "toggleOff_grf.h"
@@ -62,22 +63,44 @@ GameData::GameData(const std::string &folder) {
 			sassert(strcmp(VER_NUMBER, minVer) >= 0, "This mod requires Wordle DS\nversion %s or newer, please update.\n\n(You have " VER_NUMBER ")", minVer);
 		}
 
-		if(json.contains("infinite") && json["infinite"].isTrue()) {
-			_infinite = true;
-		}
-
-		// If it supports v2.0.0, revert to old defaults
+		// Version backwards compatibility, when there is no minimum version defined by the mod, assume the lowest version.
+		// v2.0.0, The base version uses the old stats menu, no share settings, and also doesn't have the new settings layout
+		// v2.1.0, The sharing update, it features the new statistics screen and the share settings
+		// v2.2.0, Has all the features
 		if(!minVer || strcmp("v2.0.0", minVer) <= 0) {
+			// If the mod provided a settings screen, place buttons at old locations
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = {224, 37, 21, 13};
 				_highContrastToggle = {224, 76, 21, 13};
 				_musicToggle = {224, 102, 21, 13};
-				_shareMsgBtn = {-1, -1, 0, 0};
 				_modBtn = {224, 127, 21, 13};
+
+				// Not supported in this version
+				_infiniteModeToggle = { -1, -1, 0, 0 };
+				_gameSettingsBtn = { -1, -1, 0,0 };
+				_shareMsgBtn = { -1, -1, 0, 0 };
+
+				_oldSettingsMenu = true;
 			}
 
+			// If the mod provided a custom stats screen, use the old statmenu
 			if(access((modPath + "/statsBottom.grf").c_str(), F_OK) == 0) {
 				_oldStatsMenu = true;
+			}
+		} else if(strcmp("v2.1.0", minVer) <= 0) {
+			// If the mod provided a settings screen, place buttons on the v2.1.0 location
+			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+				_hardModeToggle = { 224, 33, 21, 13 };
+				_highContrastToggle = { 224, 68, 21, 13 };
+				_musicToggle = { 224, 92, 21, 13 };
+				_shareMsgBtn = { 232, 108, 17, 17 };
+				_modBtn = { 232, 131, 17, 17 };
+
+				// Not supported in this version
+				_infiniteModeToggle = { -1, -1, 0, 0 };
+				_gameSettingsBtn = { -1, -1, 0,0 };
+
+				_oldSettingsMenu = true;
 			}
 		}
 
@@ -93,6 +116,8 @@ GameData::GameData(const std::string &folder) {
 
 		if(json.contains("lossMessage") && json["lossMessage"].isString())
 			_lossMessage = json["lossMessage"].get()->valuestring;
+		if(json.contains("lossMessageInfinite") && json["lossMessageInfinite"].isString())
+			_lossMessageInfinite = json["lossMessageInfinite"].get()->valuestring;
 
 		if(json.contains("tooShortMessage") && json["tooShortMessage"].isString())
 			_tooShortMessage = json["tooShortMessage"].get()->valuestring;
@@ -145,6 +170,9 @@ GameData::GameData(const std::string &folder) {
 				Json buttons = json["settings"]["buttons"];
 				if(buttons.contains("hardMode") && buttons["hardMode"].isArray() && buttons["hardMode"].size() == 4)
 					_hardModeToggle = Button(buttons["hardMode"]);
+
+				if(buttons.contains("infiniteMode") && buttons["infiniteMode"].isArray() && buttons["infiniteMode"].size() == 4)
+					_infiniteModeToggle = Button(buttons["infiniteMode"]);
 
 				if(buttons.contains("highContrast") && buttons["highContrast"].isArray() && buttons["highContrast"].size() == 4)
 					_highContrastToggle = Button(buttons["highContrast"]);
@@ -304,6 +332,7 @@ GameData::GameData(const std::string &folder) {
 	_howtoTop = Image((modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);
 	_modsBottom = Image((modPath + "/modsBottom.grf").c_str(), 256, 192, modsBottom_grf);
 	_settingsBottom = Image((modPath + "/settingsBottom.grf").c_str(), 256, 192, settingsBottom_grf);
+	_gameSettings = Image((modPath + "/gameSettings.grf").c_str(), 256, 192, gameSettings_grf);
 	_shareMsgSettings = Image((modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
 	_statsBottom = Image((modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 

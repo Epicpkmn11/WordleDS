@@ -26,9 +26,7 @@ Settings::Settings(const std::string &path) : _path(path) {
 
 	if(json.contains("infiniteMode") && json["infiniteMode"].isBool()) {
 		_infiniteMode = json["infiniteMode"].isTrue();
-
 	}
-
 
 	if(json.contains("altPalette") && json["altPalette"].isBool())
 		_altPalette = json["altPalette"].isTrue();

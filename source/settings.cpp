@@ -49,8 +49,7 @@ Settings::Settings(const std::string &path) : _path(path) {
 
 		if(json["shareMsg"].contains("url") && json["shareMsg"]["url"].isBool())
 			_shareUrl = json["shareMsg"]["url"].isTrue();
-	}
-	else if(json.contains("timer") && json["timer"].isBool()) {
+	} else if(json.contains("timer") && json["timer"].isBool()) {
 		_shareTimer = json["timer"].isTrue();
 	}
 }
@@ -159,7 +158,6 @@ void Settings::showMenu() {
 		.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 	Font::update(false);
 
-
 	Sprite hardToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	hardToggle.move(game->data().hardModeToggle());
 	Sprite colorToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
@@ -167,19 +165,16 @@ void Settings::showMenu() {
 	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	musicToggle.move(game->data().musicToggle());
 
-	if(!game->data().oldSettingsMenu())
-	{
+	if(!game->data().oldSettingsMenu()) {
 		hardToggle.visible(false);
 		colorToggle.visible(false);
 		musicToggle.visible(false);
 	}
 
 	while(1) {
-
 		game->data().setPalettes(_altPalette); // Does effect anything if there are no sprites being drawn?
 
-		if(game->data().oldSettingsMenu())
-		{
+		if(game->data().oldSettingsMenu()) {
 			hardToggle
 				.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 				.palette(_hardMode ? TilePalette::green : TilePalette::gray);
@@ -209,16 +204,13 @@ void Settings::showMenu() {
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
-			}
-			else if(game->data().oldSettingsMenu()) {
+			} else if(game->data().oldSettingsMenu()) {
 				if(game->data().hardModeToggle().touching(touch)) {
 					if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 						_hardMode = !_hardMode;
-				}
-				else if(game->data().highContrastToggle().touching(touch)) {
+				} else if(game->data().highContrastToggle().touching(touch)) {
 					_altPalette = !_altPalette;
-				}
-				else if(game->data().musicToggle().touching(touch)) {
+				} else if(game->data().musicToggle().touching(touch)) {
 					_music = !_music;
 					if(_music)
 						Music::music->start();
@@ -246,14 +238,12 @@ void Settings::showMenu() {
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
-			}
-			else if(game->data().shareMsgBtn().touching(touch)) {
+			} else if(game->data().shareMsgBtn().touching(touch)) {
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);
 
-				if(game->data().oldSettingsMenu())
-				{
+				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(false);
 					colorToggle.visible(false);
 					musicToggle.visible(false);
@@ -269,8 +259,7 @@ void Settings::showMenu() {
 					.decompressMap(bgGetMapPtr(BG_SUB(0)))
 					.decompressPal(BG_PALETTE_SUB);
 
-				if(game->data().oldSettingsMenu())
-				{
+				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
 					colorToggle.visible(true);
 					musicToggle.visible(true);
@@ -282,14 +271,12 @@ void Settings::showMenu() {
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
-			}
-			else if(game->data().modBtn().touching(touch)) {
+			} else if(game->data().modBtn().touching(touch)) {
 				// Clear text, hide sprites
 				Font::clear(false);
 				Font::update(false);
 
-				if(game->data().oldSettingsMenu())
-				{
+				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(false);
 					colorToggle.visible(false);
 					musicToggle.visible(false);
@@ -305,8 +292,7 @@ void Settings::showMenu() {
 					.decompressMap(bgGetMapPtr(BG_SUB(0)))
 					.decompressPal(BG_PALETTE_SUB);
 
-				if(game->data().oldSettingsMenu())
-				{
+				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
 					colorToggle.visible(true);
 					musicToggle.visible(true);
@@ -378,17 +364,13 @@ void Settings::gameSettings() {
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
-			}
-			else if(game->data().hardModeToggle().touching(touch)) {
+			} else if(game->data().hardModeToggle().touching(touch)) {
 				_hardMode = !_hardMode;
-			}
-			else if(game->data().infiniteModeToggle().touching(touch)) {
+			} else if(game->data().infiniteModeToggle().touching(touch)) {
 				_infiniteMode = !_infiniteMode;
-			}
-			else if(game->data().highContrastToggle().touching(touch)) {
+			} else if(game->data().highContrastToggle().touching(touch)) {
 				_altPalette = !_altPalette;
-			}
-			else if(game->data().musicToggle().touching(touch)) {
+			} else if(game->data().musicToggle().touching(touch)) {
 				_music = !_music;
 				if(_music)
 					Music::music->start();
@@ -443,14 +425,11 @@ void Settings::shareMsgSettings() {
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
-			}
-			else if(game->data().shareTimerToggle().touching(touch)) {
+			} else if(game->data().shareTimerToggle().touching(touch)) {
 				_shareTimer = !_shareTimer;
-			}
-			else if(game->data().shareStreakToggle().touching(touch)) {
+			} else if(game->data().shareStreakToggle().touching(touch)) {
 				_shareStreak = !_shareStreak;
-			}
-			else if(game->data().shareUrlToggle().touching(touch)) {
+			} else if(game->data().shareUrlToggle().touching(touch)) {
 				_shareUrl = !_shareUrl;
 			}
 		}
@@ -463,8 +442,7 @@ std::vector<std::string> Settings::getMods() {
 	DIR *pdir = opendir(DATA_PATH);
 	if(pdir == nullptr) {
 		game->data().mainFont().print(0, 0, false, u"Unable to open directory").update(false);
-	}
-	else {
+	} else {
 		while(true) {
 			dirent *pent = readdir(pdir);
 			if(pent == nullptr)
@@ -528,38 +506,31 @@ bool Settings::selectMod() {
 				cursorPos--;
 			else
 				cursorPos = mods.size() - 1;
-		}
-		else if(held & KEY_DOWN) {
+		} else if(held & KEY_DOWN) {
 			if(cursorPos < (int)mods.size() - 1)
 				cursorPos++;
 			else
 				cursorPos = 0;
-		}
-		else if(held & KEY_LEFT) {
+		} else if(held & KEY_LEFT) {
 			cursorPos -= modsPerScreen;
 			if(cursorPos < 0)
 				cursorPos = 0;
-		}
-		else if(held & KEY_RIGHT) {
+		} else if(held & KEY_RIGHT) {
 			cursorPos += modsPerScreen;
 			if(cursorPos > (int)mods.size() - 1)
 				cursorPos = mods.size() - 1;
-		}
-		else if(pressed & KEY_A) {
+		} else if(pressed & KEY_A) {
 			_mod = mods[cursorPos];
 			break;
-		}
-		else if(pressed & KEY_B) {
+		} else if(pressed & KEY_B) {
 			break;
-		}
-		else if(pressed & KEY_TOUCH) {
+		} else if(pressed & KEY_TOUCH) {
 			touchPosition touch;
 			touchRead(&touch);
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
-			}
-			else if(touch.py >= 24) {
+			} else if(touch.py >= 24) {
 				size_t touched = (touch.py - 24) / font.height();
 				if(touched < mods.size()) {
 					_mod = mods[touched];

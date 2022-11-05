@@ -194,9 +194,7 @@ bool Game::run() {
 			if(settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today) { // New day or infinteMode enabled, show refresh button
 				_showRefresh = true;
 				_data.refreshSprite().visible(true).update();
-			}
-			else
-			{
+			} else {
 				_showRefresh = false;
 				_data.refreshSprite().visible(false).update();
 			}

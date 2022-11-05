@@ -23,7 +23,7 @@ class Stats {
 
 public:
 	Stats(const std::string &path);
-	
+
 	bool save(void);
 
 	void showMenu(void);

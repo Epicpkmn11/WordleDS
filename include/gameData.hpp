@@ -24,7 +24,6 @@ class GameData {
 	int _maxGuesses = 6,
 		_firstDay = 18797; // June 19th 2021
 
-
 	std::string
 		_shareName = "Wordle DS",
 		_lossMessage = "Better luck tomorrow...\nThe answer was:",

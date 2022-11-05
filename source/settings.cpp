@@ -305,14 +305,13 @@ void Settings::showMenu() {
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 			}
-
 		}
-
-		save();
-
-		Font::clear(false);
-		Font::update(false);
 	}
+
+	save();
+
+	Font::clear(false);
+	Font::update(false);
 }
 
 void Settings::gameSettings() {

@@ -191,12 +191,9 @@ bool Game::run() {
 				_popupTimeout--;
 			}
 
-			if(settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today) { // New day or infinteMode enabled, show refresh button
+			if(!_showRefresh && (settings->infiniteMode() || time(NULL) / 24 / 60 / 60 != _today)) { // New day or infinite mode enabled, show refresh button
 				_showRefresh = true;
 				_data.refreshSprite().visible(true).update();
-			} else {
-				_showRefresh = false;
-				_data.refreshSprite().visible(false).update();
 			}
 		} while(!pressed && key == Kbd::NOKEY);
 

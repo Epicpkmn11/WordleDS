@@ -97,10 +97,10 @@ GameData::GameData(const std::string &folder) {
 		}
 
 		// If the minimum version is equal to or less than v2.1.0
-		if (strcmp("v2.1.0", minVer) <= 0) {
+		if(strcmp("v2.1.0", minVer) <= 0) {
 
 			// If the mod provided a settings screen, place buttons on the v2.1.0 location
-			if (access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 
 				_hardModeToggle = { 224, 33, 21, 13 };
 				_highContrastToggle = { 224, 68, 21, 13 };
@@ -182,7 +182,7 @@ GameData::GameData(const std::string &folder) {
 				if(buttons.contains("hardMode") && buttons["hardMode"].isArray() && buttons["hardMode"].size() == 4)
 					_hardModeToggle = Button(buttons["hardMode"]);
 
-				if (buttons.contains("infiniteMode") && buttons["infiniteMode"].isArray() && buttons["infiniteMode"].size() == 4)
+				if(buttons.contains("infiniteMode") && buttons["infiniteMode"].isArray() && buttons["infiniteMode"].size() == 4)
 					_infiniteModeToggle = Button(buttons["infiniteMode"]);
 
 				if(buttons.contains("highContrast") && buttons["highContrast"].isArray() && buttons["highContrast"].size() == 4)

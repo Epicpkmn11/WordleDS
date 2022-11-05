@@ -37,7 +37,7 @@ public:
 	Settings &hardMode(bool hardMode) { _hardMode = hardMode; return *this; }
 
 	bool infiniteMode(void) const { return _infiniteMode; }
-	Settings& infiniteMode(bool infiniteMode) { _infiniteMode = infiniteMode; return *this; }
+	Settings &infiniteMode(bool infiniteMode) { _infiniteMode = infiniteMode; return *this; }
 
 	bool altPalette(void) const { return _altPalette; }
 	Settings &altPalette(bool altPalette) { _altPalette = altPalette; return *this; }

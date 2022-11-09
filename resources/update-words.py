@@ -43,7 +43,7 @@ def update_words(output):
 	choices = json.loads("[" + re.findall(r'"cigar"(?:,"\w{5}")*\]', js)[0])
 
 	# Now scrape the real upcoming answers since that's in a special API now
-	choices = choices[:507] + scrape_answers(506)  # 506 is the day they started this
+	choices = choices[:506] + scrape_answers(506)  # 506 is the day they started this
 
 	output.write('''#include "words.hpp"
 

@@ -38,12 +38,15 @@ def update_words(output):
 
 	# So we can get that and grab the base list incase they ever update that again
 	js = get(script).text
-	guesses = json.loads(re.findall(r'\["aahed"(?:,"\w{5}")*\]', js)[0])
+	guesses = json.loads(re.findall(r'\["aahed"(?:,"\w{5}")*(?=,"cigar")', js)[0] + "]")
 	guesses.sort()
 	choices = json.loads("[" + re.findall(r'"cigar"(?:,"\w{5}")*\]', js)[0])
 
 	# Now scrape the real upcoming answers since that's in a special API now
-	choices = choices[:506] + scrape_answers(506)  # 506 is the day they started this
+	new_answers = scrape_answers(506)  # 506 is the day they started this
+
+	choices = [word for word in choices if word not in new_answers]
+	choices = choices[:506] + new_answers + choices[506:]
 
 	output.write('''#include "words.hpp"
 

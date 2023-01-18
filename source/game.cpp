@@ -131,7 +131,7 @@ bool Game::run() {
 			std::u16string _guess = Font::utf8to16(guess8);
 
 			Sprite *sprite = &_letterSprites[_currentGuess * _answer.size()];
-			for(char letter : _guess) {
+			for(char16_t letter : _guess) {
 				(sprite++)->palette(TilePalette::whiteDark).gfx(_data.letterGfx(_kbd.letterIndex(letter) + 1));
 			}
 			std::vector<TilePalette> newPalettes = check(_guess);

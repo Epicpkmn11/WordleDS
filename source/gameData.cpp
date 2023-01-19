@@ -67,7 +67,7 @@ GameData::GameData(const std::string &folder) {
 		// v2.0.0, The base version uses the old stats menu, no share settings, and also doesn't have the new settings layout
 		// v2.1.0, The sharing update, it features the new statistics screen and the share settings
 		// v2.2.0, Has all the features
-		if(!minVer || strcmp(minVer, "v2.0.0") <= 0) {
+		if(!minVer || strcmp(minVer, "v2.1.0") < 0) {
 			// If the mod provided a settings screen, place buttons at old locations
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = {224, 37, 21, 13};
@@ -87,7 +87,7 @@ GameData::GameData(const std::string &folder) {
 			if(access((modPath + "/statsBottom.grf").c_str(), F_OK) == 0) {
 				_oldStatsMenu = true;
 			}
-		} else if(strcmp(minVer, "v2.1.0") <= 0) {
+		} else if(strcmp(minVer, "v2.2.0") < 0) {
 			// If the mod provided a settings screen, place buttons on the v2.1.0 location
 			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = { 224, 33, 21, 13 };

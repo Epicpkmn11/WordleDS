@@ -3,6 +3,7 @@
 	"wordleOffset": 201,
 	"shareName": "Wordle (ES) DS",
 	"lossMessage": "Más suerte mañana...\nLa solución fue:",
+	"lossMessageInfinite": "Más suerte la próxima vez...\nLa solución fue:",
 	"tooShortMessage": "No hay suficientes\nletras",
 	"notWordMessage": "Palabra no está\nen lista",
 	"creditStr": "Wordle (ES) DS\nby Pk11",

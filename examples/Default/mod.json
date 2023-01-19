@@ -4,6 +4,7 @@
 	"wordleOffset": 0,
 	"shareName": "Wordle DS",
 	"lossMessage": "Better luck tomorrow...\nThe answer was:",
+	"lossMessageInfinite": "Better luck next time...\nThe answer was:",
 	"tooShortMessage": "Not enough letters",
 	"notWordMessage": "Not in word list",
 	"creditStr": "Wordle DS\nby Pk11",

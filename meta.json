@@ -27,6 +27,15 @@
 		"downloads": [
 			"Wordle (IT).zip"
 		]
+	},
+	{
+		"title": "Wordle DS (RU)",
+		"author": "[Bacer](https://github.com/LedyBacer)",
+		"description": "Wordle DS translated to Russian, words from [KarKarbI4](https://github.com/KarKarbI4)/[wordle_ru](https://github.com/KarKarbI4/wordle_ru)",
+		"categories": ["Translation", "Italian"],
+		"downloads": [
+			"Wordle DS (RU).zip"
+		]
 	}
 ]
  

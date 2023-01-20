@@ -109,7 +109,7 @@ bool Stats::showQr() {
 	std::vector<TilePalette> allCorrect;
 	for(size_t i = 0; i < game->answer().size(); i++)
 		allCorrect.push_back(TilePalette::green);
-	if((int)_boardState.size() < game->data().maxGuesses() && game->check(Font::utf8to16(_boardState.back())) != allCorrect)
+	if(_boardState.size() == 0 || ((int)_boardState.size() < game->data().maxGuesses() && game->check(Font::utf8to16(_boardState.back())) != allCorrect))
 		return false;
 
 	std::string str = shareMessage();

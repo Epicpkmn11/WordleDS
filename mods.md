@@ -32,7 +32,7 @@ Download:
 ## ![Icon](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/icons/Wordle%20DS%20%28RU%29.png) Wordle DS (RU) by [Bacer](https://github.com/LedyBacer)
 Wordle DS translated to Russian, words from [KarKarbI4](https://github.com/KarKarbI4)/[wordle_ru](https://github.com/KarKarbI4/wordle_ru)
 
-Categories: Translation, Italian
+Categories: Translation, Russian
 
 Download:
 - [Wordle DS (RU).zip](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Wordle%20DS%20%28RU%29.zip)

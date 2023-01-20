@@ -28,3 +28,11 @@ Categories: Translation, Italian
 
 Download:
 - [Wordle (IT).zip](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Wordle%20%28IT%29.zip)
+
+## ![Icon](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/icons/Wordle%20DS%20%28RU%29.png) Wordle DS (RU) by [Bacer](https://github.com/LedyBacer)
+Wordle DS translated to Russian, words from [KarKarbI4](https://github.com/KarKarbI4)/[wordle_ru](https://github.com/KarKarbI4/wordle_ru)
+
+Categories: Translation, Italian
+
+Download:
+- [Wordle DS (RU).zip](https://raw.githubusercontent.com/Epicpkmn11/WordleDS/mods/mods/Wordle%20DS%20%28RU%29.zip)

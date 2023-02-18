@@ -20,7 +20,7 @@ def crc16(data):
 def patch(path, banner):
     # we're going to make this look nice
     filesize = os.path.getsize(path)
-    while(filesize % 16 != 0):
+    while filesize % 16 != 0:
         filesize += 1
     with open(path, "rb+") as outfile:
         # new animated banner location
@@ -56,5 +56,5 @@ if __name__ == "__main__":
     path = args.input
     banner = args.banner
 
-    if(patch(path, banner)) == 0 and args.verbose:
+    if patch(path, banner) == 0 and args.verbose:
         print("\nSuccess.")

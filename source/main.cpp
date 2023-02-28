@@ -3,7 +3,6 @@
 #include "howto.hpp"
 #include "music.hpp"
 #include "settings.hpp"
-#include "wifi.hpp"
 
 #include <dirent.h>
 #include <fat.h>

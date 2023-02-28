@@ -5,6 +5,7 @@
 #include "kbd.hpp"
 #include "settings.hpp"
 #include "tonccpy.h"
+#include "wifi.hpp"
 
 #include <algorithm>
 #include <map>

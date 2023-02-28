@@ -45,8 +45,6 @@ int main() {
 		.decompressMap(bgGetMapPtr(BG(0)))
 		.decompressPal(BG_PALETTE);
 
-	getWords();
-
 	// Loop game until returns false
 	while(game->run()) {
 		Gfx::fadeOut(FADE_SLOW, FADE_TOP | FADE_BOTTOM);

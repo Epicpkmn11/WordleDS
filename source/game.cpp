@@ -124,6 +124,8 @@ Game::~Game() {
 }
 
 bool Game::run() {
+	getWords(_today);
+
 	// Reload game state from config
 	if(_stats.boardState().size() > 0) {
 		std::vector<TilePalette> palettes;

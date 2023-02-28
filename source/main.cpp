@@ -3,6 +3,7 @@
 #include "howto.hpp"
 #include "music.hpp"
 #include "settings.hpp"
+#include "wifi.hpp"
 
 #include <dirent.h>
 #include <fat.h>
@@ -43,6 +44,8 @@ int main() {
 		.decompressTiles(bgGetGfxPtr(BG(0)))
 		.decompressMap(bgGetMapPtr(BG(0)))
 		.decompressPal(BG_PALETTE);
+
+	getWords();
 
 	// Loop game until returns false
 	while(game->run()) {

@@ -47,8 +47,8 @@ HttpResponse httpGet(const char *host, const char *path) {
 	closesocket(sock);
 
 	if(res.content.compare(0, 9, "HTTP/1.1 ") == 0) {
-		res.status = atoi(res.content.c_str() + 9);
-		res.content = res.content.substr(res.content.find("\r\n\r\n") + 4);
+		res.status = atoi(res.content.c_str() + 9); // Get status code number
+		res.content = res.content.substr(res.content.find("\r\n\r\n") + 4); // Get content (after the headers)
 		return res;
 	} else {
 		return {0, "Request failed"};
@@ -56,7 +56,7 @@ HttpResponse httpGet(const char *host, const char *path) {
 
 }
 
-void getWords(int day) {
+void getWords(int day, const char *url) {
 	game->drawBgBottom("Connecting to Wi-Fi", 0);
 	Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);;
 	if(!Wifi_CheckInit()) {
@@ -70,20 +70,55 @@ void getWords(int day) {
 		Wifi_EnableWifi();
 	}
 
+	// Parse out the host and request path
+	char host[256], path[256];
+	if(memcmp(url, "http://", 7) != 0)
+		return; // Invalid URL, must be HTTP not HTTPS
+
+	// The host is from after the 'http://' until the '/path/to/file.json'
+	snprintf(host, sizeof(host), "%s", url + 7);
+	char *slash = strchr(host, '/');
+	if(!slash)
+		return;
+	*slash = '\0';
+
+	// The path should include a date since we only want new IDs, so strftime that in
+	time_t epoch = (game->data().firstDay() + game->data().choiceOrder().size()) * 24 * 60 * 60;
+	tm *time = localtime(&epoch);
+	strftime(path, sizeof(path), url + 7 + (slash - host), time);
+
+	// Try get the page
 	game->drawBgBottom("Updating words...", 240);
-	HttpResponse res = httpGet("wordle.xn--rck9c.xn--tckwe", "/words.php?date=2023-02-24&include=id");
+	HttpResponse res = httpGet(host, path);
+	Wifi_DisableWifi();
+
 	if(res.status == 200) {
-		Json words(res.content.c_str(), false);
-		FILE *file = fopen("/test.json", "wb");
-		if(file) {
-			std::string str = words.dump();
-			fwrite(str.c_str(), 1, str.size(), file);
-			fclose(file);
+		// We should now have a JSON array of new IDs
+		Json json(res.content.c_str(), false);
+		if(json.isObject() && json.contains("status") && strcmp(json["status"].get()->valuestring, "ERROR") == 0) {
+			game->drawBgBottom("Already up to date.", 240);
+		} else if(json.isArray()) {
+			// Validate results
+			int choiceCount = game->data().choices().size();
+			std::vector<int> ids;
+			for(const Json id : json) {
+				if(id.isNumber() && id.get()->valueint >= 1 && id.get()->valueint <= choiceCount) {
+					ids.push_back(id.get()->valueint);
+				} else {
+					game->drawBgBottom("Error loading IDs." + std::to_string(id.get()->valueint), 240);
+					return;
+				}
+			}
+
+			// Save to mod.json
+			game->drawBgBottom("Saving...", 240);
+			game->data().appendChoiceOrder(ids);
+
+			game->drawBgBottom("Update successful!", 240);
+		} else {
+			game->drawBgBottom("Invalid JSON!", 240);
 		}
-		game->drawBgBottom("Update successful!", 240);
 	} else {
 		game->drawBgBottom("Update failed!!", 240);
 	}
-
-	Wifi_DisableWifi();
 }

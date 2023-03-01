@@ -125,7 +125,8 @@ Game::~Game() {
 }
 
 bool Game::run() {
-	getWords(_today);
+	if(_data.choiceOrderUrl() != "")
+		getWords(_today, _data.choiceOrderUrl().c_str());
 
 	// Reload game state from config
 	if(_stats.boardState().size() > 0) {

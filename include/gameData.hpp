@@ -21,6 +21,8 @@
 #include <vector>
 
 class GameData {
+	std::string _modPath;
+
 	int _maxGuesses = 6,
 		_firstDay = 18797; // June 19th 2021
 
@@ -42,6 +44,8 @@ class GameData {
 		_emojiYellow = "🟨",
 		_emojiYellowAlt = "🟦",
 		_emojiWhite = "⬜";
+
+	std::string _choiceOrderUrl = "http://wordle.xn--rck9c.xn--tckwe/words.php?date=%Y-%m-%d&include=id";
 
 	// Buttons in the setting selector
 	Button _gameSettingsBtn = { 232, 33, 17, 17 };
@@ -215,6 +219,8 @@ public:
 	const std::string &shareStreak(void) const { return _shareStreak; }
 	const std::string &shareStreakLoss(void) const { return _shareStreakLoss; }
 
+	const std::string &choiceOrderUrl(void) const { return _choiceOrderUrl; }
+
 	const Button &hardModeToggle(void) const { return _hardModeToggle; }
 	const Button &infiniteModeToggle(void) const { return _infiniteModeToggle; }
 	const Button &highContrastToggle(void) const { return _highContrastToggle; }
@@ -283,6 +289,8 @@ public:
 	const std::string &numberSuffix(int i) const;
 	void setPalettes(bool altPalette) const;
 	const std::u16string &getAnswer(time_t day) const;
+
+	void appendChoiceOrder(const std::vector<int> &ids);
 };
 
 #endif // GAME_DATA_HPP

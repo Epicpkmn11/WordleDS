@@ -147,10 +147,7 @@ void Settings::legacyImport(const std::string &path) {
 
 void Settings::showMenu() {
 	// Change to settings menu background
-	game->data().settingsBottom()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	game->data().mainFont()
 		.palette(TEXT_GRAY)
@@ -229,10 +226,7 @@ void Settings::showMenu() {
 				gameSettings();
 
 				// Restore background
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
+				game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
@@ -257,10 +251,7 @@ void Settings::showMenu() {
 
 				// Restore background and sprites
 				swiWaitForVBlank();
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
+				game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
@@ -292,10 +283,7 @@ void Settings::showMenu() {
 
 				// Restore background and sprites
 				swiWaitForVBlank();
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
+				game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
@@ -319,10 +307,7 @@ void Settings::showMenu() {
 
 void Settings::gameSettings() {
 	// Change to game settings background
-	game->data().gameSettings()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().gameSettings().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	Sprite hardModeToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	hardModeToggle.move(game->data().hardModeToggle());
@@ -389,10 +374,7 @@ void Settings::gameSettings() {
 
 void Settings::shareMsgSettings() {
 	// Change to share message settings background
-	game->data().shareMsgSettings()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().shareMsgSettings().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	Sprite timerToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	timerToggle.move(game->data().shareTimerToggle());
@@ -471,10 +453,7 @@ std::vector<std::string> Settings::getMods() {
 void Settings::selectMod() {
 	// Change to mods menu background
 	swiWaitForVBlank();
-	game->data().modsBottom()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().modsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	std::vector<std::string> mods = getMods();
 	Font &font = game->data().mainFont();

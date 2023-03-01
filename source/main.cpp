@@ -39,10 +39,7 @@ int main() {
 	}
 
 	game->drawBgBottom(fatInited ? "" : "FAT init failed\nStats cannot be saved", 240);
-	game->data().bgTop()
-		.decompressTiles(bgGetGfxPtr(BG(0)))
-		.decompressMap(bgGetMapPtr(BG(0)))
-		.decompressPal(BG_PALETTE);
+	game->data().bgTop().decompress(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);;
 
 	// Loop game until returns false
 	while(game->run()) {

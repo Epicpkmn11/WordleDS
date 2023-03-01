@@ -11,14 +11,8 @@
 
 void howtoMenu() {
 	// Change to howto menu background and hide letterSprites
-	game->data().howtoTop()
-		.decompressTiles(bgGetGfxPtr(BG(0)))
-		.decompressMap(bgGetMapPtr(BG(0)))
-		.decompressPal(BG_PALETTE);
-	game->data().howtoBottom()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().howtoTop().decompress(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
+	game->data().howtoBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	for(Sprite &sprite : game->letterSprites())
 		sprite.visible(false);

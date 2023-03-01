@@ -5,7 +5,6 @@
 #include "kbd.hpp"
 #include "settings.hpp"
 #include "tonccpy.h"
-#include "wifi.hpp"
 
 #include <algorithm>
 #include <map>
@@ -13,31 +12,6 @@
 #include <time.h>
 
 Game *game;
-
-void Game::drawBgBottom(std::string_view msg, int timeout = -1) {
-	swiWaitForVBlank();
-
-	Font::clear(false);
-
-	if(msg.size() == 0) {
-		_data.bgBottom()
-			.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-			.decompressMap(bgGetMapPtr(BG_SUB(0)))
-			.decompressPal(BG_PALETTE_SUB);
-	} else {
-		_data.bgBottomBox()
-			.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-			.decompressMap(bgGetMapPtr(BG_SUB(0)))
-			.decompressPal(BG_PALETTE_SUB);
-
-		_data.mainFont().palette(TEXT_WHITE).print(0, 56 - _data.mainFont().calcHeight(msg) / 2, false, msg, Alignment::center);
-	}
-
-	Font::update(false);
-
-	if(timeout != -1)
-		_popupTimeout = timeout;
-}
 
 std::vector<TilePalette> Game::check(const std::u16string &_guess) {
 	std::vector<TilePalette> res;
@@ -104,8 +78,13 @@ Game::Game() :
 
 	_data.setPalettes(settings->altPalette());
 
-	_data.bgTop().decompress(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
-	_data.bgBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	_data.bgTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
+	_data.bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+
+	_data.popupBox()
+		.decompressTiles(bgGetGfxPtr(BG_SUB(1)))
+		.decompressMap(bgGetMapPtr(BG_SUB(1)))
+		.decompressPal(BG_PALETTE_SUB + 0xE0);
 
 	// Check if bootstub exists
 	extern char *fake_heap_end;
@@ -119,9 +98,6 @@ Game::~Game() {
 }
 
 bool Game::run() {
-	if(_data.choiceOrderUrl() != "")
-		getWords(_today, _data.choiceOrderUrl().c_str());
-
 	// Reload game state from config
 	if(_stats.boardState().size() > 0) {
 		std::vector<TilePalette> palettes;
@@ -186,19 +162,13 @@ bool Game::run() {
 			else
 				key = Kbd::NOKEY;
 
-			if(_popupTimeout == 0) { // Reset to no message box
-				drawBgBottom("");
-				if(_showRefresh)
-					_data.refreshSprite().visible(true).update();
-			}
-			if(_popupTimeout >= 0) {
-				_popupTimeout--;
-			}
 
 			if(!_showRefresh && time(NULL) / 24 / 60 / 60 != _today) { // New day or infinite mode enabled, show refresh button
 				_showRefresh = true;
-				_data.refreshSprite().visible(true).update();
 			}
+
+			if(!Gfx::popupVisible() && _showRefresh && !_data.refreshSprite().visible())
+				_data.refreshSprite().visible(true).update();
 		} while(!pressed && key == Kbd::NOKEY);
 
 		// Process keyboard
@@ -229,7 +199,7 @@ bool Game::run() {
 						if(strlen(invalidMessage) > 0) {
 							if(_showRefresh)
 								_data.refreshSprite().visible(false).update();
-							drawBgBottom(invalidMessage, 120);
+							Gfx::showPopup(invalidMessage, 120);
 							break;
 						}
 					}
@@ -261,7 +231,7 @@ bool Game::run() {
 				} else {
 					if(_showRefresh)
 						_data.refreshSprite().visible(false).update();
-					drawBgBottom(_guess.size() < _answer.size() ? _data.tooShortMessage() : _data.notWordMessage(), 120);
+					Gfx::showPopup(_guess.size() < _answer.size() ? _data.tooShortMessage() : _data.notWordMessage(), 120);
 				}
 				break;
 
@@ -310,7 +280,7 @@ bool Game::run() {
 					Font::clear(false);
 					Font::update(false);
 
-					howtoMenu();
+					howtoMenu(false);
 				} else if(touch.px > 116 && touch.px < 140) {
 					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 					if(showKeyboard)
@@ -350,10 +320,10 @@ bool Game::run() {
 
 				// Restore normal background
 				swiWaitForVBlank();
-				_data.bgTop().decompress(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
-				_data.bgBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+				_data.bgTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
+				_data.bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 				Gfx::fadeIn(FADE_FAST, (touch.px < 24) ? FADE_TOP | FADE_BOTTOM : FADE_BOTTOM);
-			} else if(_showRefresh && _popupTimeout == -1 && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
+			} else if(_showRefresh && Gfx::popupVisible() && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
 				if(settings->infiniteMode()) {
 					if(!_won)
@@ -394,11 +364,11 @@ bool Game::run() {
 			if(_showRefresh)
 				_data.refreshSprite().visible(false).update();
 			if(_won) {
-				drawBgBottom(_data.victoryMessage(_currentGuess - 1));
+				Gfx::showPopup(_data.victoryMessage(_currentGuess - 1), 180);
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				drawBgBottom(settings->infiniteMode() ? _data.lossMessageInfinite() : _data.lossMessage());
+				Gfx::showPopup(settings->infiniteMode() ? _data.lossMessageInfinite() : _data.lossMessage(), 180);
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < _answer.size(); i++) {
@@ -430,7 +400,7 @@ bool Game::run() {
 
 			// Restore normal background
 			swiWaitForVBlank();
-			_data.bgBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+			_data.bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 			Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 		}
 	}

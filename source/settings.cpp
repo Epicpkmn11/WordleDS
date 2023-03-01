@@ -7,6 +7,7 @@
 #include "stats.hpp"
 #include "tonccpy.h"
 #include "version.hpp"
+#include "wifi.hpp"
 
 #include <algorithm>
 #include <array>
@@ -147,7 +148,7 @@ void Settings::legacyImport(const std::string &path) {
 
 void Settings::showMenu() {
 	// Change to settings menu background
-	game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	game->data().settingsBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	game->data().mainFont()
 		.palette(TEXT_GRAY)
@@ -205,6 +206,8 @@ void Settings::showMenu() {
 				if(game->data().hardModeToggle().touching(touch)) {
 					if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 						_hardMode = !_hardMode;
+					else
+						Gfx::showPopup("TODO No switch", 120);
 				} else if(game->data().highContrastToggle().touching(touch)) {
 					_altPalette = !_altPalette;
 					game->data().setPalettes(_altPalette);
@@ -226,7 +229,7 @@ void Settings::showMenu() {
 				gameSettings();
 
 				// Restore background
-				game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+				game->data().settingsBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
@@ -251,7 +254,7 @@ void Settings::showMenu() {
 
 				// Restore background and sprites
 				swiWaitForVBlank();
-				game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+				game->data().settingsBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
@@ -283,7 +286,7 @@ void Settings::showMenu() {
 
 				// Restore background and sprites
 				swiWaitForVBlank();
-				game->data().settingsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+				game->data().settingsBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
@@ -307,7 +310,7 @@ void Settings::showMenu() {
 
 void Settings::gameSettings() {
 	// Change to game settings background
-	game->data().gameSettings().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	game->data().gameSettings().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	Sprite hardModeToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	hardModeToggle.move(game->data().hardModeToggle());
@@ -354,6 +357,8 @@ void Settings::gameSettings() {
 			} else if(game->data().hardModeToggle().touching(touch)) {
 				if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 					_hardMode = !_hardMode;
+				else
+					Gfx::showPopup("TODO No switch", 120);
 			} else if(game->data().infiniteModeToggle().touching(touch)) {
 				_infiniteMode = !_infiniteMode;
 			} else if(game->data().highContrastToggle().touching(touch)) {
@@ -374,7 +379,7 @@ void Settings::gameSettings() {
 
 void Settings::shareMsgSettings() {
 	// Change to share message settings background
-	game->data().shareMsgSettings().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	game->data().shareMsgSettings().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	Sprite timerToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	timerToggle.move(game->data().shareTimerToggle());
@@ -453,7 +458,7 @@ std::vector<std::string> Settings::getMods() {
 void Settings::selectMod() {
 	// Change to mods menu background
 	swiWaitForVBlank();
-	game->data().modsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	game->data().modsBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	std::vector<std::string> mods = getMods();
 	Font &font = game->data().mainFont();
@@ -518,6 +523,8 @@ void Settings::selectMod() {
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
+			} else if(touch.px < 24 && touch.py < 24 && game->data().choiceOrderUrl() != "") { // Update
+				getWords(game->data().choiceOrderUrl().c_str());
 			} else if(touch.py >= 24) {
 				size_t touched = (touch.py - 24) / font.height();
 				if(touched < mods.size()) {

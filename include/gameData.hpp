@@ -48,15 +48,15 @@ class GameData {
 	std::string _choiceOrderUrl = "http://wordle.xn--rck9c.xn--tckwe/words.php?date=%Y-%m-%d&include=id";
 
 	// Buttons in the setting selector
-	Button _gameSettingsBtn = { 232, 33, 17, 17 };
+	Button _gameSettingsBtn = {232, 33, 17, 17};
 	Button _shareMsgBtn = {232, 64, 17, 17};
 	Button _modBtn = {232, 92, 17, 17};
 
 	// Buttons in the game settings
-	Button _hardModeToggle = { 224, 38, 21, 13 };
-	Button _infiniteModeToggle = { 224, 74, 21, 13 };
-	Button _highContrastToggle = { 224, 109, 21, 13 };
-	Button _musicToggle = { 224, 136, 21, 13 };
+	Button _hardModeToggle = {224, 38, 21, 13};
+	Button _infiniteModeToggle = {224, 74, 21, 13};
+	Button _highContrastToggle = {224, 109, 21, 13};
+	Button _musicToggle = {224, 136, 21, 13};
 
 	// Buttons in the share message settings
 	Button _shareTimerToggle = {224, 37, 21, 13};
@@ -169,7 +169,6 @@ class GameData {
 
 	Image
 		_bgBottom,
-		_bgBottomBox,
 		_bgTop,
 		_howtoBottom,
 		_howtoTop,
@@ -177,7 +176,8 @@ class GameData {
 		_settingsBottom,
 		_gameSettings,
 		_shareMsgSettings,
-		_statsBottom;
+		_statsBottom,
+		_popupBox;
 
 	OamGfx
 		_backspaceKeyGfx,
@@ -255,7 +255,6 @@ public:
 	int choiceOrder(size_t i) const { return _choiceOrder[i]; }
 
 	const Image &bgBottom(void) const { return _bgBottom; };
-	const Image &bgBottomBox(void) const { return _bgBottomBox; };
 	const Image &bgTop(void) const { return _bgTop; };
 	const Image &howtoBottom(void) const { return _howtoBottom; };
 	const Image &howtoTop(void) const { return _howtoTop; };
@@ -264,6 +263,7 @@ public:
 	const Image &gameSettings(void) const { return _gameSettings; };
 	const Image &shareMsgSettings(void) const { return _shareMsgSettings; };
 	const Image &statsBottom(void) const { return _statsBottom; };
+	const Image &popupBox(void) const { return _popupBox; };
 
 	const OamGfx &backspaceKeyGfx(void) const { return _backspaceKeyGfx; }
 	const OamGfx &enterKeyGfx(void) const { return _enterKeyGfx; }

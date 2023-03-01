@@ -209,7 +209,7 @@ std::string Stats::shareMessage() {
 
 void Stats::showMenu() {
 	// Change to stats menu background
-	game->data().statsBottom().decompress(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	game->data().statsBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
 
 	while(1) {
 		// Print stats

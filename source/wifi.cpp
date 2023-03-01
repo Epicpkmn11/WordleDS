@@ -56,14 +56,14 @@ HttpResponse httpGet(const char *host, const char *path) {
 
 }
 
-void getWords(int day, const char *url) {
-	game->drawBgBottom("Connecting to Wi-Fi", 0);
+void getWords(const char *url) {
+	Gfx::showPopup("Connecting to Wi-Fi", 0);
 	Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);;
 	if(!Wifi_CheckInit()) {
 		if(Wifi_InitDefault(WFC_CONNECT)) {
-			game->drawBgBottom("Connected to Wi-Fi!", 240);
+			Gfx::showPopup("Connected to Wi-Fi!", 240);
 		} else {
-			game->drawBgBottom("Failed to connect to Wi-Fi", 240);
+			Gfx::showPopup("Failed to connect to Wi-Fi", 240);
 			return;
 		}
 	} else {
@@ -88,7 +88,7 @@ void getWords(int day, const char *url) {
 	strftime(path, sizeof(path), url + 7 + (slash - host), time);
 
 	// Try get the page
-	game->drawBgBottom("Updating words...", 240);
+	Gfx::showPopup("Updating words...", 240);
 	HttpResponse res = httpGet(host, path);
 	Wifi_DisableWifi();
 
@@ -96,7 +96,7 @@ void getWords(int day, const char *url) {
 		// We should now have a JSON array of new IDs
 		Json json(res.content.c_str(), false);
 		if(json.isObject() && json.contains("status") && strcmp(json["status"].get()->valuestring, "ERROR") == 0) {
-			game->drawBgBottom("Already up to date.", 240);
+			Gfx::showPopup("Already up to date.", 240);
 		} else if(json.isArray()) {
 			// Validate results
 			int choiceCount = game->data().choices().size();
@@ -105,20 +105,20 @@ void getWords(int day, const char *url) {
 				if(id.isNumber() && id.get()->valueint >= 1 && id.get()->valueint <= choiceCount) {
 					ids.push_back(id.get()->valueint);
 				} else {
-					game->drawBgBottom("Error loading IDs." + std::to_string(id.get()->valueint), 240);
+					Gfx::showPopup("Error loading IDs." + std::to_string(id.get()->valueint), 240);
 					return;
 				}
 			}
 
 			// Save to mod.json
-			game->drawBgBottom("Saving...", 240);
+			Gfx::showPopup("Saving...", 240);
 			game->data().appendChoiceOrder(ids);
 
-			game->drawBgBottom("Update successful!", 240);
+			Gfx::showPopup("Update successful!", 240);
 		} else {
-			game->drawBgBottom("Invalid JSON!", 240);
+			Gfx::showPopup("Invalid JSON!", 240);
 		}
 	} else {
-		game->drawBgBottom("Update failed!!", 240);
+		Gfx::showPopup("Update failed!!", 240);
 	}
 }

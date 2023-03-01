@@ -18,7 +18,6 @@ class Game {
 	std::u16string_view _answer;
 	std::u16string _guess = u"";
 	int _currentGuess = 0;
-	int _popupTimeout = -1;
 	bool _won = false;
 	bool _statsSaved = false;
 	bool _showRefresh = settings->infiniteMode();
@@ -34,7 +33,6 @@ public:
 
 	~Game(void);
 
-	void drawBgBottom(std::string_view msg, int timeout);
 	std::vector<TilePalette> check(const std::u16string &guess);
 	std::string shareMessage(void);
 	bool run(void);

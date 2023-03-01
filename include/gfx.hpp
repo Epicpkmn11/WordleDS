@@ -38,6 +38,10 @@ enum class FlipOptions {
 namespace Gfx {
 	void init(void);
 
+	void showPopup(std::string_view msg, int timeout);
+	void hidePopup(void);
+	bool popupVisible(void);
+
 	void flipSprites(Sprite *letterSprites, int count, std::vector<TilePalette> newPalettes, FlipOptions option = FlipOptions::none);
 
 	void fadeIn(int frames, int screen);

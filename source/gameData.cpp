@@ -6,7 +6,7 @@
 
 #include "backspaceKey_grf.h"
 #include "bgBottom_grf.h"
-#include "bgBottomBox_grf.h"
+#include "popupBox_grf.h"
 #include "bgTop_grf.h"
 #include "enterKey_grf.h"
 #include "howtoBottom_grf.h"
@@ -340,7 +340,7 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 
 	// Load images
 	_bgBottom = Image((_modPath + "/bgBottom.grf").c_str(), 256, 192, bgBottom_grf);
-	_bgBottomBox = Image((_modPath + "/bgBottomBox.grf").c_str(), 256, 192, bgBottomBox_grf);
+	_popupBox = Image((_modPath + "/popupBox.grf").c_str(), 256, 192, popupBox_grf);
 	_bgTop = Image((_modPath + "/bgTop.grf").c_str(), 256, 192, bgTop_grf);
 	_howtoBottom = Image((_modPath + "/howtoBottom.grf").c_str(), 256, 192, howtoBottom_grf);
 	_howtoTop = Image((_modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);

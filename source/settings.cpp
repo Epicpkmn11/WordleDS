@@ -17,7 +17,7 @@
 Settings *settings;
 
 Settings::Settings(const std::string &path) : _path(path) {
-	Json json(_path.c_str());
+	Json json(_path.c_str(), true);
 	if(!json.get())
 		return;
 
@@ -80,7 +80,7 @@ bool Settings::save() {
 }
 
 void Settings::legacyImport(const std::string &path) {
-	Json json(path.c_str());
+	Json json(path.c_str(), true);
 	if(!json.get())
 		return;
 

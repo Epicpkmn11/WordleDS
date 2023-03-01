@@ -55,7 +55,7 @@ std::vector<u16> GameData::getPalette(const Json &json, int size) {
 GameData::GameData(const std::string &folder) {
 	const std::string modPath(DATA_PATH + folder);
 
-	Json json((modPath + MOD_JSON).c_str());
+	Json json((modPath + MOD_JSON).c_str(), true);
 	if(json.get() != nullptr) {
 		const char *minVer = nullptr;
 		if(json.contains("minVersion") && json["minVersion"].isString()) {

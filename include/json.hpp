@@ -26,7 +26,7 @@ public:
 	};
 
 	explicit Json(void);
-	explicit Json(const char *path);
+	explicit Json(const char *str, bool fromFile);
 	Json(cJSON *json) : _json(std::shared_ptr<cJSON>(json, [](cJSON *p) {})) {}
 
 	const Json operator[](int index) const { return cJSON_GetArrayItem(_json.get(), index); }

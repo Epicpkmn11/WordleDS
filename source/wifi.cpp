@@ -1,17 +1,23 @@
 #include "game.hpp"
+#include "gfx.hpp"
 #include "json.hpp"
 
-// #include <nds.h>
 #include <dswifi9.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <string>
 #include <string.h>
 #include <sys/socket.h>
+#include <vector>
 
-std::string httpGet(const char *host, const char *path) {
+struct HttpResponse {
+	int status;
+	std::string content;
+};
+
+HttpResponse httpGet(const char *host, const char *path) {
 	char request[256];
-	snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Wordle DS\r\n\r\n", path, host);
+	snprintf(request, sizeof(request), "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: Wordle DS\r\n\r\n", path, host);
 
 	hostent *hostEnt = gethostbyname(host);
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -24,30 +30,60 @@ std::string httpGet(const char *host, const char *path) {
 
 	send(sock, request, strlen(request), 0);
 
-	int len;
-	char buffer[256];
-	std::string response;
+	HttpResponse res;
+	while(true) {
+		char buffer[256];
+		int len = recv(sock, buffer, 255, 0);
+		if(len > 0) {
+			buffer[len] = '\0';
+			res.content += buffer;
 
-	while((len = recv(sock, buffer, 255, 0)) != 0) {
-		buffer[len] = '\0';
-		response += buffer;
+			if(len < 255)
+				break;
+		}
 	}
 
 	shutdown(sock, 0);
 	closesocket(sock);
 
-	return response;
+	if(res.content.compare(0, 9, "HTTP/1.1 ") == 0) {
+		res.status = atoi(res.content.c_str() + 9);
+		res.content = res.content.substr(res.content.find("\r\n\r\n") + 4);
+		return res;
+	} else {
+		return {0, "Request failed"};
+	}
+
 }
 
 void getWords(int day) {
+	game->drawBgBottom("Connecting to Wi-Fi", 0);
+	Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);;
 	if(!Wifi_CheckInit()) {
-		Wifi_InitDefault(WFC_CONNECT);
+		if(Wifi_InitDefault(WFC_CONNECT)) {
+			game->drawBgBottom("Connected to Wi-Fi!", 240);
+		} else {
+			game->drawBgBottom("Failed to connect to Wi-Fi", 240);
+			return;
+		}
 	} else {
 		Wifi_EnableWifi();
 	}
 
-	std::string jsonStr = httpGet("wordle.xn--rck9c.xn--tckwe", "/word.php?day=2023-02-24");
-	game->drawBgBottom(jsonStr, 240);
+	game->drawBgBottom("Updating words...", 240);
+	HttpResponse res = httpGet("wordle.xn--rck9c.xn--tckwe", "/words.php?date=2023-02-24&include=id");
+	if(res.status == 200) {
+		Json words(res.content.c_str(), false);
+		FILE *file = fopen("/test.json", "wb");
+		if(file) {
+			std::string str = words.dump();
+			fwrite(str.c_str(), 1, str.size(), file);
+			fclose(file);
+		}
+		game->drawBgBottom("Update successful!", 240);
+	} else {
+		game->drawBgBottom("Update failed!!", 240);
+	}
 
 	Wifi_DisableWifi();
 }

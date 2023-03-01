@@ -161,6 +161,8 @@ class GameData {
 
 	std::vector<std::u16string> _choices, _guesses;
 
+	std::vector<int> _choiceOrder;
+
 	Image
 		_bgBottom,
 		_bgBottomBox,
@@ -243,6 +245,8 @@ public:
 	const std::u16string &choices(size_t i) const { return _choices[i]; }
 	const std::vector<std::u16string> &guesses(void) const { return _guesses; }
 	const std::u16string &guesses(size_t i) const { return _guesses[i]; }
+	const std::vector<int> &choiceOrder(void) const { return _choiceOrder; }
+	int choiceOrder(size_t i) const { return _choiceOrder[i]; }
 
 	const Image &bgBottom(void) const { return _bgBottom; };
 	const Image &bgBottomBox(void) const { return _bgBottomBox; };
@@ -278,6 +282,7 @@ public:
 	const std::string &victoryMessage(size_t i) const;
 	const std::string &numberSuffix(int i) const;
 	void setPalettes(bool altPalette) const;
+	const std::u16string &getAnswer(time_t day) const;
 };
 
 #endif // GAME_DATA_HPP

@@ -304,7 +304,17 @@ GameData::GameData(const std::string &folder) {
 					_choices.push_back(u16word);
 				}
 			} else {
+				_choiceOrder = Words::order;
 				_choices = Words::choices;
+			}
+
+			if(json["words"].contains("order") && json["words"]["order"].isArray()) {
+				for(const Json &word : json["words"]["order"]) {
+					int i = word.get()->valueint;
+					if(i > 0 && i < (int)_choices.size()) {
+						_choiceOrder.push_back(i);
+					}
+				}
 			}
 
 			if(json["words"].contains("guesses") && json["words"]["guesses"].isArray()) {
@@ -316,10 +326,12 @@ GameData::GameData(const std::string &folder) {
 				}
 			}
 		} else {
+			_choiceOrder = Words::order;
 			_choices = Words::choices;
 			_guesses = Words::guesses;
 		}
 	} else {
+		_choiceOrder = Words::order;
 		_choices = Words::choices;
 		_guesses = Words::guesses;
 	}
@@ -424,3 +436,12 @@ void GameData::setPalettes(bool altPalette) const {
 	// Fonts
 	tonccpy(BG_PALETTE_SUB + TEXT_BLACK, _fontPalettes[altPalette].data(), _fontPalettes[altPalette].size() * sizeof(u16));
 }
+
+const std::u16string &GameData::getAnswer(time_t day) const {
+		unsigned int index = (unsigned int)day - _firstDay;
+		if(_choiceOrder.size() > 0) {
+			return _choices[_choiceOrder[index % _choiceOrder.size()] - 1];
+		} else {
+			return _choices[index % _choices.size()];
+		}
+	}

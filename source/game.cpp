@@ -87,7 +87,7 @@ Game::Game() :
 		_kbd(_data.keyboard(), _data.letters(), _data.kbdGfx(), _data.backspaceKeyGfx(), _data.enterKeyGfx()) {
 	// Get random word based on date
 	_today = settings->infiniteMode() ? rand() : time(NULL) / 24 / 60 / 60;
-	_answer = _data.choices((unsigned int)(_today - _data.firstDay()) % _data.choices().size());
+	_answer = _data.getAnswer(_today);
 
 	for(size_t i = 0; i < _answer.size(); i++)
 		_knownPositions += u' ';

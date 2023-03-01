@@ -9,25 +9,6 @@ import json
 import re
 
 
-def scrape_answers(start):
-	"""Scrapes the upcoming answers"""
-
-	day = start
-	words = []
-
-	while True:
-		date = datetime.fromtimestamp(1624078800 + day * 60 * 60 * 24, timezone.utc)
-		day += 1
-		json = get(date.strftime("https://www.nytimes.com/svc/wordle/v2/%Y-%m-%d.json")).json()
-		if "status" in json:
-			break
-
-		print("%(days_since_launch)d (%(print_date)s) - %(editor)s" % json)
-		words.append(json["solution"])
-
-	return words
-
-
 def update_words(output):
 	"""Updates the word lists"""
 
@@ -42,25 +23,25 @@ def update_words(output):
 	guesses.sort()
 	choices = json.loads("[" + re.findall(r'"cigar"(?:,"\w{5}")*\]', js)[0])
 
-	# Now scrape the real upcoming answers since that's in a special API now
-	new_answers = scrape_answers(506)  # 506 is the day they started this
+	# Then grab the known word order
+	words = get("https://wordle.xn--rck9c.xn--tckwe/words.php?date=2021-06-19&limit=10000").json()
 
-	choices = [word for word in choices if word not in new_answers]
-	choices = choices[:506] + new_answers + choices[506:]
+	# Now let's make the file, first inclues
+	output.write('#include "words.hpp"\n\n')
 
-	output.write('''#include "words.hpp"
+	# Then the known word order
+	output.write("std::vector<int> Words::order = {")
+	output.write(", ".join([word["id"] for word in words]))
+	output.write("};\n\n")
 
-// This list is in order, don't look if you don't want spoilers, if editing you should shuffle it somehow
-std::vector<std::u16string> Words::choices = {u"''')
-
+	# The choice words
+	output.write('std::vector<std::u16string> Words::choices = {u"')
 	output.write('", u"'.join([word.upper() for word in choices]))
+	output.write('"};\n\n')
 
-	output.write('''"};
-
-std::vector<std::u16string> Words::guesses = {u"''')
-
+	# And the guess words
+	output.write('std::vector<std::u16string> Words::guesses = {u"')
 	output.write('", u"'.join([word.upper() for word in guesses]))
-
 	output.write('"};\n')
 
 

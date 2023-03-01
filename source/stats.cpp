@@ -12,7 +12,7 @@
 #include <qrencode.h>
 
 Stats::Stats(const std::string &path) : _path(path) {
-	Json json(_path.c_str());
+	Json json(_path.c_str(), true);
 	if(!json.get())
 		return;
 
@@ -118,7 +118,7 @@ bool Stats::showQr() {
 		// URL encode string
 		replaceAll(str, "\n", "%0a");
 		replaceAll(str, " ", "%20");
-		str = "https://xn--rck9c.xn--tckwe/wordle.php?message=" + str;
+		str = "https://wordle.xn--rck9c.xn--tckwe/share.php?message=" + str;
 	}
 
 	QRcode *qr = QRcode_encodeString(str.c_str(), 0, QR_ECLEVEL_L, QR_MODE_8, true);

@@ -78,13 +78,9 @@ Game::Game() :
 
 	_data.setPalettes(settings->altPalette());
 
-	_data.bgTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
-	_data.bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
-
-	_data.popupBox()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(1)))
-		.decompressMap(bgGetMapPtr(BG_SUB(1)))
-		.decompressPal(BG_PALETTE_SUB + 0xE0);
+	_data.bgTop().decompressAll(BG(0));
+	_data.bgBottom().decompressAll(BG_SUB(0));
+	_data.popupBox().decompressAll(BG_SUB(1), BG_PALETTE_SUB + 0xE0);
 
 	// Check if bootstub exists
 	extern char *fake_heap_end;
@@ -320,8 +316,8 @@ bool Game::run() {
 
 				// Restore normal background
 				swiWaitForVBlank();
-				_data.bgTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
-				_data.bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+				_data.bgTop().decompressAll(BG(0));
+				_data.bgBottom().decompressAll(BG_SUB(0));
 				Gfx::fadeIn(FADE_FAST, (touch.px < 24) ? FADE_TOP | FADE_BOTTOM : FADE_BOTTOM);
 			} else if(_showRefresh && Gfx::popupVisible() && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
@@ -400,7 +396,7 @@ bool Game::run() {
 
 			// Restore normal background
 			swiWaitForVBlank();
-			_data.bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+			_data.bgBottom().decompressAll(BG_SUB(0));
 			Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 		}
 	}

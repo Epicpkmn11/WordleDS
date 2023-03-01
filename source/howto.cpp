@@ -11,8 +11,8 @@
 
 void howtoMenu(bool slowFade) {
 	// Change to howto menu background and hide letterSprites
-	game->data().howtoTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
-	game->data().howtoBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
+	game->data().howtoTop().decompressAll(BG(0));
+	game->data().howtoBottom().decompressAll(BG_SUB(0));
 
 	for(Sprite &sprite : game->letterSprites())
 		sprite.visible(false);

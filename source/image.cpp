@@ -2,6 +2,7 @@
 #include "tonccpy.h"
 
 #include <nds/arm9/sassert.h>
+#include <nds/arm9/background.h>
 #include <nds/arm9/decompress.h>
 
 #define CHUNK_ID(a, b, c, d) ((u32)((a) | (b) << 8 | (c) << 16 | (d) << 24))
@@ -73,3 +74,10 @@ Image::Image(const char *path, u32 width, u32 height, const u8 *fallback, bool e
 		src += size + 8;
 	}
 }
+
+const Image &Image::decompressAll(int bg, void *palDst) const {
+	decompressTiles(bgGetGfxPtr(bg));
+	decompressMap(bgGetMapPtr(bg));
+	decompressPal(palDst != nullptr ? palDst : (bg < 4 ? BG_PALETTE : BG_PALETTE_SUB));
+	return *this;
+};

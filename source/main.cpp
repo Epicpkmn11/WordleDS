@@ -33,18 +33,14 @@ int main() {
 		Music::music->start();
 
 	// Show howto if first game
-	if(game->stats().firstPlay()) {
+	if(game->stats().firstPlay())
 		howtoMenu(true);
-
-		// Restore normal background
-		game->data().bgTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);
-		game->data().bgBottom().decompressAll(bgGetGfxPtr(BG_SUB(0)), bgGetMapPtr(BG_SUB(0)), BG_PALETTE_SUB);
-		Gfx::fadeIn(FADE_FAST, FADE_TOP | FADE_BOTTOM);
-	}
 
 	if(!fatInited)
 		Gfx::showPopup("FAT init failed\nStats cannot be saved", 240);
-	game->data().bgTop().decompressAll(bgGetGfxPtr(BG(0)), bgGetMapPtr(BG(0)), BG_PALETTE);;
+	game->data().bgBottom().decompressAll(BG_SUB(0));
+	game->data().bgTop().decompressAll(BG(0));
+	Gfx::fadeIn(game->stats().firstPlay() ? FADE_FAST : FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 
 	// Loop game until returns false
 	while(game->run()) {

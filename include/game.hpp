@@ -28,6 +28,9 @@ class Game {
 
 	static void timerHandler(void);
 
+	void fadeOut(int frames, int screen);
+	void fadeIn(int frames, int screen);
+
 public:
 	Game(void);
 

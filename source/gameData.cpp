@@ -136,6 +136,9 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 		if(json.contains("guessMustContainX") && json["guessMustContainX"].isString())
 			_guessMustContainX = json["guessMustContainX"].get()->valuestring;
 
+		if(json.contains("hardModeOnlyAtStart") && json["hardModeOnlyAtStart"].isString())
+			_hardModeOnlyAtStart = json["hardModeOnlyAtStart"].get()->valuestring;
+
 		if(json.contains("shareMsg") && json["shareMsg"].isObject()) {
 			if(json["shareMsg"].contains("time") && json["shareMsg"]["time"].isString())
 				_shareTime = json["shareMsg"]["time"].get()->valuestring;
@@ -321,6 +324,10 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 
 			if(json["words"].contains("orderUrl") && json["words"]["orderUrl"].isString()) {
 				_choiceOrderUrl = json["words"]["orderUrl"].get()->valuestring;
+			} else if(folder != DEFAULT_MOD) {
+				// If not the default mod and no URL, don't show the update icon
+				_choiceOrderUrl = "";
+				_statsBtn = {116, 4, 24, 24};
 			}
 
 			if(json["words"].contains("guesses") && json["words"]["guesses"].isArray()) {
@@ -335,6 +342,24 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 			_choiceOrder = Words::order;
 			_choices = Words::choices;
 			_guesses = Words::guesses;
+		}
+
+		if(json.contains("mainMenu") && json["mainMenu"].isObject()) {
+			if(json["mainMenu"].contains("buttons") && json["mainMenu"]["buttons"].isObject()) {
+				Json buttons = json["mainMenu"]["buttons"];
+
+				if(buttons.contains("howto") && buttons["howto"].isArray() && buttons["howto"].size() == 4)
+					_howtoBtn = Button(buttons["howto"]);
+
+				if(buttons.contains("stats") && buttons["stats"].isArray() && buttons["stats"].size() == 4)
+					_statsBtn = Button(buttons["stats"]);
+
+				if(buttons.contains("update") && buttons["update"].isArray() && buttons["update"].size() == 4)
+					_updateBtn = Button(buttons["update"]);
+
+				if(buttons.contains("settings") && buttons["settings"].isArray() && buttons["settings"].size() == 4)
+					_settingsBtn = Button(buttons["settings"]);
+			}
 		}
 	} else {
 		_choiceOrder = Words::order;
@@ -424,10 +449,10 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 	}
 	delete[] letterTilesBuffer;
 
-	_btnHowtoSprite.move(_howtoBtn.x, _howtoBtn.y).visible(true).gfx(_btnHowtoGfx).palette(5);
-	_btnStatsSprite.move(_statsBtn.x, _statsBtn.y).visible(true).gfx(_btnStatsGfx).palette(6);
-	_btnUpdateSprite.move(_updateBtn.x, _updateBtn.y).visible(true).gfx(_btnUpdateGfx).palette(7);
-	_btnSettingsSprite.move(_settingsBtn.x, _settingsBtn.y).visible(true).gfx(_btnSettingsGfx).palette(8);
+	_btnHowtoSprite.move(_howtoBtn.x, _howtoBtn.y).visible(false).gfx(_btnHowtoGfx).palette(5);
+	_btnStatsSprite.move(_statsBtn.x, _statsBtn.y).visible(false).gfx(_btnStatsGfx).palette(6);
+	_btnUpdateSprite.move(_updateBtn.x, _updateBtn.y).visible(false).gfx(_btnUpdateGfx).palette(7);
+	_btnSettingsSprite.move(_settingsBtn.x, _settingsBtn.y).visible(false).gfx(_btnSettingsGfx).palette(8);
 
 	_refreshSprite.move(96, 36).visible(false).gfx(_refreshGfx);
 

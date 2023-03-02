@@ -35,6 +35,7 @@ class GameData {
 		_creditStr = "Wordle DS\nby Pk11",
 		_nthMustBeX = "%d%s letter must be %s",
 		_guessMustContainX = "Guess must contain %s",
+		_hardModeOnlyAtStart = "Can only be enabled\nat the start of a round",
 		_shareTime = " %02d:%02d",
 		_shareTimeHour = " %02d:%02d:%02d",
 		_shareStreak = " 📈%d",
@@ -47,12 +48,11 @@ class GameData {
 
 	std::string _choiceOrderUrl = "http://wordle.xn--rck9c.xn--tckwe/words.php?date=%Y-%m-%d&include=id";
 
-	// Buttons on the main maenu
-	// TODO
-	Button _howtoBtn = {8, 4, 24, 24};
-	Button _statsBtn = {64, 4, 24, 24};
-	Button _updateBtn = {168, 4, 24, 24};
-	Button _settingsBtn = {224, 4, 24, 24};
+	// Buttons on the main menu
+	Button _howtoBtn = {26, 4, 24, 24};
+	Button _statsBtn = {86, 4, 24, 24};
+	Button _updateBtn = {146, 4, 24, 24};
+	Button _settingsBtn = {206, 4, 24, 24};
 
 	// Buttons in the setting selector
 	Button _gameSettingsBtn = {232, 33, 17, 17};
@@ -231,12 +231,18 @@ public:
 	const std::string &creditStr(void) const { return _creditStr; }
 	const std::string &nthMustBeX(void) const { return _nthMustBeX; }
 	const std::string &guessMustContainX(void) const { return _guessMustContainX; }
+	const std::string &hardModeOnlyAtStart(void) const { return _hardModeOnlyAtStart; }
 	const std::string &shareTime(void) const { return _shareTime; }
 	const std::string &shareTimeHour(void) const { return _shareTimeHour; }
 	const std::string &shareStreak(void) const { return _shareStreak; }
 	const std::string &shareStreakLoss(void) const { return _shareStreakLoss; }
 
 	const std::string &choiceOrderUrl(void) const { return _choiceOrderUrl; }
+
+	const Button &howtoBtn(void) const { return _howtoBtn; }
+	const Button &statsBtn(void) const { return _statsBtn; }
+	const Button &updateBtn(void) const { return _updateBtn; }
+	const Button &settingsBtn(void) const { return _settingsBtn; }
 
 	const Button &hardModeToggle(void) const { return _hardModeToggle; }
 	const Button &infiniteModeToggle(void) const { return _infiniteModeToggle; }

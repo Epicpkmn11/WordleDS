@@ -7,7 +7,6 @@
 #include "stats.hpp"
 #include "tonccpy.h"
 #include "version.hpp"
-#include "wifi.hpp"
 
 #include <algorithm>
 #include <array>
@@ -207,7 +206,7 @@ void Settings::showMenu() {
 					if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 						_hardMode = !_hardMode;
 					else
-						Gfx::showPopup("TODO No switch", 120);
+						Gfx::showPopup(game->data().hardModeOnlyAtStart(), 120);
 				} else if(game->data().highContrastToggle().touching(touch)) {
 					_altPalette = !_altPalette;
 					game->data().setPalettes(_altPalette);
@@ -358,7 +357,7 @@ void Settings::gameSettings() {
 				if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 					_hardMode = !_hardMode;
 				else
-					Gfx::showPopup("TODO No switch", 120);
+					Gfx::showPopup(game->data().hardModeOnlyAtStart(), 120);
 			} else if(game->data().infiniteModeToggle().touching(touch)) {
 				_infiniteMode = !_infiniteMode;
 			} else if(game->data().highContrastToggle().touching(touch)) {
@@ -523,8 +522,6 @@ void Settings::selectMod() {
 
 			if(touch.px > 232 && touch.py < 24) { // X
 				break;
-			} else if(touch.px < 24 && touch.py < 24 && game->data().choiceOrderUrl() != "") { // Update
-				getWords(game->data().choiceOrderUrl().c_str());
 			} else if(touch.py >= 24) {
 				size_t touched = (touch.py - 24) / font.height();
 				if(touched < mods.size()) {

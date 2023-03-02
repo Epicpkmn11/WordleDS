@@ -5,6 +5,7 @@
 #include "kbd.hpp"
 #include "settings.hpp"
 #include "tonccpy.h"
+#include "wifi.hpp"
 
 #include <algorithm>
 #include <map>
@@ -80,7 +81,7 @@ Game::Game() :
 
 	_data.bgTop().decompressAll(BG(0));
 	_data.bgBottom().decompressAll(BG_SUB(0));
-	_data.popupBox().decompressAll(BG_SUB(1), BG_PALETTE_SUB + 0xE0);
+	_data.popupBox().decompressAll(BG_SUB(1), BG_PALETTE_SUB + 0xD0);
 
 	// Check if bootstub exists
 	extern char *fake_heap_end;
@@ -135,13 +136,7 @@ bool Game::run() {
 	if(_won || _currentGuess > _data.maxGuesses())
 		_statsSaved = true; // an already completed game was loaded, don't re-save
 
-	if(!_won && _currentGuess <= _data.maxGuesses())
-		_kbd.show();
-
-	if(_showRefresh)
-		_data.refreshSprite().visible(true).update();
-
-	Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
+	fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 
 	u16 pressed, held;
 	char16_t key = NOKEY;
@@ -263,62 +258,32 @@ bool Game::run() {
 
 		if(pressed & KEY_TOUCH) {
 			if(touch.py < 24) { // One of the icons at the top
-				swiWaitForVBlank();
-
-				bool showKeyboard = _kbd.visible();
-
-				if(touch.px < 24) {
-					Gfx::fadeOut(FADE_FAST, FADE_TOP | FADE_BOTTOM);
-					if(showKeyboard)
-						_kbd.hide();
-					if(_showRefresh)
-						_data.refreshSprite().visible(false).update();
-					Font::clear(false);
-					Font::update(false);
-
+				if(_data.howtoBtn().touching(touch)) {
+					fadeOut(FADE_FAST, FADE_TOP | FADE_BOTTOM);
 					howtoMenu(false);
-				} else if(touch.px > 116 && touch.px < 140) {
-					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
-					if(showKeyboard)
-						_kbd.hide();
-					if(_showRefresh)
-						_data.refreshSprite().visible(false).update();
-					Font::clear(false);
-					Font::update(false);
-
+					fadeIn(FADE_FAST, FADE_TOP | FADE_BOTTOM);
+				} else if(_data.statsBtn().touching(touch)) {
+					fadeOut(FADE_FAST, FADE_BOTTOM);
 					_stats.showMenu();
-				} else if(touch.px > 232) {
-					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
-					if(showKeyboard)
-						_kbd.hide();
-					if(_showRefresh)
-						_data.refreshSprite().visible(false).update();
-					Font::clear(false);
-					Font::update(false);
+					fadeIn(FADE_FAST, FADE_BOTTOM);
+				} else if(_data.choiceOrderUrl() != "" && _data.updateBtn().touching(touch)) {
+					WiFi::getWords(_data.choiceOrderUrl().c_str());
+				} else if(_data.settingsBtn().touching(touch)) {
+					fadeOut(FADE_FAST, FADE_BOTTOM);
 
 					std::string loadedMod = settings->mod();
 					bool loadedInfinite = settings->infiniteMode();
 					settings->showMenu();
 
-					if(settings->mod() != loadedMod || settings->infiniteMode() != loadedInfinite) {
+					if(settings->mod() != loadedMod || settings->infiniteMode() != loadedInfinite)
 						return true;
-					}
 
 					Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
 					Font::clear(false);
 					Font::update(false);
+
+					fadeIn(FADE_FAST, FADE_BOTTOM);
 				}
-
-				if(showKeyboard)
-					_kbd.show();
-				if(_showRefresh)
-					_data.refreshSprite().visible(true).update();
-
-				// Restore normal background
-				swiWaitForVBlank();
-				_data.bgTop().decompressAll(BG(0));
-				_data.bgBottom().decompressAll(BG_SUB(0));
-				Gfx::fadeIn(FADE_FAST, (touch.px < 24) ? FADE_TOP | FADE_BOTTOM : FADE_BOTTOM);
 			} else if(_showRefresh && Gfx::popupVisible() && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
 				if(settings->infiniteMode()) {
@@ -360,11 +325,11 @@ bool Game::run() {
 			if(_showRefresh)
 				_data.refreshSprite().visible(false).update();
 			if(_won) {
-				Gfx::showPopup(_data.victoryMessage(_currentGuess - 1), 180);
+				Gfx::showPopup(_data.victoryMessage(_currentGuess - 1));
 				for(int i = 0; i < 180; i++)
 					swiWaitForVBlank();
 			} else {
-				Gfx::showPopup(settings->infiniteMode() ? _data.lossMessageInfinite() : _data.lossMessage(), 180);
+				Gfx::showPopup(settings->infiniteMode() ? _data.lossMessageInfinite() : _data.lossMessage());
 
 				std::vector<Sprite> answerSprites;
 				for(uint i = 0; i < _answer.size(); i++) {
@@ -384,22 +349,50 @@ bool Game::run() {
 				Gfx::flipSprites(answerSprites.data(), answerSprites.size(), {}, FlipOptions::hide);
 			}
 
-			Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
-			Font::clear(false);
-			Font::update(false);
+			fadeOut(FADE_FAST, FADE_BOTTOM);
 
 			// Show stats
 			_stats.showMenu();
 
-			if(_showRefresh)
-				_data.refreshSprite().visible(true).update();
-
-			// Restore normal background
-			swiWaitForVBlank();
-			_data.bgBottom().decompressAll(BG_SUB(0));
-			Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
+			fadeIn(FADE_FAST, FADE_BOTTOM);
 		}
 	}
 
 	return false;
+}
+
+void Game::fadeOut(int frames, int screen) {
+	Gfx::fadeOut(FADE_FAST, screen);
+	_kbd.hide();
+	if(_showRefresh)
+		_data.refreshSprite().visible(false);
+
+	_data.btnHowtoSprite().visible(false);
+	_data.btnStatsSprite().visible(false);
+	_data.btnUpdateSprite().visible(false);
+	_data.btnSettingsSprite().visible(false);
+
+	Sprite::update(false);
+
+	Font::clear(false);
+	Font::update(false);
+}
+
+void Game::fadeIn(int frames, int screen) {
+	if(!_won && _currentGuess <= _data.maxGuesses())
+		_kbd.show();
+	if(_showRefresh)
+		_data.refreshSprite().visible(true);
+
+	_data.btnHowtoSprite().visible(true);
+	_data.btnStatsSprite().visible(true);
+	if(_data.choiceOrderUrl() != "")
+		_data.btnUpdateSprite().visible(true);
+	_data.btnSettingsSprite().visible(true);
+
+	Sprite::update(false);
+
+	_data.bgTop().decompressAll(BG(0));
+	_data.bgBottom().decompressAll(BG_SUB(0));
+	Gfx::fadeIn(FADE_FAST, screen);
 }

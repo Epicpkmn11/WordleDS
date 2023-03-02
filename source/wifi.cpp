@@ -1,3 +1,4 @@
+#include "wifi.hpp"
 #include "game.hpp"
 #include "gfx.hpp"
 #include "json.hpp"
@@ -56,14 +57,13 @@ HttpResponse httpGet(const char *host, const char *path) {
 
 }
 
-void getWords(const char *url) {
-	Gfx::showPopup("Connecting to Wi-Fi", 0);
-	Gfx::fadeIn(FADE_SLOW, FADE_TOP | FADE_BOTTOM);;
+void WiFi::getWords(const char *url) {
+	Gfx::showPopup("Connecting to Wi-Fi");
 	if(!Wifi_CheckInit()) {
 		if(Wifi_InitDefault(WFC_CONNECT)) {
-			Gfx::showPopup("Connected to Wi-Fi!", 240);
+			Gfx::showPopup("Connected to Wi-Fi!");
 		} else {
-			Gfx::showPopup("Failed to connect to Wi-Fi", 240);
+			Gfx::showPopup("Failed to connect to Wi-Fi", 120);
 			return;
 		}
 	} else {
@@ -88,7 +88,7 @@ void getWords(const char *url) {
 	strftime(path, sizeof(path), url + 7 + (slash - host), time);
 
 	// Try get the page
-	Gfx::showPopup("Updating words...", 240);
+	Gfx::showPopup("Updating words...");
 	HttpResponse res = httpGet(host, path);
 	Wifi_DisableWifi();
 
@@ -96,7 +96,7 @@ void getWords(const char *url) {
 		// We should now have a JSON array of new IDs
 		Json json(res.content.c_str(), false);
 		if(json.isObject() && json.contains("status") && strcmp(json["status"].get()->valuestring, "ERROR") == 0) {
-			Gfx::showPopup("Already up to date.", 240);
+			Gfx::showPopup("Already up to date.", 120);
 		} else if(json.isArray()) {
 			// Validate results
 			int choiceCount = game->data().choices().size();
@@ -105,20 +105,20 @@ void getWords(const char *url) {
 				if(id.isNumber() && id.get()->valueint >= 1 && id.get()->valueint <= choiceCount) {
 					ids.push_back(id.get()->valueint);
 				} else {
-					Gfx::showPopup("Error loading IDs." + std::to_string(id.get()->valueint), 240);
+					Gfx::showPopup("Error loading IDs.", 120);
 					return;
 				}
 			}
 
 			// Save to mod.json
-			Gfx::showPopup("Saving...", 240);
+			Gfx::showPopup("Saving...");
 			game->data().appendChoiceOrder(ids);
 
-			Gfx::showPopup("Update successful!", 240);
+			Gfx::showPopup("Update successful!", 120);
 		} else {
-			Gfx::showPopup("Invalid JSON!", 240);
+			Gfx::showPopup("Invalid JSON!", 120);
 		}
 	} else {
-		Gfx::showPopup("Update failed!!", 240);
+		Gfx::showPopup("Update failed!!", 120);
 	}
 }

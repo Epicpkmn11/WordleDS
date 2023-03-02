@@ -503,9 +503,14 @@ void GameData::setPalettes(bool altPalette) const {
 }
 
 const std::u16string &GameData::getAnswer(time_t day) const {
+	const static std::u16string emptyString;
+
 	unsigned int index = (unsigned int)day - _firstDay;
-	if(_choiceOrder.size() > 0) {
-		return _choices[_choiceOrder[index % _choiceOrder.size()] - 1];
+	if(_choiceOrder.size() > 0 && !settings->infiniteMode()) {
+		if(index < _choiceOrder.size())
+			return _choices[_choiceOrder[index] - 1];
+		else
+			return emptyString;
 	} else {
 		return _choices[index % _choices.size()];
 	}

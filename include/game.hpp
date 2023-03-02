@@ -44,6 +44,7 @@ public:
 	GameData &data(void) { return _data; }
 	Kbd &kbd(void) { return _kbd; }
 
+	time_t today(void) const { return _today; }
 	std::u16string_view answer(void) const { return _answer; }
 	bool won(void) const { return _won; }
 	int currentGuess(void) const { return _currentGuess; }

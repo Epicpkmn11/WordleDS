@@ -268,6 +268,9 @@ bool Game::run() {
 					fadeIn(FADE_FAST, FADE_BOTTOM);
 				} else if(_data.choiceOrderUrl() != "" && _data.updateBtn().touching(touch)) {
 					WiFi::getWords(_data.choiceOrderUrl().c_str());
+					if(_answer == u"" && _data.getAnswer(_today) != u"") {
+						return true;
+					}
 				} else if(_data.settingsBtn().touching(touch)) {
 					fadeOut(FADE_FAST, FADE_BOTTOM);
 
@@ -284,7 +287,7 @@ bool Game::run() {
 
 					fadeIn(FADE_FAST, FADE_BOTTOM);
 				}
-			} else if(_showRefresh && Gfx::popupVisible() && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
+			} else if(_showRefresh && !Gfx::popupVisible() && (touch.py >= 36 && touch.py <= 36 + 64 && touch.px >= 96 && touch.px <= 96 + 64)) {
 				// Refresh button
 				if(settings->infiniteMode()) {
 					if(!_won)
@@ -362,7 +365,7 @@ bool Game::run() {
 }
 
 void Game::fadeOut(int frames, int screen) {
-	Gfx::fadeOut(FADE_FAST, screen);
+	Gfx::fadeOut(frames, screen);
 	_kbd.hide();
 	if(_showRefresh)
 		_data.refreshSprite().visible(false);
@@ -379,10 +382,15 @@ void Game::fadeOut(int frames, int screen) {
 }
 
 void Game::fadeIn(int frames, int screen) {
-	if(!_won && _currentGuess <= _data.maxGuesses())
+	if(!_won && _currentGuess <= _data.maxGuesses() && _answer != u"") {
 		_kbd.show();
-	if(_showRefresh)
-		_data.refreshSprite().visible(true);
+
+		if(_showRefresh)
+			_data.refreshSprite().visible(true);
+	} else if(_answer == u"") {
+		Gfx::showPopup("Update word list\nor play infinite");
+	}
+	
 
 	_data.btnHowtoSprite().visible(true);
 	_data.btnStatsSprite().visible(true);
@@ -394,5 +402,5 @@ void Game::fadeIn(int frames, int screen) {
 
 	_data.bgTop().decompressAll(BG(0));
 	_data.bgBottom().decompressAll(BG_SUB(0));
-	Gfx::fadeIn(FADE_FAST, screen);
+	Gfx::fadeIn(frames, screen);
 }

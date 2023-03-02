@@ -152,6 +152,7 @@ void Settings::showMenu() {
 	game->data().mainFont()
 		.palette(TEXT_GRAY)
 		.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+		.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 		.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 	Font::update(false);
 
@@ -225,7 +226,10 @@ void Settings::showMenu() {
 				Font::clear(false);
 				Font::update(false);
 
+				bool loadedInfinite = infiniteMode();
 				gameSettings();
+				if(loadedInfinite != infiniteMode())
+					break;
 
 				// Restore background
 				game->data().settingsBottom().decompressAll(BG_SUB(0));
@@ -233,6 +237,7 @@ void Settings::showMenu() {
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
@@ -265,6 +270,7 @@ void Settings::showMenu() {
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
@@ -297,6 +303,7 @@ void Settings::showMenu() {
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
@@ -310,6 +317,8 @@ void Settings::showMenu() {
 void Settings::gameSettings() {
 	// Change to game settings background
 	game->data().gameSettings().decompressAll(BG_SUB(0));
+
+	bool loadedInfinite = infiniteMode();
 
 	Sprite hardModeToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	hardModeToggle.move(game->data().hardModeToggle());
@@ -373,7 +382,11 @@ void Settings::gameSettings() {
 		}
 	}
 
-	Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+	
+	if(loadedInfinite == infiniteMode())
+		Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+	else
+		Gfx::fadeOut(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 }
 
 void Settings::shareMsgSettings() {
@@ -537,4 +550,21 @@ void Settings::selectMod() {
 	Font::update(false);
 
 	return;
+}
+
+std::string Settings::currentWordIndex() {
+	char str[16];
+	if(game->data().choiceOrder().size() > 0) {
+		if(infiniteMode())
+			snprintf(str, sizeof(str), "Inf/%d", game->data().choiceOrder().size());
+		else
+			snprintf(str, sizeof(str), "%lld/%d", game->today() - game->data().firstDay(), game->data().choiceOrder().size());
+	} else {
+		if(infiniteMode())
+			strcpy(str, "Inf");
+		else
+			snprintf(str, sizeof(str), "%lld", game->today() - game->data().firstDay());
+	}
+
+	return str;
 }

@@ -328,7 +328,13 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 			} else if(folder != DEFAULT_MOD) {
 				// If not the default mod and no URL, don't show the update icon
 				_choiceOrderUrl = "";
-				_statsBtn = {116, 4, 24, 24};
+				_howtoBtn = {2, 2, 24, 24};
+				_statsBtn = {116, 2, 24, 24};
+				_settingsBtn = {230, 2, 24, 24};
+
+				if((!minVer || strcmp(minVer, "v3.0.0") < 0) && access((_modPath + "/bottomBg.grf").c_str(), F_OK) == 0) {
+					_mainMenuSprites = false;
+				}
 			}
 
 			if(json["words"].contains("guesses") && json["words"]["guesses"].isArray()) {

@@ -49,10 +49,10 @@ class GameData {
 	std::string _choiceOrderUrl = "http://wordle.xn--rck9c.xn--tckwe/words.php?date=%Y-%m-%d&include=id";
 
 	// Buttons on the main menu
-	Button _howtoBtn = {26, 4, 24, 24};
-	Button _statsBtn = {86, 4, 24, 24};
-	Button _updateBtn = {146, 4, 24, 24};
-	Button _settingsBtn = {206, 4, 24, 24};
+	Button _howtoBtn = {26, 2, 24, 24};
+	Button _statsBtn = {86, 2, 24, 24};
+	Button _updateBtn = {146, 2, 24, 24};
+	Button _settingsBtn = {206, 2, 24, 24};
 
 	// Buttons in the setting selector
 	Button _gameSettingsBtn = {232, 33, 17, 17};
@@ -72,6 +72,7 @@ class GameData {
 
 	bool _oldStatsMenu = false;
 	bool _oldSettingsMenu = false;
+	bool _mainMenuSprites = true;
 
 	std::vector<std::u16string> _howtoWords = {
 		u"WEARY",
@@ -258,6 +259,7 @@ public:
 
 	bool oldStatsMenu(void) const { return _oldStatsMenu; }
 	bool oldSettingsMenu(void) const { return _oldSettingsMenu; }
+	bool mainMenuSprites(void) const { return _mainMenuSprites; }
 
 	const std::vector<char16_t> &letters(void) const { return _letters; }
 	char16_t letters(size_t i) const { return _letters[i]; }

@@ -390,13 +390,14 @@ void Game::fadeIn(int frames, int screen) {
 	} else if(_answer == u"") {
 		Gfx::showPopup("Update word list\nor play infinite");
 	}
-	
 
-	_data.btnHowtoSprite().visible(true);
-	_data.btnStatsSprite().visible(true);
-	if(_data.choiceOrderUrl() != "")
-		_data.btnUpdateSprite().visible(true);
-	_data.btnSettingsSprite().visible(true);
+	if(_data.mainMenuSprites()) {
+		_data.btnHowtoSprite().visible(true);
+		_data.btnStatsSprite().visible(true);
+		if(_data.choiceOrderUrl() != "")
+			_data.btnUpdateSprite().visible(true);
+		_data.btnSettingsSprite().visible(true);
+	}
 
 	Sprite::update(false);
 

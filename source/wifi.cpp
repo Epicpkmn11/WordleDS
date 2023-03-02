@@ -3,8 +3,6 @@
 #include "gfx.hpp"
 #include "json.hpp"
 
-#include <nds.h>
-
 #include <dswifi9.h>
 #include <netdb.h>
 #include <netinet/in.h>

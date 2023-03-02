@@ -16,6 +16,23 @@
 
 Settings *settings;
 
+std::string Settings::currentWordIndex() {
+	char str[16];
+	if(game->data().choiceOrder().size() > 0) {
+		if(infiniteMode())
+			snprintf(str, sizeof(str), "Inf/%d", game->data().choiceOrder().size());
+		else
+			snprintf(str, sizeof(str), "%lld/%d", game->today() - game->data().firstDay(), game->data().choiceOrder().size());
+	} else {
+		if(infiniteMode())
+			return "Inf";
+		else
+			snprintf(str, sizeof(str), "%lld", game->today() - game->data().firstDay());
+	}
+
+	return str;
+}
+
 Settings::Settings(const std::string &path) : _path(path) {
 	Json json(_path.c_str(), true);
 	if(!json.get())
@@ -550,21 +567,4 @@ void Settings::selectMod() {
 	Font::update(false);
 
 	return;
-}
-
-std::string Settings::currentWordIndex() {
-	char str[16];
-	if(game->data().choiceOrder().size() > 0) {
-		if(infiniteMode())
-			snprintf(str, sizeof(str), "Inf/%d", game->data().choiceOrder().size());
-		else
-			snprintf(str, sizeof(str), "%lld/%d", game->today() - game->data().firstDay(), game->data().choiceOrder().size());
-	} else {
-		if(infiniteMode())
-			strcpy(str, "Inf");
-		else
-			snprintf(str, sizeof(str), "%lld", game->today() - game->data().firstDay());
-	}
-
-	return str;
 }

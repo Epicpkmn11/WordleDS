@@ -354,45 +354,57 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 	_shareMsgSettings = Image((_modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
 	_statsBottom = Image((_modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 
+	// Keyboard
+	_backspaceKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
+	Image backspaceKey((_modPath + "/backspaceKey.grf").c_str(), 64, 32, backspaceKey_grf);
+	backspaceKey.decompressTiles(_backspaceKeyGfx.get());
+
+	_enterKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
+	Image enterKey((_modPath + "/enterKey.grf").c_str(), 64, 32, enterKey_grf);
+	enterKey.decompressTiles(_enterKeyGfx.get());
+
+	// Toggles
+	_toggleOffGfx = OamGfx(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	Image toggleOff((_modPath + "/toggleOff.grf").c_str(), 32, 16, toggleOff_grf);
+	toggleOff.decompressTiles(_toggleOffGfx.get());
+	
+	_toggleOnGfx = OamGfx(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	Image toggleOn((_modPath + "/toggleOn.grf").c_str(), 32, 16, toggleOn_grf);
+	toggleOn.decompressTiles(_toggleOnGfx.get());
+
+	// Refresh
+	_refreshGfx = OamGfx(false, SpriteSize_64x64, SpriteColorFormat_16Color);
+	Image refreshButton((_modPath + "/refreshButton.grf").c_str(), 64, 64, refreshButton_grf);
+	refreshButton.decompressTiles(_refreshGfx.get());
+
+	// Main menu buttons
 	_btnHowtoGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 	Image btnHowto((_modPath + "/btnHowto.grf").c_str(), 32, 32, btnHowto_grf);
-	btnHowto.decompressTiles(_btnHowtoGfx.get());
-
-	_btnSettingsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
-	Image btnSettings((_modPath + "/btnHowtobtnSettings").c_str(), 32, 32, btnSettings_grf);
-	btnSettings.decompressTiles(_btnSettingsGfx.get());
+	btnHowto
+		.decompressTiles(_btnHowtoGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x50);
 
 	_btnStatsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 	Image btnStats((_modPath + "/btnStats.grf").c_str(), 32, 32, btnStats_grf);
-	btnStats.decompressTiles(_btnStatsGfx.get());
+	btnStats
+		.decompressTiles(_btnStatsGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x60);
 
 	_btnUpdateGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 	Image btnUpdate((_modPath + "/btnUpdate.grf").c_str(), 32, 32, btnUpdate_grf);
-	btnUpdate.decompressTiles(_btnUpdateGfx.get());
+	btnUpdate
+		.decompressTiles(_btnUpdateGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x70);
 
-	Image backspaceKey = Image((_modPath + "/backspaceKey.grf").c_str(), 64, 32, backspaceKey_grf);
-	_backspaceKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
-	backspaceKey.decompressTiles(_backspaceKeyGfx.get());
-
-	Image enterKey = Image((_modPath + "/enterKey.grf").c_str(), 64, 32, enterKey_grf);
-	_enterKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
-	enterKey.decompressTiles(_enterKeyGfx.get());
-
-	Image toggleOff = Image((_modPath + "/toggleOff.grf").c_str(), 32, 16, toggleOff_grf);
-	_toggleOffGfx = OamGfx(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	toggleOff.decompressTiles(_toggleOffGfx.get());
-	
-	Image toggleOn = Image((_modPath + "/toggleOn.grf").c_str(), 32, 16, toggleOn_grf);
-	_toggleOnGfx = OamGfx(false, SpriteSize_32x16, SpriteColorFormat_16Color);
-	toggleOn.decompressTiles(_toggleOnGfx.get());
-
-	Image refreshButton = Image((_modPath + "/refreshButton.grf").c_str(), 64, 64, refreshButton_grf);
-	_refreshGfx = OamGfx(false, SpriteSize_64x64, SpriteColorFormat_16Color);
-	refreshButton.decompressTiles(_refreshGfx.get());
+	_btnSettingsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnSettings((_modPath + "/btnHowtobtnSettings").c_str(), 32, 32, btnSettings_grf);
+	btnSettings
+		.decompressTiles(_btnSettingsGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x80);
 
 	constexpr int tileSize = 32 * 32 / 2;
 
-	Image kbdKeys = Image((_modPath + "/kbdKeys.grf").c_str(), 32, 832, kbdKeys_grf, false);
+	Image kbdKeys((_modPath + "/kbdKeys.grf").c_str(), 32, 832, kbdKeys_grf, false);
 	u8 *kbdKeysBuffer = new u8[kbdKeys.tilesLen()];
 	kbdKeys.decompressTiles(kbdKeysBuffer, false);
 	for(size_t i = 0; i < kbdKeys.tilesLen(); i += tileSize) {
@@ -412,10 +424,10 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 	}
 	delete[] letterTilesBuffer;
 
-	_btnHowtoSprite.move(_howtoBtn.x, _howtoBtn.y).visible(false).gfx(_btnHowtoGfx);
-	_btnStatsSprite.move(_statsBtn.x, _statsBtn.y).visible(false).gfx(_btnStatsGfx);
-	_btnUpdateSprite.move(_updateBtn.x, _updateBtn.y).visible(false).gfx(_btnUpdateGfx);
-	_btnSettingsSprite.move(_settingsBtn.x, _settingsBtn.y).visible(false).gfx(_btnSettingsGfx);
+	_btnHowtoSprite.move(_howtoBtn.x, _howtoBtn.y).visible(true).gfx(_btnHowtoGfx).palette(5);
+	_btnStatsSprite.move(_statsBtn.x, _statsBtn.y).visible(true).gfx(_btnStatsGfx).palette(6);
+	_btnUpdateSprite.move(_updateBtn.x, _updateBtn.y).visible(true).gfx(_btnUpdateGfx).palette(7);
+	_btnSettingsSprite.move(_settingsBtn.x, _settingsBtn.y).visible(true).gfx(_btnSettingsGfx).palette(8);
 
 	_refreshSprite.move(96, 36).visible(false).gfx(_refreshGfx);
 

@@ -3,6 +3,8 @@
 #include "gfx.hpp"
 #include "json.hpp"
 
+#include <nds.h>
+
 #include <dswifi9.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -96,7 +98,7 @@ void WiFi::getWords(const char *url) {
 		// We should now have a JSON array of new IDs
 		Json json(res.content.c_str(), false);
 		if(json.isObject() && json.contains("status") && strcmp(json["status"].get()->valuestring, "ERROR") == 0) {
-			Gfx::showPopup("Already up to date.", 120);
+			Gfx::showPopup(json["message"].get()->valuestring, 120);
 		} else if(json.isArray()) {
 			// Validate results
 			int choiceCount = game->data().choices().size();
@@ -105,7 +107,7 @@ void WiFi::getWords(const char *url) {
 				if(id.isNumber() && id.get()->valueint >= 1 && id.get()->valueint <= choiceCount) {
 					ids.push_back(id.get()->valueint);
 				} else {
-					Gfx::showPopup("Error loading IDs.", 120);
+					Gfx::showPopup("Error loading IDs", 120);
 					return;
 				}
 			}

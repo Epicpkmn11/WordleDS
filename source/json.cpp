@@ -55,7 +55,10 @@ Json Json::set(cJSON *item, const char *name) {
 		cJSON_AddItemToArray(_json.get(), item);
 	} else if(isObject()) {
 		sassert(name != nullptr, "name must NOT be nullptr for\nobjects");
-		cJSON_AddItemToObject(_json.get(), name, item);
+		if(contains(name))
+			cJSON_ReplaceItemInObjectCaseSensitive(_json.get(), name, item);
+		else
+			cJSON_AddItemToObject(_json.get(), name, item);
 	} else {
 		sassert(false, "set can only be used on arrays\nand objects");
 	}

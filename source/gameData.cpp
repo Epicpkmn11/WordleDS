@@ -314,6 +314,7 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 			}
 
 			if(json["words"].contains("order") && json["words"]["order"].isArray()) {
+				_choiceOrder.clear();
 				for(const Json &word : json["words"]["order"]) {
 					int i = word.get()->valueint;
 					if(i >= 1 && i < (int)_choices.size()) {

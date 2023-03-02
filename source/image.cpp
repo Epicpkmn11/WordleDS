@@ -5,6 +5,10 @@
 #include <nds/arm9/background.h>
 #include <nds/arm9/decompress.h>
 
+// sassert but it fixes the brightness
+#undef sassert
+#define sassert(e,...) ((e) ? (void)0 : (setBrightness(2, 0), __sassert(__FILE__, __LINE__, #e, __VA_ARGS__)))
+
 #define CHUNK_ID(a, b, c, d) ((u32)((a) | (b) << 8 | (c) << 16 | (d) << 24))
 
 bool Image::grfDecompress(const void *src, void *dst, bool vram) {

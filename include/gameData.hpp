@@ -47,6 +47,13 @@ class GameData {
 
 	std::string _choiceOrderUrl = "http://wordle.xn--rck9c.xn--tckwe/words.php?date=%Y-%m-%d&include=id";
 
+	// Buttons on the main maenu
+	// TODO
+	Button _howtoBtn = {8, 4, 24, 24};
+	Button _statsBtn = {64, 4, 24, 24};
+	Button _updateBtn = {168, 4, 24, 24};
+	Button _settingsBtn = {224, 4, 24, 24};
+
 	// Buttons in the setting selector
 	Button _gameSettingsBtn = {232, 33, 17, 17};
 	Button _shareMsgBtn = {232, 64, 17, 17};
@@ -184,9 +191,19 @@ class GameData {
 		_enterKeyGfx,
 		_refreshGfx,
 		_toggleOffGfx,
-		_toggleOnGfx;
+		_toggleOnGfx,
+		_btnHowtoGfx,
+		_btnSettingsGfx,
+		_btnStatsGfx,
+		_btnUpdateGfx;
 
 	std::vector<OamGfx> _letterGfx, _letterGfxSub, _kbdGfx;
+
+	Sprite
+		_btnHowtoSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color),
+		_btnStatsSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color),
+		_btnUpdateSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color),
+		_btnSettingsSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 
 	Sprite _refreshSprite = Sprite(false, SpriteSize_64x64, SpriteColorFormat_16Color);
 
@@ -278,9 +295,19 @@ public:
 	const std::vector<OamGfx> &kbdGfx(void) const { return _kbdGfx; };
 	const OamGfx &kbdGfx(size_t i) const { return _kbdGfx[i]; };
 
+	const OamGfx &btnHowtoGfx(void) const { return _btnHowtoGfx; }
+	const OamGfx &btnStatsGfx(void) const { return _btnStatsGfx; }
+	const OamGfx &btnUpdateGfx(void) const { return _btnUpdateGfx; }
+	const OamGfx &btnSettingsGfx(void) const { return _btnSettingsGfx; }
+
 	Font &mainFont(void) { return _mainFont; }
 	Font &numbersLarge(void) { return _numbersLarge; }
 	Font &numbersSmall(void) { return _numbersSmall; }
+
+	Sprite &btnHowtoSprite(void) { return _btnHowtoSprite; }
+	Sprite &btnStatsSprite(void) { return _btnStatsSprite; }
+	Sprite &btnUpdateSprite(void) { return _btnUpdateSprite; }
+	Sprite &btnSettingsSprite(void) { return _btnSettingsSprite; }
 
 	Sprite &refreshSprite(void) { return _refreshSprite; }
 

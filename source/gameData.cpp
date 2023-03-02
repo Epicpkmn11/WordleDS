@@ -6,6 +6,10 @@
 
 #include "backspaceKey_grf.h"
 #include "bgBottom_grf.h"
+#include "btnHowto_grf.h"
+#include "btnSettings_grf.h"
+#include "btnStats_grf.h"
+#include "btnUpdate_grf.h"
 #include "popupBox_grf.h"
 #include "bgTop_grf.h"
 #include "enterKey_grf.h"
@@ -350,6 +354,22 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 	_shareMsgSettings = Image((_modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
 	_statsBottom = Image((_modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 
+	_btnHowtoGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnHowto((_modPath + "/btnHowto.grf").c_str(), 32, 32, btnHowto_grf);
+	btnHowto.decompressTiles(_btnHowtoGfx.get());
+
+	_btnSettingsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnSettings((_modPath + "/btnHowtobtnSettings").c_str(), 32, 32, btnSettings_grf);
+	btnSettings.decompressTiles(_btnSettingsGfx.get());
+
+	_btnStatsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnStats((_modPath + "/btnStats.grf").c_str(), 32, 32, btnStats_grf);
+	btnStats.decompressTiles(_btnStatsGfx.get());
+
+	_btnUpdateGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnUpdate((_modPath + "/btnUpdate.grf").c_str(), 32, 32, btnUpdate_grf);
+	btnUpdate.decompressTiles(_btnUpdateGfx.get());
+
 	Image backspaceKey = Image((_modPath + "/backspaceKey.grf").c_str(), 64, 32, backspaceKey_grf);
 	_backspaceKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
 	backspaceKey.decompressTiles(_backspaceKeyGfx.get());
@@ -391,6 +411,11 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 		tonccpy(_letterGfxSub.back().get(), letterTilesBuffer + i, tileSize);
 	}
 	delete[] letterTilesBuffer;
+
+	_btnHowtoSprite.move(_howtoBtn.x, _howtoBtn.y).visible(false).gfx(_btnHowtoGfx);
+	_btnStatsSprite.move(_statsBtn.x, _statsBtn.y).visible(false).gfx(_btnStatsGfx);
+	_btnUpdateSprite.move(_updateBtn.x, _updateBtn.y).visible(false).gfx(_btnUpdateGfx);
+	_btnSettingsSprite.move(_settingsBtn.x, _settingsBtn.y).visible(false).gfx(_btnSettingsGfx);
 
 	_refreshSprite.move(96, 36).visible(false).gfx(_refreshGfx);
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser, FileType
-from datetime import datetime, timezone
 from requests import get
 from bs4 import BeautifulSoup
 
@@ -24,14 +23,14 @@ def update_words(output):
 	choices = json.loads("[" + re.findall(r'"cigar"(?:,"\w{5}")*\]', js)[0])
 
 	# Then grab the known word order
-	words = get("https://wordle.xn--rck9c.xn--tckwe/words.php?date=2021-06-19&limit=10000").json()
+	words = get("https://wordle.xn--rck9c.xn--tckwe/words.php?date=2021-06-19&limit=10000&include=id").json()
 
 	# Now let's make the file, first inclues
 	output.write('#include "words.hpp"\n\n')
 
 	# Then the known word order
 	output.write("std::vector<int> Words::order = {")
-	output.write(", ".join([word["id"] for word in words]))
+	output.write(", ".join([str(word) for word in words]))
 	output.write("};\n\n")
 
 	# The choice words

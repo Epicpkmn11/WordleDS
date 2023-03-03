@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-from argparse import ArgumentParser, FileType
-from datetime import datetime, timezone
+from argparse import ArgumentParser
 from requests import get
 from os import path
 
 import json
-import re
 
 
 def update_words(mod_json):
@@ -21,7 +19,7 @@ def update_words(mod_json):
 
 	# Ensure the structure exists
 	if "words" not in j:
-			j["words"] = {}
+		j["words"] = {}
 
 	# Get all of the known word order
 	j["words"]["order"] = get("https://wordle.xn--rck9c.xn--tckwe/words.php?date=2021-06-19&limit=10000&include=id").json()

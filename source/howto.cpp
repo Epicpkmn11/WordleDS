@@ -9,16 +9,10 @@
 #include <nds.h>
 #include <string>
 
-void howtoMenu() {
+void howtoMenu(bool slowFade) {
 	// Change to howto menu background and hide letterSprites
-	game->data().howtoTop()
-		.decompressTiles(bgGetGfxPtr(BG(0)))
-		.decompressMap(bgGetMapPtr(BG(0)))
-		.decompressPal(BG_PALETTE);
-	game->data().howtoBottom()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().howtoTop().decompressAll(BG(0));
+	game->data().howtoBottom().decompressAll(BG_SUB(0));
 
 	for(Sprite &sprite : game->letterSprites())
 		sprite.visible(false);
@@ -36,7 +30,7 @@ void howtoMenu() {
 	}
 
 	Sprite::update(false);
-	Gfx::fadeIn(FADE_FAST, FADE_TOP | FADE_BOTTOM);
+	Gfx::fadeIn(slowFade ? FADE_SLOW : FADE_FAST, FADE_TOP | FADE_BOTTOM);
 
 	std::vector<Sprite> toFlip;
 	std::vector<TilePalette> flipColors;

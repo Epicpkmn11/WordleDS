@@ -6,7 +6,11 @@
 
 #include "backspaceKey_grf.h"
 #include "bgBottom_grf.h"
-#include "bgBottomBox_grf.h"
+#include "btnHowto_grf.h"
+#include "btnSettings_grf.h"
+#include "btnStats_grf.h"
+#include "btnUpdate_grf.h"
+#include "popupBox_grf.h"
 #include "bgTop_grf.h"
 #include "enterKey_grf.h"
 #include "howtoBottom_grf.h"
@@ -52,10 +56,8 @@ std::vector<u16> GameData::getPalette(const Json &json, int size) {
 	return output;
 }
 
-GameData::GameData(const std::string &folder) {
-	const std::string modPath(DATA_PATH + folder);
-
-	Json json((modPath + MOD_JSON).c_str());
+GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
+	Json json((_modPath + MOD_JSON).c_str(), true);
 	if(json.get() != nullptr) {
 		const char *minVer = nullptr;
 		if(json.contains("minVersion") && json["minVersion"].isString()) {
@@ -69,7 +71,7 @@ GameData::GameData(const std::string &folder) {
 		// v2.2.0, Has all the features
 		if(!minVer || strcmp(minVer, "v2.1.0") < 0) {
 			// If the mod provided a settings screen, place buttons at old locations
-			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+			if(access((_modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = {224, 37, 21, 13};
 				_highContrastToggle = {224, 76, 21, 13};
 				_musicToggle = {224, 102, 21, 13};
@@ -84,12 +86,12 @@ GameData::GameData(const std::string &folder) {
 			}
 
 			// If the mod provided a custom stats screen, use the old statmenu
-			if(access((modPath + "/statsBottom.grf").c_str(), F_OK) == 0) {
+			if(access((_modPath + "/statsBottom.grf").c_str(), F_OK) == 0) {
 				_oldStatsMenu = true;
 			}
 		} else if(strcmp(minVer, "v2.2.0") < 0) {
 			// If the mod provided a settings screen, place buttons on the v2.1.0 location
-			if(access((modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
+			if(access((_modPath + "/settingsBottom.grf").c_str(), F_OK) == 0) {
 				_hardModeToggle = { 224, 33, 21, 13 };
 				_highContrastToggle = { 224, 68, 21, 13 };
 				_musicToggle = { 224, 92, 21, 13 };
@@ -133,6 +135,9 @@ GameData::GameData(const std::string &folder) {
 
 		if(json.contains("guessMustContainX") && json["guessMustContainX"].isString())
 			_guessMustContainX = json["guessMustContainX"].get()->valuestring;
+
+		if(json.contains("hardModeOnlyAtStart") && json["hardModeOnlyAtStart"].isString())
+			_hardModeOnlyAtStart = json["hardModeOnlyAtStart"].get()->valuestring;
 
 		if(json.contains("shareMsg") && json["shareMsg"].isObject()) {
 			if(json["shareMsg"].contains("time") && json["shareMsg"]["time"].isString())
@@ -304,7 +309,32 @@ GameData::GameData(const std::string &folder) {
 					_choices.push_back(u16word);
 				}
 			} else {
+				_choiceOrder = Words::order;
 				_choices = Words::choices;
+			}
+
+			if(json["words"].contains("order") && json["words"]["order"].isArray()) {
+				_choiceOrder.clear();
+				for(const Json &word : json["words"]["order"]) {
+					int i = word.get()->valueint;
+					if(i >= 1 && i < (int)_choices.size()) {
+						_choiceOrder.push_back(i);
+					}
+				}
+			}
+
+			if(json["words"].contains("orderUrl") && json["words"]["orderUrl"].isString()) {
+				_choiceOrderUrl = json["words"]["orderUrl"].get()->valuestring;
+			} else if(folder != DEFAULT_MOD) {
+				// If not the default mod and no URL, don't show the update icon
+				_choiceOrderUrl = "";
+				_howtoBtn = {2, 2, 24, 24};
+				_statsBtn = {116, 2, 24, 24};
+				_settingsBtn = {230, 2, 24, 24};
+
+				if((!minVer || strcmp(minVer, "v3.0.0") < 0) && access((_modPath + "/bottomBg.grf").c_str(), F_OK) == 0) {
+					_mainMenuSprites = false;
+				}
 			}
 
 			if(json["words"].contains("guesses") && json["words"]["guesses"].isArray()) {
@@ -316,49 +346,97 @@ GameData::GameData(const std::string &folder) {
 				}
 			}
 		} else {
+			_choiceOrder = Words::order;
 			_choices = Words::choices;
 			_guesses = Words::guesses;
 		}
+
+		if(json.contains("mainMenu") && json["mainMenu"].isObject()) {
+			if(json["mainMenu"].contains("buttons") && json["mainMenu"]["buttons"].isObject()) {
+				Json buttons = json["mainMenu"]["buttons"];
+
+				if(buttons.contains("howto") && buttons["howto"].isArray() && buttons["howto"].size() == 4)
+					_howtoBtn = Button(buttons["howto"]);
+
+				if(buttons.contains("stats") && buttons["stats"].isArray() && buttons["stats"].size() == 4)
+					_statsBtn = Button(buttons["stats"]);
+
+				if(buttons.contains("update") && buttons["update"].isArray() && buttons["update"].size() == 4)
+					_updateBtn = Button(buttons["update"]);
+
+				if(buttons.contains("settings") && buttons["settings"].isArray() && buttons["settings"].size() == 4)
+					_settingsBtn = Button(buttons["settings"]);
+			}
+		}
 	} else {
+		_choiceOrder = Words::order;
 		_choices = Words::choices;
 		_guesses = Words::guesses;
 	}
 
 	// Load images
-	_bgBottom = Image((modPath + "/bgBottom.grf").c_str(), 256, 192, bgBottom_grf);
-	_bgBottomBox = Image((modPath + "/bgBottomBox.grf").c_str(), 256, 192, bgBottomBox_grf);
-	_bgTop = Image((modPath + "/bgTop.grf").c_str(), 256, 192, bgTop_grf);
-	_howtoBottom = Image((modPath + "/howtoBottom.grf").c_str(), 256, 192, howtoBottom_grf);
-	_howtoTop = Image((modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);
-	_modsBottom = Image((modPath + "/modsBottom.grf").c_str(), 256, 192, modsBottom_grf);
-	_settingsBottom = Image((modPath + "/settingsBottom.grf").c_str(), 256, 192, settingsBottom_grf);
-	_gameSettings = Image((modPath + "/gameSettings.grf").c_str(), 256, 192, gameSettings_grf);
-	_shareMsgSettings = Image((modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
-	_statsBottom = Image((modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
+	_bgBottom = Image((_modPath + "/bgBottom.grf").c_str(), 256, 192, bgBottom_grf);
+	_popupBox = Image((_modPath + "/popupBox.grf").c_str(), 256, 192, popupBox_grf);
+	_bgTop = Image((_modPath + "/bgTop.grf").c_str(), 256, 192, bgTop_grf);
+	_howtoBottom = Image((_modPath + "/howtoBottom.grf").c_str(), 256, 192, howtoBottom_grf);
+	_howtoTop = Image((_modPath + "/howtoTop.grf").c_str(), 256, 192, howtoTop_grf);
+	_modsBottom = Image((_modPath + "/modsBottom.grf").c_str(), 256, 192, modsBottom_grf);
+	_settingsBottom = Image((_modPath + "/settingsBottom.grf").c_str(), 256, 192, settingsBottom_grf);
+	_gameSettings = Image((_modPath + "/gameSettings.grf").c_str(), 256, 192, gameSettings_grf);
+	_shareMsgSettings = Image((_modPath + "/shareMsgSettings.grf").c_str(), 256, 192, shareMsgSettings_grf);
+	_statsBottom = Image((_modPath + "/statsBottom.grf").c_str(), 256, 192, statsBottom_grf);
 
-	Image backspaceKey = Image((modPath + "/backspaceKey.grf").c_str(), 64, 32, backspaceKey_grf);
+	// Keyboard
 	_backspaceKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
+	Image backspaceKey((_modPath + "/backspaceKey.grf").c_str(), 64, 32, backspaceKey_grf);
 	backspaceKey.decompressTiles(_backspaceKeyGfx.get());
 
-	Image enterKey = Image((modPath + "/enterKey.grf").c_str(), 64, 32, enterKey_grf);
 	_enterKeyGfx = OamGfx(false, SpriteSize_64x32, SpriteColorFormat_16Color);
+	Image enterKey((_modPath + "/enterKey.grf").c_str(), 64, 32, enterKey_grf);
 	enterKey.decompressTiles(_enterKeyGfx.get());
 
-	Image toggleOff = Image((modPath + "/toggleOff.grf").c_str(), 32, 16, toggleOff_grf);
+	// Toggles
 	_toggleOffGfx = OamGfx(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	Image toggleOff((_modPath + "/toggleOff.grf").c_str(), 32, 16, toggleOff_grf);
 	toggleOff.decompressTiles(_toggleOffGfx.get());
 	
-	Image toggleOn = Image((modPath + "/toggleOn.grf").c_str(), 32, 16, toggleOn_grf);
 	_toggleOnGfx = OamGfx(false, SpriteSize_32x16, SpriteColorFormat_16Color);
+	Image toggleOn((_modPath + "/toggleOn.grf").c_str(), 32, 16, toggleOn_grf);
 	toggleOn.decompressTiles(_toggleOnGfx.get());
 
-	Image refreshButton = Image((modPath + "/refreshButton.grf").c_str(), 64, 64, refreshButton_grf);
+	// Refresh
 	_refreshGfx = OamGfx(false, SpriteSize_64x64, SpriteColorFormat_16Color);
+	Image refreshButton((_modPath + "/refreshButton.grf").c_str(), 64, 64, refreshButton_grf);
 	refreshButton.decompressTiles(_refreshGfx.get());
+
+	// Main menu buttons
+	_btnHowtoGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnHowto((_modPath + "/btnHowto.grf").c_str(), 32, 32, btnHowto_grf);
+	btnHowto
+		.decompressTiles(_btnHowtoGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x50);
+
+	_btnStatsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnStats((_modPath + "/btnStats.grf").c_str(), 32, 32, btnStats_grf);
+	btnStats
+		.decompressTiles(_btnStatsGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x60);
+
+	_btnUpdateGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnUpdate((_modPath + "/btnUpdate.grf").c_str(), 32, 32, btnUpdate_grf);
+	btnUpdate
+		.decompressTiles(_btnUpdateGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x70);
+
+	_btnSettingsGfx = OamGfx(false, SpriteSize_32x32, SpriteColorFormat_16Color);
+	Image btnSettings((_modPath + "/btnHowtobtnSettings").c_str(), 32, 32, btnSettings_grf);
+	btnSettings
+		.decompressTiles(_btnSettingsGfx.get())
+		.decompressPal(SPRITE_PALETTE_SUB + 0x80);
 
 	constexpr int tileSize = 32 * 32 / 2;
 
-	Image kbdKeys = Image((modPath + "/kbdKeys.grf").c_str(), 32, 832, kbdKeys_grf, false);
+	Image kbdKeys((_modPath + "/kbdKeys.grf").c_str(), 32, 832, kbdKeys_grf, false);
 	u8 *kbdKeysBuffer = new u8[kbdKeys.tilesLen()];
 	kbdKeys.decompressTiles(kbdKeysBuffer, false);
 	for(size_t i = 0; i < kbdKeys.tilesLen(); i += tileSize) {
@@ -367,7 +445,7 @@ GameData::GameData(const std::string &folder) {
 	}
 	delete[] kbdKeysBuffer;
 
-	Image letterTiles((modPath + "/letterTiles.grf").c_str(), 32, 864, letterTiles_grf, false);
+	Image letterTiles((_modPath + "/letterTiles.grf").c_str(), 32, 864, letterTiles_grf, false);
 	u8 *letterTilesBuffer = new u8[letterTiles.tilesLen()];
 	letterTiles.decompressTiles(letterTilesBuffer, false);
 	for(size_t i = 0; i < letterTiles.tilesLen(); i += tileSize) {
@@ -378,12 +456,17 @@ GameData::GameData(const std::string &folder) {
 	}
 	delete[] letterTilesBuffer;
 
+	_btnHowtoSprite.move(_howtoBtn.x, _howtoBtn.y).visible(false).gfx(_btnHowtoGfx).palette(5);
+	_btnStatsSprite.move(_statsBtn.x, _statsBtn.y).visible(false).gfx(_btnStatsGfx).palette(6);
+	_btnUpdateSprite.move(_updateBtn.x, _updateBtn.y).visible(false).gfx(_btnUpdateGfx).palette(7);
+	_btnSettingsSprite.move(_settingsBtn.x, _settingsBtn.y).visible(false).gfx(_btnSettingsGfx).palette(8);
+
 	_refreshSprite.move(96, 36).visible(false).gfx(_refreshGfx);
 
 	// Load fonts
-	_mainFont = std::move(Font((modPath + "/main.nftr").c_str(), main_nftr));
-	_numbersLarge = std::move(Font((modPath + "/numbersLarge.nftr").c_str(), numbersLarge_nftr));
-	_numbersSmall = std::move(Font((modPath + "/numbersSmall.nftr").c_str(), numbersSmall_nftr));
+	_mainFont = std::move(Font((_modPath + "/main.nftr").c_str(), main_nftr));
+	_numbersLarge = std::move(Font((_modPath + "/numbersLarge.nftr").c_str(), numbersLarge_nftr));
+	_numbersSmall = std::move(Font((_modPath + "/numbersSmall.nftr").c_str(), numbersSmall_nftr));
 	_numbersLarge.palette(TEXT_BLACK);
 	_numbersSmall.palette(TEXT_BLACK);
 }
@@ -423,4 +506,40 @@ void GameData::setPalettes(bool altPalette) const {
 
 	// Fonts
 	tonccpy(BG_PALETTE_SUB + TEXT_BLACK, _fontPalettes[altPalette].data(), _fontPalettes[altPalette].size() * sizeof(u16));
+}
+
+const std::u16string &GameData::getAnswer(time_t day) const {
+	const static std::u16string emptyString;
+
+	unsigned int index = (unsigned int)day - _firstDay;
+	if(_choiceOrder.size() > 0 && !settings->infiniteMode()) {
+		if(index < _choiceOrder.size())
+			return _choices[_choiceOrder[index] - 1];
+		else
+			return emptyString;
+	} else {
+		return _choices[index % _choices.size()];
+	}
+}
+
+void GameData::appendChoiceOrder(const std::vector<int> &ids) {
+	_choiceOrder.reserve(_choiceOrder.size() + ids.size());
+	_choiceOrder.insert(_choiceOrder.end(), ids.begin(), ids.end());
+
+	Json json((_modPath + MOD_JSON).c_str(), true);
+	if(json.get() == nullptr)
+		json = Json();
+
+	if(!json.contains("words"))
+		json.create(true, "words");
+
+	Json words = json["words"];
+	words.set(_choiceOrder, "order");
+
+	FILE *modJson = fopen((_modPath + MOD_JSON).c_str(), "w");
+	if(modJson) {
+		std::string str = json.dump();
+		fwrite(str.c_str(), 1, str.size(), modJson);
+		fclose(modJson);
+	}
 }

@@ -35,6 +35,7 @@ public:
 	const Image &decompressTiles(void *dst, bool vram = true) const { grfDecompress(_tiles, dst, vram); return *this; }
 	const Image &decompressMap(void *dst, bool vram = true) const { grfDecompress(_map, dst, vram); return *this; }
 	const Image &decompressPal(void *dst, bool vram = true) const { grfDecompress(_pal, dst, vram); return *this; }
+	const Image &decompressAll(int bg, void *palDst = nullptr) const;
 };
 
 #endif // IMAGE_HPP

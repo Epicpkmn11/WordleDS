@@ -24,6 +24,8 @@ class Settings {
 	std::vector<std::string> getMods(void);
 	void selectMod(void);
 
+	std::string currentWordIndex(void);
+
 public:
 	Settings(const std::string &path);
 

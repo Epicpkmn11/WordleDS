@@ -11,30 +11,34 @@ Json::Json(void) {
 	_json = std::shared_ptr<cJSON>(cJSON_CreateObject(), [](cJSON *p) { cJSON_Delete(p); });
 }
 
-Json::Json(const char *path) {
-	FILE *file = fopen(path, "r");
-	if(!file)
-		return;
+Json::Json(const char *str, bool fromFile) {
+	if(fromFile) {
+		FILE *file = fopen(str, "r");
+		if(!file)
+			return;
 
-	fseek(file, 0, SEEK_END);
-	size_t fsize = ftell(file);
-	if(fsize == 0) {
-		fclose(file);
-		return;
-	}
-	fseek(file, 0, SEEK_SET);
+		fseek(file, 0, SEEK_END);
+		size_t fsize = ftell(file);
+		if(fsize == 0) {
+			fclose(file);
+			return;
+		}
+		fseek(file, 0, SEEK_SET);
 
-	char *buffer = new char[fsize];
-	if(fread(buffer, 1, fsize, file) != fsize) {
+		char *buffer = new char[fsize];
+		if(fread(buffer, 1, fsize, file) != fsize) {
+			fclose(file);
+			delete[] buffer;
+			return;
+		}
 		fclose(file);
+
+		_json = std::shared_ptr<cJSON>(cJSON_ParseWithLength(buffer, fsize), [](cJSON *p) { cJSON_Delete(p); });
+
 		delete[] buffer;
-		return;
+	} else {
+		_json = std::shared_ptr<cJSON>(cJSON_Parse(str), [](cJSON *p) { cJSON_Delete(p); });
 	}
-	fclose(file);
-
-	_json = std::shared_ptr<cJSON>(cJSON_ParseWithLength(buffer, fsize), [](cJSON *p) { cJSON_Delete(p); });
-
-	delete[] buffer;
 }
 
 std::string Json::dump() const {
@@ -51,7 +55,10 @@ Json Json::set(cJSON *item, const char *name) {
 		cJSON_AddItemToArray(_json.get(), item);
 	} else if(isObject()) {
 		sassert(name != nullptr, "name must NOT be nullptr for\nobjects");
-		cJSON_AddItemToObject(_json.get(), name, item);
+		if(contains(name))
+			cJSON_ReplaceItemInObjectCaseSensitive(_json.get(), name, item);
+		else
+			cJSON_AddItemToObject(_json.get(), name, item);
 	} else {
 		sassert(false, "set can only be used on arrays\nand objects");
 	}

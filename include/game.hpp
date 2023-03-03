@@ -18,7 +18,6 @@ class Game {
 	std::u16string_view _answer;
 	std::u16string _guess = u"";
 	int _currentGuess = 0;
-	int _popupTimeout = -1;
 	bool _won = false;
 	bool _statsSaved = false;
 	bool _showRefresh = settings->infiniteMode();
@@ -29,12 +28,14 @@ class Game {
 
 	static void timerHandler(void);
 
+	void fadeOut(int frames, int screen);
+	void fadeIn(int frames, int screen);
+
 public:
 	Game(void);
 
 	~Game(void);
 
-	void drawBgBottom(std::string_view msg, int timeout);
 	std::vector<TilePalette> check(const std::u16string &guess);
 	std::string shareMessage(void);
 	bool run(void);
@@ -43,6 +44,7 @@ public:
 	GameData &data(void) { return _data; }
 	Kbd &kbd(void) { return _kbd; }
 
+	time_t today(void) const { return _today; }
 	std::u16string_view answer(void) const { return _answer; }
 	bool won(void) const { return _won; }
 	int currentGuess(void) const { return _currentGuess; }

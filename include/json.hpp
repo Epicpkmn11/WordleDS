@@ -26,11 +26,13 @@ public:
 	};
 
 	explicit Json(void);
-	explicit Json(const char *path);
+	explicit Json(const char *str, bool fromFile);
 	Json(cJSON *json) : _json(std::shared_ptr<cJSON>(json, [](cJSON *p) {})) {}
 
 	const Json operator[](int index) const { return cJSON_GetArrayItem(_json.get(), index); }
 	const Json operator[](const char *string) const { return cJSON_GetObjectItemCaseSensitive(_json.get(), string); }
+	Json operator[](int index) { return cJSON_GetArrayItem(_json.get(), index); }
+	Json operator[](const char *string) { return cJSON_GetObjectItemCaseSensitive(_json.get(), string); }
 
 	const Iterator begin(void) const { return _json->child; }
 	const Iterator end(void) const { return nullptr; }
@@ -58,6 +60,8 @@ public:
 	inline Json set(double val, const char *name = nullptr) { return set(cJSON_CreateNumber(val), name); }
 	inline Json set(const char *val, const char *name = nullptr) { return set(cJSON_CreateString(val), name); }
 	inline Json set(const std::vector<int> &val, const char *name = nullptr) { return set(cJSON_CreateIntArray(val.data(), val.size()), name); }
+
+	void remove(void) { cJSON_Delete(_json.get()); _json = nullptr; }
 };
 
 #endif // JSON_HPP

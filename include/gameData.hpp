@@ -21,6 +21,8 @@
 #include <vector>
 
 class GameData {
+	std::string _modPath;
+
 	int _maxGuesses = 6,
 		_firstDay = 18797; // June 19th 2021
 
@@ -33,6 +35,7 @@ class GameData {
 		_creditStr = "Wordle DS\nby Pk11",
 		_nthMustBeX = "%d%s letter must be %s",
 		_guessMustContainX = "Guess must contain %s",
+		_hardModeOnlyAtStart = "Can only be enabled\nat the start of a round",
 		_shareTime = " %02d:%02d",
 		_shareTimeHour = " %02d:%02d:%02d",
 		_shareStreak = " 📈%d",
@@ -43,16 +46,24 @@ class GameData {
 		_emojiYellowAlt = "🟦",
 		_emojiWhite = "⬜";
 
+	std::string _choiceOrderUrl = "http://wordle.xn--rck9c.xn--tckwe/words.php?date=%Y-%m-%d&include=id";
+
+	// Buttons on the main menu
+	Button _howtoBtn = {26, 2, 24, 24};
+	Button _statsBtn = {86, 2, 24, 24};
+	Button _updateBtn = {146, 2, 24, 24};
+	Button _settingsBtn = {206, 2, 24, 24};
+
 	// Buttons in the setting selector
-	Button _gameSettingsBtn = { 232, 33, 17, 17 };
+	Button _gameSettingsBtn = {232, 33, 17, 17};
 	Button _shareMsgBtn = {232, 64, 17, 17};
 	Button _modBtn = {232, 92, 17, 17};
 
 	// Buttons in the game settings
-	Button _hardModeToggle = { 224, 38, 21, 13 };
-	Button _infiniteModeToggle = { 224, 74, 21, 13 };
-	Button _highContrastToggle = { 224, 109, 21, 13 };
-	Button _musicToggle = { 224, 136, 21, 13 };
+	Button _hardModeToggle = {224, 38, 21, 13};
+	Button _infiniteModeToggle = {224, 74, 21, 13};
+	Button _highContrastToggle = {224, 109, 21, 13};
+	Button _musicToggle = {224, 136, 21, 13};
 
 	// Buttons in the share message settings
 	Button _shareTimerToggle = {224, 37, 21, 13};
@@ -61,6 +72,7 @@ class GameData {
 
 	bool _oldStatsMenu = false;
 	bool _oldSettingsMenu = false;
+	bool _mainMenuSprites = true;
 
 	std::vector<std::u16string> _howtoWords = {
 		u"WEARY",
@@ -161,9 +173,10 @@ class GameData {
 
 	std::vector<std::u16string> _choices, _guesses;
 
+	std::vector<int> _choiceOrder;
+
 	Image
 		_bgBottom,
-		_bgBottomBox,
 		_bgTop,
 		_howtoBottom,
 		_howtoTop,
@@ -171,16 +184,27 @@ class GameData {
 		_settingsBottom,
 		_gameSettings,
 		_shareMsgSettings,
-		_statsBottom;
+		_statsBottom,
+		_popupBox;
 
 	OamGfx
 		_backspaceKeyGfx,
 		_enterKeyGfx,
 		_refreshGfx,
 		_toggleOffGfx,
-		_toggleOnGfx;
+		_toggleOnGfx,
+		_btnHowtoGfx,
+		_btnSettingsGfx,
+		_btnStatsGfx,
+		_btnUpdateGfx;
 
 	std::vector<OamGfx> _letterGfx, _letterGfxSub, _kbdGfx;
+
+	Sprite
+		_btnHowtoSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color),
+		_btnStatsSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color),
+		_btnUpdateSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color),
+		_btnSettingsSprite = Sprite(false, SpriteSize_32x32, SpriteColorFormat_16Color);
 
 	Sprite _refreshSprite = Sprite(false, SpriteSize_64x64, SpriteColorFormat_16Color);
 
@@ -208,10 +232,18 @@ public:
 	const std::string &creditStr(void) const { return _creditStr; }
 	const std::string &nthMustBeX(void) const { return _nthMustBeX; }
 	const std::string &guessMustContainX(void) const { return _guessMustContainX; }
+	const std::string &hardModeOnlyAtStart(void) const { return _hardModeOnlyAtStart; }
 	const std::string &shareTime(void) const { return _shareTime; }
 	const std::string &shareTimeHour(void) const { return _shareTimeHour; }
 	const std::string &shareStreak(void) const { return _shareStreak; }
 	const std::string &shareStreakLoss(void) const { return _shareStreakLoss; }
+
+	const std::string &choiceOrderUrl(void) const { return _choiceOrderUrl; }
+
+	const Button &howtoBtn(void) const { return _howtoBtn; }
+	const Button &statsBtn(void) const { return _statsBtn; }
+	const Button &updateBtn(void) const { return _updateBtn; }
+	const Button &settingsBtn(void) const { return _settingsBtn; }
 
 	const Button &hardModeToggle(void) const { return _hardModeToggle; }
 	const Button &infiniteModeToggle(void) const { return _infiniteModeToggle; }
@@ -227,6 +259,7 @@ public:
 
 	bool oldStatsMenu(void) const { return _oldStatsMenu; }
 	bool oldSettingsMenu(void) const { return _oldSettingsMenu; }
+	bool mainMenuSprites(void) const { return _mainMenuSprites; }
 
 	const std::vector<char16_t> &letters(void) const { return _letters; }
 	char16_t letters(size_t i) const { return _letters[i]; }
@@ -243,9 +276,10 @@ public:
 	const std::u16string &choices(size_t i) const { return _choices[i]; }
 	const std::vector<std::u16string> &guesses(void) const { return _guesses; }
 	const std::u16string &guesses(size_t i) const { return _guesses[i]; }
+	const std::vector<int> &choiceOrder(void) const { return _choiceOrder; }
+	int choiceOrder(size_t i) const { return _choiceOrder[i]; }
 
 	const Image &bgBottom(void) const { return _bgBottom; };
-	const Image &bgBottomBox(void) const { return _bgBottomBox; };
 	const Image &bgTop(void) const { return _bgTop; };
 	const Image &howtoBottom(void) const { return _howtoBottom; };
 	const Image &howtoTop(void) const { return _howtoTop; };
@@ -254,6 +288,7 @@ public:
 	const Image &gameSettings(void) const { return _gameSettings; };
 	const Image &shareMsgSettings(void) const { return _shareMsgSettings; };
 	const Image &statsBottom(void) const { return _statsBottom; };
+	const Image &popupBox(void) const { return _popupBox; };
 
 	const OamGfx &backspaceKeyGfx(void) const { return _backspaceKeyGfx; }
 	const OamGfx &enterKeyGfx(void) const { return _enterKeyGfx; }
@@ -268,9 +303,19 @@ public:
 	const std::vector<OamGfx> &kbdGfx(void) const { return _kbdGfx; };
 	const OamGfx &kbdGfx(size_t i) const { return _kbdGfx[i]; };
 
+	const OamGfx &btnHowtoGfx(void) const { return _btnHowtoGfx; }
+	const OamGfx &btnStatsGfx(void) const { return _btnStatsGfx; }
+	const OamGfx &btnUpdateGfx(void) const { return _btnUpdateGfx; }
+	const OamGfx &btnSettingsGfx(void) const { return _btnSettingsGfx; }
+
 	Font &mainFont(void) { return _mainFont; }
 	Font &numbersLarge(void) { return _numbersLarge; }
 	Font &numbersSmall(void) { return _numbersSmall; }
+
+	Sprite &btnHowtoSprite(void) { return _btnHowtoSprite; }
+	Sprite &btnStatsSprite(void) { return _btnStatsSprite; }
+	Sprite &btnUpdateSprite(void) { return _btnUpdateSprite; }
+	Sprite &btnSettingsSprite(void) { return _btnSettingsSprite; }
 
 	Sprite &refreshSprite(void) { return _refreshSprite; }
 
@@ -278,6 +323,9 @@ public:
 	const std::string &victoryMessage(size_t i) const;
 	const std::string &numberSuffix(int i) const;
 	void setPalettes(bool altPalette) const;
+	const std::u16string &getAnswer(time_t day) const;
+
+	void appendChoiceOrder(const std::vector<int> &ids);
 };
 
 #endif // GAME_DATA_HPP

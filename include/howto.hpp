@@ -1,6 +1,6 @@
 #ifndef HOWTO_HPP
 #define HOWTO_HPP
 
-void howtoMenu(void);
+void howtoMenu(bool slowFade);
 
 #endif // HOWTO_HPP

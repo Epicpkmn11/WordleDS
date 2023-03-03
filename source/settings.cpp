@@ -16,8 +16,25 @@
 
 Settings *settings;
 
+std::string Settings::currentWordIndex() {
+	char str[16];
+	if(game->data().choiceOrder().size() > 0) {
+		if(infiniteMode())
+			snprintf(str, sizeof(str), "Inf/%d", game->data().choiceOrder().size());
+		else
+			snprintf(str, sizeof(str), "%lld/%d", game->today() - game->data().firstDay(), game->data().choiceOrder().size());
+	} else {
+		if(infiniteMode())
+			return "Inf";
+		else
+			snprintf(str, sizeof(str), "%lld", game->today() - game->data().firstDay());
+	}
+
+	return str;
+}
+
 Settings::Settings(const std::string &path) : _path(path) {
-	Json json(_path.c_str());
+	Json json(_path.c_str(), true);
 	if(!json.get())
 		return;
 
@@ -80,7 +97,7 @@ bool Settings::save() {
 }
 
 void Settings::legacyImport(const std::string &path) {
-	Json json(path.c_str());
+	Json json(path.c_str(), true);
 	if(!json.get())
 		return;
 
@@ -147,14 +164,12 @@ void Settings::legacyImport(const std::string &path) {
 
 void Settings::showMenu() {
 	// Change to settings menu background
-	game->data().settingsBottom()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().settingsBottom().decompressAll(BG_SUB(0));
 
 	game->data().mainFont()
 		.palette(TEXT_GRAY)
 		.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+		.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 		.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 	Font::update(false);
 
@@ -208,6 +223,8 @@ void Settings::showMenu() {
 				if(game->data().hardModeToggle().touching(touch)) {
 					if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 						_hardMode = !_hardMode;
+					else
+						Gfx::showPopup(game->data().hardModeOnlyAtStart(), 120);
 				} else if(game->data().highContrastToggle().touching(touch)) {
 					_altPalette = !_altPalette;
 					game->data().setPalettes(_altPalette);
@@ -226,17 +243,18 @@ void Settings::showMenu() {
 				Font::clear(false);
 				Font::update(false);
 
+				bool loadedInfinite = infiniteMode();
 				gameSettings();
+				if(loadedInfinite != infiniteMode())
+					break;
 
 				// Restore background
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
+				game->data().settingsBottom().decompressAll(BG_SUB(0));
 
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
@@ -257,10 +275,7 @@ void Settings::showMenu() {
 
 				// Restore background and sprites
 				swiWaitForVBlank();
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
+				game->data().settingsBottom().decompressAll(BG_SUB(0));
 
 				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
@@ -272,6 +287,7 @@ void Settings::showMenu() {
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
@@ -292,10 +308,7 @@ void Settings::showMenu() {
 
 				// Restore background and sprites
 				swiWaitForVBlank();
-				game->data().settingsBottom()
-					.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-					.decompressMap(bgGetMapPtr(BG_SUB(0)))
-					.decompressPal(BG_PALETTE_SUB);
+				game->data().settingsBottom().decompressAll(BG_SUB(0));
 
 				if(game->data().oldSettingsMenu()) {
 					hardToggle.visible(true);
@@ -307,6 +320,7 @@ void Settings::showMenu() {
 				game->data().mainFont()
 					.palette(TEXT_GRAY)
 					.print(4, 192 - 2 - game->data().mainFont().calcHeight(game->data().creditStr()), false, game->data().creditStr())
+					.print(256 - 4, 192 - 2 - game->data().mainFont().height() * 2, false, currentWordIndex(), Alignment::right)
 					.print(256 - 4, 192 - 2 - game->data().mainFont().height(), false, VER_NUMBER, Alignment::right);
 				Font::update(false);
 				Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
@@ -319,10 +333,9 @@ void Settings::showMenu() {
 
 void Settings::gameSettings() {
 	// Change to game settings background
-	game->data().gameSettings()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().gameSettings().decompressAll(BG_SUB(0));
+
+	bool loadedInfinite = infiniteMode();
 
 	Sprite hardModeToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	hardModeToggle.move(game->data().hardModeToggle());
@@ -369,6 +382,8 @@ void Settings::gameSettings() {
 			} else if(game->data().hardModeToggle().touching(touch)) {
 				if(game->stats().boardState().size() == 0) // Can't toggle mid-game
 					_hardMode = !_hardMode;
+				else
+					Gfx::showPopup(game->data().hardModeOnlyAtStart(), 120);
 			} else if(game->data().infiniteModeToggle().touching(touch)) {
 				_infiniteMode = !_infiniteMode;
 			} else if(game->data().highContrastToggle().touching(touch)) {
@@ -384,15 +399,16 @@ void Settings::gameSettings() {
 		}
 	}
 
-	Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+	
+	if(loadedInfinite == infiniteMode())
+		Gfx::fadeOut(FADE_FAST, FADE_BOTTOM);
+	else
+		Gfx::fadeOut(FADE_SLOW, FADE_TOP | FADE_BOTTOM);
 }
 
 void Settings::shareMsgSettings() {
 	// Change to share message settings background
-	game->data().shareMsgSettings()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().shareMsgSettings().decompressAll(BG_SUB(0));
 
 	Sprite timerToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	timerToggle.move(game->data().shareTimerToggle());
@@ -471,10 +487,7 @@ std::vector<std::string> Settings::getMods() {
 void Settings::selectMod() {
 	// Change to mods menu background
 	swiWaitForVBlank();
-	game->data().modsBottom()
-		.decompressTiles(bgGetGfxPtr(BG_SUB(0)))
-		.decompressMap(bgGetMapPtr(BG_SUB(0)))
-		.decompressPal(BG_PALETTE_SUB);
+	game->data().modsBottom().decompressAll(BG_SUB(0));
 
 	std::vector<std::string> mods = getMods();
 	Font &font = game->data().mainFont();

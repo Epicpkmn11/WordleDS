@@ -9,6 +9,7 @@
 	"creditStr": "uwdl DS\nby Pk1-chan",
 	"nthMustBeX": "%d%s weta must be %s",
 	"guessMustContainX": "Gyus must contain %s",
+	"hardModeOnlyAtStart": "Can onwy be enyabwd\nat da stawt of a wound",
 	"shareMsg": {
 		"time": " %d minyutes %d seconds",
 		"timeHour": " %d houws %d minyutes %d seconds",

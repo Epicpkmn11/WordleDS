@@ -1,0 +1,84 @@
+{
+	"minVersion": "v2.2.0",
+	"maxGuesses": 6,
+	"wordleOffset": 0,
+	"shareName": "Wordle DS",
+	"lossMessage": "Better luck tomorrow...\nThe answer was:",
+	"lossMessageInfinite": "Better luck next time...\nThe answer was:",
+	"tooShortMessage": "Not enough letters",
+	"notWordMessage": "Not in word list",
+	"creditStr": "Wordle DS\nby Pk11",
+	"nthMustBeX": "%d%s letter must be %s",
+	"guessMustContainX": "Guess must contain %s",
+	"hardModeOnlyAtStart": "Can only be enabled\nat the start of a round",
+	"emoji": {
+		"green": "🟩",
+		"greenAlt":"🟧",
+		"yellow": "🟨",
+		"yellowAlt": "🟦",
+		"white": "⬜"
+	},
+	"howto": {
+		"words": [
+			"WEARY",
+			"PILLS",
+			"VAGUE"
+		],
+		"colors": [
+			"green", "white", "white", "white", "white",
+			"white", "yellow", "white", "white", "white",
+			"white", "white", "white", "gray", "white"
+		]
+	},
+	"victoryMessages": [
+		"Genius",
+		"Magnificent",
+		"Impressive",
+		"Splendid",
+		"Great",
+		"Phew"
+	],
+	"numberSuffixes": {
+		"1": "st",
+		"2": "nd",
+		"3": "rd",
+		"default": "th"
+	},
+	"letters": [
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+		"I",
+		"J",
+		"K",
+		"L",
+		"M",
+		"N",
+		"O",
+		"P",
+		"Q",
+		"R",
+		"S",
+		"T",
+		"U",
+		"V",
+		"W",
+		"X",
+		"Y",
+		"Z"
+	],
+	"keyboard": [
+		[4,  114,  "Q"], [29, 114, "W"], [54, 114, "E"], [79, 114, "R"], [104, 114, "T"], [129, 114, "Y"], [154, 114, "U"], [179, 114, "I"], [204, 114,  "O"], [229, 114, "P"],
+		[16, 140,  "A"], [41, 140, "S"], [66, 140, "D"], [91, 140, "F"], [116, 140, "G"], [141, 140, "H"], [166, 140, "J"], [191, 140, "K"], [216, 140,  "L"],
+		[4,  166, "\n"], [41, 166, "Z"], [66, 166, "X"], [91, 166, "C"], [116, 166, "V"], [141, 166, "B"], [166, 166, "N"], [191, 166, "M"], [216, 166, "\b"]
+	],
+	"words": {
+		"choices": [],
+		"guesses": []
+	}
+}

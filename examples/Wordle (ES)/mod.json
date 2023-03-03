@@ -1,4 +1,5 @@
 {
+	"minVersion": "v2.2.0",
 	"maxGuesses": 6,
 	"wordleOffset": 201,
 	"shareName": "Wordle (ES) DS",
@@ -9,6 +10,7 @@
 	"creditStr": "Wordle (ES) DS\nby Pk11",
 	"nthMustBeX": "%d%s letra debe ser %s",
 	"guessMustContainX": "Adivinar debe\ncontener %s",
+	"hardModeOnlyAtStart": "Sólo se puede habilitar\nal comienzo de ronda.",
 	"howto": {
 		"words": [
 			"RUBIA",

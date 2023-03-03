@@ -4,7 +4,7 @@
 		"author": "[Pk11](https://github.com/Epicpkmn11)",
 		"description": "Wordle DS translated to Spanish, based on Daniel Rodriguez's [Wordle (ES)](https://wordle.danielfrg.com/).",
 		"categories": ["Translation", "Spanish"],
-		"version": "v1.0.1",
+		"version": "v1.1.0",
 		"downloads": [
 			"Wordle (ES).zip"
 		]

@@ -311,6 +311,8 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 			} else {
 				_choiceOrder = Words::order;
 				_choices = Words::choices;
+				if(!json["words"].contains("guesses") || !json["words"]["guesses"].isArray())
+					_guesses = Words::guesses;
 			}
 
 			if(json["words"].contains("order") && json["words"]["order"].isArray()) {

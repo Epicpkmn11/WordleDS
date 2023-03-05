@@ -14,7 +14,7 @@ args = parser.parse_args()
 
 url = f"https://github.com/Epicpkmn11/WordleDS/releases/download/{args.version}/WordleDS"
 
-for ext in (".cia", ".nds"):
+for ext in (".cia", ".dsi"):
 	qr = qrcode.make(url + ext, box_size=5, version=5).convert("RGBA")
 
 	with Image.open(args.icon) as img:

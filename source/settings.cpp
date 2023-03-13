@@ -22,7 +22,7 @@ std::string Settings::currentWordIndex() {
 		if(infiniteMode())
 			snprintf(str, sizeof(str), "Inf/%d", game->data().choiceOrder().size());
 		else
-			snprintf(str, sizeof(str), "%lld/%d", game->today() - game->data().firstDay(), game->data().choiceOrder().size());
+			snprintf(str, sizeof(str), "%lld/%d", game->today() - game->data().firstDay(), game->data().choiceOrder().size() - 1);
 	} else {
 		if(infiniteMode())
 			return "Inf";

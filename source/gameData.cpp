@@ -511,17 +511,21 @@ void GameData::setPalettes(bool altPalette) const {
 }
 
 const std::u16string &GameData::getAnswer(time_t day) const {
-	const static std::u16string emptyString;
-
 	unsigned int index = (unsigned int)day - _firstDay;
 	if(_choiceOrder.size() > 0 && !settings->infiniteMode()) {
-		if(index < _choiceOrder.size())
-			return _choices[_choiceOrder[index] - 1];
-		else
-			return emptyString;
+		if(index < _choiceOrder.size()) {
+			int id = _choiceOrder[index];
+			if(id > 0 && id <= _choices.size())
+				return _choices[id - 1];
+			else if(id < 0 && id >= -_guesses.size())
+				return _guesses[-id - 1];
+		}
 	} else {
 		return _choices[index % _choices.size()];
 	}
+
+	const static std::u16string emptyString;
+	return emptyString;
 }
 
 void GameData::appendChoiceOrder(const std::vector<int> &ids) {

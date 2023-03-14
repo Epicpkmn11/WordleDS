@@ -100,12 +100,17 @@ void WiFi::getWords(const char *url) {
 		} else if(json.isArray()) {
 			// Validate results
 			int choiceCount = game->data().choices().size();
+			int guessCount = -game->data().guesses().size(); // Guess list IDs are negative
 			std::vector<int> ids;
 			for(const Json id : json) {
-				if(id.isNumber() && id.get()->valueint >= 1 && id.get()->valueint <= choiceCount) {
-					ids.push_back(id.get()->valueint);
+				if(id.isNumber()) {
+					int val = id.get()->valueint;
+					if((val >= 1 && val <= choiceCount) || (val <= -1 && val >= guessCount))
+						ids.push_back(id.get()->valueint);
+					else
+						Gfx::showPopup("Error: Invalid ID", 120);
 				} else {
-					Gfx::showPopup("Error loading IDs", 120);
+					Gfx::showPopup("Error: Non-numeric ID", 120);
 					return;
 				}
 			}

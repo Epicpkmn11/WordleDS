@@ -99,8 +99,8 @@ void WiFi::getWords(const char *url) {
 			Gfx::showPopup(json["message"].get()->valuestring, 120);
 		} else if(json.isArray()) {
 			// Validate results
-			int choiceCount = game->data().choices().size();
-			int guessCount = -game->data().guesses().size(); // Guess list IDs are negative
+			const int choiceCount = game->data().choices().size();
+			const int guessCount = -game->data().guesses().size(); // Guess list IDs are negative
 			std::vector<int> ids;
 			for(const Json id : json) {
 				if(id.isNumber()) {

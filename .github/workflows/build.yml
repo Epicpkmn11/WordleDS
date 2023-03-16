@@ -20,7 +20,7 @@ jobs:
     name: Build with Docker using BlocksDS
     steps:
       - name: Install Python
-        run: apt-get -y install python
+        run: apt-get -y install python3
       - name: Checkout repo
         uses: actions/checkout@v1
       - name: Build Wordle DS

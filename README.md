@@ -1,5 +1,5 @@
 # Wordle DS
-A clone of [Wordle](https://www.nytimes.com/games/wordle/index.html) for the Nintendo DS(i). The word list matches the official NY Times version, as long as you keep up to date. A sharable text file will be made as `sd:/_nds/WordleDS/Wordle DS/share.txt` on completion or can be accessed as a QR code from the statistics menu.
+A clone of [Wordle](https://www.nytimes.com/games/wordle/index.html) for the Nintendo DS(i). The daily word matches the official NY Times version. A sharable text file will be made as `sd:/_nds/WordleDS/Wordle DS/share.txt` on completion or can be accessed as a QR code from the statistics menu.
 
 ## Building
 Follow devkitPro's [Getting Started](https://devkitpro.org/wiki/Getting_Started) guide to install libnds, devkitARM, and grit, then simply run `make`.

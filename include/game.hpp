@@ -15,7 +15,7 @@ class Game {
 	Kbd _kbd;
 
 	time_t _today;
-	std::u16string_view _answer;
+	std::u16string _answer;
 	std::u16string _guess = u"";
 	int _currentGuess = 0;
 	bool _won = false;
@@ -45,7 +45,7 @@ public:
 	Kbd &kbd(void) { return _kbd; }
 
 	time_t today(void) const { return _today; }
-	std::u16string_view answer(void) const { return _answer; }
+	const std::u16string &answer(void) const { return _answer; }
 	bool won(void) const { return _won; }
 	int currentGuess(void) const { return _currentGuess; }
 

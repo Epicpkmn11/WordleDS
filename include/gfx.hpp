@@ -38,7 +38,7 @@ enum class FlipOptions {
 namespace Gfx {
 	void init(void);
 
-	void showPopup(std::string_view msg, int timeout = -2);
+	void showPopup(const std::string &msg, int timeout = -2);
 	void hidePopup(void);
 	bool popupVisible(void);
 

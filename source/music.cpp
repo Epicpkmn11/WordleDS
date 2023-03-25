@@ -12,7 +12,7 @@ Music *Music::music;
 Music::Music(const std::string &folder) {
 	std::string musicPath = DATA_PATH + folder + "/music.msl";
 	if(access(musicPath.c_str(), F_OK) == 0)
-		mmInitDefault(musicPath.data());
+		mmInitDefault((char *)musicPath.c_str());
 	else
 		mmInitDefaultMem((mm_addr)soundbank_bin);
 	mmLoad(MOD_MUSIC);

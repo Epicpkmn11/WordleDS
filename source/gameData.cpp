@@ -17,10 +17,10 @@
 #include "howtoTop_grf.h"
 #include "kbdKeys_grf.h"
 #include "letterTiles_grf.h"
-#include "main_nftr.h"
+#include "main_nftr_bin.h"
 #include "modsBottom_grf.h"
-#include "numbersLarge_nftr.h"
-#include "numbersSmall_nftr.h"
+#include "numbersLarge_nftr_bin.h"
+#include "numbersSmall_nftr_bin.h"
 #include "refreshButton_grf.h"
 #include "settingsBottom_grf.h"
 #include "gameSettings_grf.h"
@@ -467,9 +467,9 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 	_refreshSprite.move(96, 36).visible(false).gfx(_refreshGfx);
 
 	// Load fonts
-	_mainFont = std::move(Font((_modPath + "/main.nftr").c_str(), main_nftr));
-	_numbersLarge = std::move(Font((_modPath + "/numbersLarge.nftr").c_str(), numbersLarge_nftr));
-	_numbersSmall = std::move(Font((_modPath + "/numbersSmall.nftr").c_str(), numbersSmall_nftr));
+	_mainFont = std::move(Font((_modPath + "/main.nftr").c_str(), main_nftr_bin));
+	_numbersLarge = std::move(Font((_modPath + "/numbersLarge.nftr").c_str(), numbersLarge_nftr_bin));
+	_numbersSmall = std::move(Font((_modPath + "/numbersSmall.nftr").c_str(), numbersSmall_nftr_bin));
 	_numbersLarge.palette(TEXT_BLACK);
 	_numbersSmall.palette(TEXT_BLACK);
 }

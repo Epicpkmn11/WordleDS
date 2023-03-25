@@ -45,7 +45,7 @@ void Gfx::init() {
 	irqSet(IRQ_VBLANK, vblankHandler);
 }
 
-void Gfx::showPopup(std::string_view msg, int timeout) {
+void Gfx::showPopup(const std::string &msg, int timeout) {
 	if(game) {
 		Font::clear(false);
 		game->data().mainFont().palette(TEXT_WHITE).print(0, 56 - game->data().mainFont().calcHeight(msg) / 2, false, msg, Alignment::center);

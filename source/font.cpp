@@ -146,7 +146,7 @@ u16 Font::getCharIndex(char16_t c) const {
 	return questionMark;
 }
 
-std::u16string Font::utf8to16(std::string_view text) {
+std::u16string Font::utf8to16(const std::string &text) {
 	std::u16string out;
 	for(uint i = 0; i < text.size();) {
 		char16_t c;
@@ -168,7 +168,7 @@ std::u16string Font::utf8to16(std::string_view text) {
 	return out;
 }
 
-std::string Font::utf16to8(std::u16string_view text) {
+std::string Font::utf16to8(const std::u16string &text) {
 	std::string out;
 	for(char16_t c : text)
 		out += utf16to8(c);
@@ -199,7 +199,7 @@ std::string Font::utf16to8(char16_t c) {
 	}
 }
 
-int Font::calcWidth(std::u16string_view text) const {
+int Font::calcWidth(const std::u16string &text) const {
 	uint x = 0;
 
 	for(char16_t c : text) {
@@ -210,7 +210,7 @@ int Font::calcWidth(std::u16string_view text) const {
 	return x;
 }
 
-int Font::calcHeight(std::u16string_view text) const {
+int Font::calcHeight(const std::u16string &text) const {
 	uint height = tileHeight;
 
 	for(char16_t c : text) {
@@ -221,7 +221,7 @@ int Font::calcHeight(std::u16string_view text) const {
 	return height;
 }
 
-ITCM_CODE Font &Font::print(int x, int y, bool top, std::u16string_view text, Alignment align) {
+ITCM_CODE Font &Font::print(int x, int y, bool top, std::u16string text, Alignment align) {
 	// Adjust x for alignment
 	switch(align) {
 		case Alignment::left: {

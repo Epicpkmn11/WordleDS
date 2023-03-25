@@ -28,7 +28,7 @@ SDIMAGE		:=
 # -----------------
 
 SOURCEDIRS	:= source
-INCLUDEDIRS	:= include
+INCLUDEDIRS	:= include build/version
 GFXDIRS		:= gfx
 BINDIRS		:= data
 AUDIODIRS	:= audio
@@ -38,6 +38,20 @@ NITROFATDIR	:=
 # ---------------------------
 
 DEFINES		:=
+
+# Get version number from git
+# ---------------------------
+
+ifneq ($(shell echo $(shell git tag -l --points-at HEAD) | head -c 1),) # If on a tagged commit, use just tag
+GIT_VER := $(shell git tag -l --points-at HEAD)
+else # Otherwise include commit
+GIT_VER := $(shell git describe --abbrev=0 --tags)-$(shell git rev-parse --short=7 HEAD)
+endif
+
+# Print new version if changed
+ifeq (,$(findstring $(GIT_VER),$(shell cat build/version/version.hpp)))
+$(shell mkdir -p build/version && printf "#ifndef VERSION_HPP\n#define VERSION_HPP\n\n#define VER_NUMBER \"$(GIT_VER)\"\n\n#endif\n" > build/version/version.hpp)
+endif
 
 # Libraries
 # ---------
@@ -81,10 +95,6 @@ endif
 # Source files
 # ------------
 
-ifneq ($(BINDIRS),)
-    SOURCES_BIN	:= $(shell find -L $(BINDIRS) -name "*.bin")
-    INCLUDEDIRS	+= $(addprefix $(BUILDDIR)/,$(BINDIRS))
-endif
 ifneq ($(GFXDIRS),)
     SOURCES_PNG	:= $(shell find -L $(GFXDIRS) -name "*.png")
     INCLUDEDIRS	+= $(addprefix $(BUILDDIR)/,$(GFXDIRS))
@@ -94,6 +104,10 @@ ifneq ($(AUDIODIRS),)
     ifneq ($(SOURCES_AUDIO),)
         INCLUDEDIRS	+= $(SOUNDBANKDIR)
     endif
+endif
+ifneq ($(BINDIRS),)
+    SOURCES_BIN	:= $(shell find -L $(BINDIRS) -name "*.bin") $(SOURCES_PNG:.png=.grf)
+    INCLUDEDIRS	+= $(addprefix $(BUILDDIR)/,$(BINDIRS))
 endif
 
 SOURCES_S	:= $(shell find -L $(SOURCEDIRS) -name "*.s")
@@ -144,11 +158,9 @@ LDFLAGS		:= -mthumb -mthumb-interwork $(LIBDIRSFLAGS) \
 # Intermediate build files
 # ------------------------
 
-OBJS_ASSETS	:= $(addsuffix .o,$(addprefix $(BUILDDIR)/,$(SOURCES_BIN))) \
-			   $(addsuffix .o,$(addprefix $(BUILDDIR)/,$(SOURCES_PNG)))
+OBJS_ASSETS	:= $(addsuffix .o,$(addprefix $(BUILDDIR)/,$(SOURCES_BIN)))
 
-HEADERS_ASSETS	:= $(patsubst %.bin,%_bin.h,$(addprefix $(BUILDDIR)/,$(SOURCES_BIN))) \
-				   $(patsubst %.png,%.h,$(addprefix $(BUILDDIR)/,$(SOURCES_PNG)))
+HEADERS_ASSETS	:= $(patsubst %.bin,%_bin.h,$(addprefix $(BUILDDIR)/,$(SOURCES_BIN)))
 
 ifneq ($(SOURCES_AUDIO),)
     OBJS_ASSETS		+= $(SOUNDBANKDIR)/soundbank.c.o
@@ -236,11 +248,16 @@ $(BUILDDIR)/%.bin.o $(BUILDDIR)/%_bin.h : %.bin
 	$(V)$(BLOCKSDS)/tools/bin2c/bin2c $< $(@D)
 	$(V)$(CC) $(CFLAGS) -MMD -MP -c -o $(BUILDDIR)/$*.bin.o $(BUILDDIR)/$*_bin.c
 
-$(BUILDDIR)/%.png.o $(BUILDDIR)/%.h : %.png %.grit
+$(BUILDDIR)/%.grf.o $(BUILDDIR)/%_grf.h : $(BUILDDIR)/%.grf
+	@echo "  BIN2C   $<"
+	@$(MKDIR) -p $(@D)
+	$(V)$(BLOCKSDS)/tools/bin2c/bin2c $< $(@D)
+	$(V)$(CC) $(CFLAGS) -MMD -MP -c -o $(BUILDDIR)/$*.grf.o $(BUILDDIR)/$*_grf.c
+
+$(BUILDDIR)/%.grf : %.png %.grit
 	@echo "  GRIT    $<"
 	@$(MKDIR) -p $(@D)
-	$(V)$(BLOCKSDS)/tools/grit/grit $< -ftc -W1 -o$(BUILDDIR)/$*
-	$(V)$(CC) $(CFLAGS) -MMD -MP -c -o $(BUILDDIR)/$*.png.o $(BUILDDIR)/$*.c
+	$(V)$(BLOCKSDS)/tools/grit/grit $< -ftr -fh! -W1 -o$(BUILDDIR)/$*
 
 $(SOUNDBANKDIR)/soundbank.c.o $(SOUNDBANKDIR)/soundbank.h : $(SOURCES_AUDIO)
 	@echo "  MMUTIL $^"

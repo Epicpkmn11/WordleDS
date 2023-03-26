@@ -195,11 +195,17 @@ $(NITROFAT_IMG): $(NITROFATDIR)
 $(ROM): $(NITROFAT_IMG)
 endif
 
+ifneq (,$(findstring .bin,$(GAME_ICON)))
+NDSTOOL_ICON	:= -t $(GAME_ICON)
+else
+NDSTOOL_ICON	:= -b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1);$(GAME_SUBTITLE2)"
+endif
+
 $(ROM): $(ELF)
 	@echo "  NDSTOOL $@"
 	$(V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
 		-7 $(BLOCKSDS)/sys/default_arm7/arm7.elf -9 $(ELF) \
-		-b $(GAME_ICON) "$(GAME_TITLE);$(GAME_SUBTITLE1);$(GAME_SUBTITLE2)" \
+		$(NDSTOOL_ICON) \
 		$(NDSTOOL_FAT)
 
 $(ELF): $(OBJS)

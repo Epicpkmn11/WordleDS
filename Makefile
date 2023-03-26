@@ -28,7 +28,7 @@ SDIMAGE		:=
 # -----------------
 
 SOURCEDIRS	:= source
-INCLUDEDIRS	:= include build/version
+INCLUDEDIRS	:= include include/libqrencode build/version
 GFXDIRS		:= gfx
 BINDIRS		:= data
 AUDIODIRS	:= audio
@@ -56,9 +56,8 @@ endif
 # Libraries
 # ---------
 
-LIBS		:= -lqrencode -lmm9 -ldswifi9 -lnds9 -lstdc++ -lc
-LIBDIRS		:= libs \
-			   $(BLOCKSDS)/libs/maxmod \
+LIBS		:= -lmm9 -ldswifi9 -lnds9 -lstdc++ -lc
+LIBDIRS		:= $(BLOCKSDS)/libs/maxmod \
 			   $(BLOCKSDS)/libs/dswifi \
 			   $(BLOCKSDS)/libs/libnds \
 			   $(BLOCKSDS)/libs/libstdc++9 \

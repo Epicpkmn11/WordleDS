@@ -56,11 +56,10 @@ endif
 # Libraries
 # ---------
 
-LIBS		:= -lqrencode -lmm9 -ldswifi9 -lnds9 -lsysnds9 -lstdc++ -lc
+LIBS		:= -lqrencode -lmm9 -ldswifi9 -lnds9 -lstdc++ -lc
 LIBDIRS		:= libs \
 			   $(BLOCKSDS)/libs/maxmod \
 			   $(BLOCKSDS)/libs/dswifi \
-			   $(BLOCKSDS)/libs/libsysnds \
 			   $(BLOCKSDS)/libs/libnds \
 			   $(BLOCKSDS)/libs/libstdc++9 \
 			   $(BLOCKSDS)/libs/libc9

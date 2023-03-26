@@ -28,9 +28,9 @@ jobs:
           make
 
           # Make CIA
-          curl -LO https://github.com/ihaveamac/ctr_toolkit/releases/download/make_cia6.4builds/make_cia6.4builds.zip
-          unzip -j make_cia6.4builds.zip linux/make_cia
-          ./make_cia --srl=WordleDS.dsi
+          # curl -LO https://github.com/ihaveamac/ctr_toolkit/releases/download/make_cia6.4builds/make_cia6.4builds.zip
+          # unzip -j make_cia6.4builds.zip linux/make_cia
+          # ./make_cia --srl=WordleDS.dsi
 
           # Move builds to dir for upload
           mkdir artifacts

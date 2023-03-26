@@ -4,7 +4,9 @@
 #include "music.hpp"
 #include "settings.hpp"
 
+extern "C" { // temp
 #include <fat.h>
+}
 #include <nds.h>
 #include <sys/stat.h>
 

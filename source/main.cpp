@@ -4,9 +4,9 @@
 #include "music.hpp"
 #include "settings.hpp"
 
-#include <dirent.h>
 #include <fat.h>
 #include <nds.h>
+#include <sys/stat.h>
 
 int main() {
 	bool fatInited = fatInitDefault();
@@ -14,9 +14,9 @@ int main() {
 	setBrightness(3, 16);
 
 	if(fatInited) {
-		// mkdir("/_nds", 0777);
-		// mkdir("/_nds/WordleDS", 0777);
-		// mkdir(DATA_PATH DEFAULT_MOD, 0777);
+		mkdir("/_nds", 0777);
+		mkdir("/_nds/WordleDS", 0777);
+		mkdir(DATA_PATH DEFAULT_MOD, 0777);
 	}
 
 	// Import old settings to new location

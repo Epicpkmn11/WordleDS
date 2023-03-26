@@ -35,8 +35,8 @@ jobs:
           # Move builds to dir for upload
           mkdir artifacts
           mv *.nds artifacts
-          mv *.dsi artifacts
-          mv *.cia artifacts
+          # mv *.dsi artifacts
+          # mv *.cia artifacts
       - name: Publish build to GH Actions
         uses: actions/upload-artifact@v2
         with:

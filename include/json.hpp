@@ -20,14 +20,14 @@ public:
 
 		bool operator==(const Iterator &rhs) const { return get() == rhs.get(); }
 		bool operator!=(const Iterator &rhs) const { return get() != rhs.get(); }
-		const void operator++(void) { _json = _json->next; }
-		const void operator--(void) { _json = _json->prev; }
+		void operator++(void) { _json = _json->next; }
+		void operator--(void) { _json = _json->prev; }
 		Json operator*(void) { return Json(_json); }
 	};
 
 	explicit Json(void);
 	explicit Json(const char *str, bool fromFile);
-	Json(cJSON *json) : _json(std::shared_ptr<cJSON>(json, [](cJSON *p) {})) {}
+	Json(cJSON *json) : _json(std::shared_ptr<cJSON>(json, [](cJSON *) {})) {}
 
 	const Json operator[](int index) const { return cJSON_GetArrayItem(_json.get(), index); }
 	const Json operator[](const char *string) const { return cJSON_GetObjectItemCaseSensitive(_json.get(), string); }

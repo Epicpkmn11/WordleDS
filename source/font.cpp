@@ -175,7 +175,7 @@ std::string Font::utf16to8(std::u16string_view text) {
 	return out;
 }
 
-std::string Font::utf16to8(char16_t c) {
+std::string Font::utf16to8(u32 c) {
 	if(c <= 0x007F) {
 		return {char(c)};
 	} else if(c <= 0x7FF) {

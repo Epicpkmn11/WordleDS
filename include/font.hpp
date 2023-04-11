@@ -35,7 +35,7 @@ private:
 public:
 	static std::u16string utf8to16(std::string_view text);
 	static std::string utf16to8(std::u16string_view text);
-	static std::string utf16to8(char16_t c);
+	static std::string utf16to8(u32 c);
 
 	Font(const char *path, const u8 *fallback);
 	Font(void) {}

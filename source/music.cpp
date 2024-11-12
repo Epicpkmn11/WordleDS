@@ -30,5 +30,4 @@ void Music::start(void) const {
 
 void Music::stop(void) const {
 	mmStop();
-	mmStop(); // yes, this *is* needed
 }

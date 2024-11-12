@@ -4,6 +4,7 @@
 #include "json.hpp"
 
 #include <dswifi9.h>
+#include <nds/interrupts.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <string>
@@ -18,7 +19,7 @@ struct HttpResponse {
 
 HttpResponse httpGet(const char *host, const char *path) {
 	char request[256];
-	snprintf(request, sizeof(request), "GET %s HTTP/1.0\r\nHost: %s\r\nUser-Agent: Wordle DS\r\n\r\n", path, host);
+	snprintf(request, sizeof(request), "GET %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Wordle DS\r\n\r\n", path, host);
 
 	hostent *hostEnt = gethostbyname(host);
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -35,13 +36,19 @@ HttpResponse httpGet(const char *host, const char *path) {
 	while(true) {
 		char buffer[256];
 		int len = recv(sock, buffer, 255, 0);
-		if(len > 0) {
-			buffer[len] = '\0';
-			res.content += buffer;
 
-			if(len < 255)
-				break;
-		}
+		buffer[len] = '\0';
+		res.content += buffer;
+
+		// Seems dumb, but waiting for the socket to timeout takes
+		// much longer than waiting a few vblanks
+		// (and if you don't add a bit of delay, it doesn't always
+		// have 255 ready)
+		// TODO: something better
+		swiWaitForVBlank();
+
+		if(len < 255)
+			break;
 	}
 
 	shutdown(sock, 0);
@@ -50,24 +57,35 @@ HttpResponse httpGet(const char *host, const char *path) {
 	if(res.content.compare(0, 9, "HTTP/1.1 ") == 0) {
 		res.status = atoi(res.content.c_str() + 9); // Get status code number
 		res.content = res.content.substr(res.content.find("\r\n\r\n") + 4); // Get content (after the headers)
+
+		// Parse chunked transfer
+		std::string parsed;
+		while(true) {
+			uint len = strtol(res.content.c_str(), NULL, 16);
+			if(len == 0)
+				break;
+
+			if(len > res.content.size())
+				return {0, "Request failed"};
+
+			parsed += res.content.substr(res.content.find("\r\n") + 2, len);
+			res.content = res.content.substr(res.content.find("\r\n") + 2 + len + 2);
+		}
+		res.content = parsed;
+
 		return res;
 	} else {
 		return {0, "Request failed"};
 	}
-
 }
 
 void WiFi::getWords(const char *url) {
 	Gfx::showPopup("Connecting to Wi-Fi");
-	if(!Wifi_CheckInit()) {
-		if(Wifi_InitDefault(WFC_CONNECT)) {
-			Gfx::showPopup("Connected to Wi-Fi!");
-		} else {
-			Gfx::showPopup("Failed to connect to Wi-Fi", 120);
-			return;
-		}
+	if(Wifi_InitDefault(WFC_CONNECT)) {
+		Gfx::showPopup("Connected to Wi-Fi!");
 	} else {
-		Wifi_EnableWifi();
+		Gfx::showPopup("Failed to connect to Wi-Fi", 120);
+		return;
 	}
 
 	// Parse out the host and request path
@@ -90,7 +108,7 @@ void WiFi::getWords(const char *url) {
 	// Try get the page
 	Gfx::showPopup("Updating words...");
 	HttpResponse res = httpGet(host, path);
-	Wifi_DisableWifi();
+	Wifi_DisconnectAP();
 
 	if(res.status == 200) {
 		// We should now have a JSON array of new IDs

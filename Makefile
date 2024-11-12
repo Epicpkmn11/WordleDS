@@ -48,10 +48,10 @@ NITRO    :=
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
+ARCH := -march=armv5te -mtune=arm946e-s
 
-CFLAGS   := -g -Wall -Wno-psabi -O3\
-			$(ARCH) $(INCLUDE) -DARM9
+CFLAGS   := -g -Wall -O2 -ffunction-sections -fdata-sections\
+            $(ARCH) $(INCLUDE) -DARM9
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS  := -g $(ARCH)
 LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
@@ -59,7 +59,12 @@ LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project (order is important)
 #---------------------------------------------------------------------------------
-LIBS := -lqrencode -lfat -ldswifi9 -lmm9 -lnds9
+LIBS := -lqrencode -lfat -ldswifi9 -lnds9
+
+# automagically add maxmod library
+ifneq ($(strip $(AUDIO)),)
+LIBS := -lmm9 $(LIBS)
+endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -77,9 +82,9 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export OUTPUT := $(CURDIR)/$(TARGET)
 
 export VPATH := $(CURDIR)/$(subst /,,$(dir $(ICON)))\
-				$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))\
-				$(foreach dir,$(DATA),$(CURDIR)/$(dir))\
-				$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
+                $(foreach dir,$(SOURCES),$(CURDIR)/$(dir))\
+                $(foreach dir,$(DATA),$(CURDIR)/$(dir))\
+                $(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
 
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
@@ -91,22 +96,22 @@ BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) $(PNGFILES:.
 
 # prepare NitroFS directory
 ifneq ($(strip $(NITRO)),)
-	export NITRO_FILES := $(CURDIR)/$(NITRO)
+  export NITRO_FILES := $(CURDIR)/$(NITRO)
 endif
 
 # get audio list for maxmod
 ifneq ($(strip $(AUDIO)),)
-	export MODFILES	:=	$(foreach dir,$(notdir $(wildcard $(AUDIO)/*.*)),$(CURDIR)/$(AUDIO)/$(dir))
+  export MODFILES	:=	$(foreach dir,$(notdir $(wildcard $(AUDIO)/*.*)),$(CURDIR)/$(AUDIO)/$(dir))
 
-	# place the soundbank file in NitroFS if using it
-	ifneq ($(strip $(NITRO)),)
-		export SOUNDBANK := $(NITRO_FILES)/soundbank.bin
+  # place the soundbank file in NitroFS if using it
+  ifneq ($(strip $(NITRO)),)
+    export SOUNDBANK := $(NITRO_FILES)/soundbank.bin
 
-	# otherwise, needs to be loaded from memory
-	else
-		export SOUNDBANK := soundbank.bin
-		BINFILES += $(SOUNDBANK)
-	endif
+  # otherwise, needs to be loaded from memory
+  else
+    export SOUNDBANK := soundbank.bin
+    BINFILES += $(SOUNDBANK)
+  endif
 endif
 
 #---------------------------------------------------------------------------------
@@ -114,11 +119,11 @@ endif
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(CPPFILES)),)
 #---------------------------------------------------------------------------------
-	export LD := $(CC)
+  export LD := $(CC)
 #---------------------------------------------------------------------------------
 else
 #---------------------------------------------------------------------------------
-	export LD := $(CXX)
+  export LD := $(CXX)
 #---------------------------------------------------------------------------------
 endif
 #---------------------------------------------------------------------------------
@@ -131,10 +136,10 @@ export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
 
 export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 
-export INCLUDE   := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir))\
-					$(foreach dir,$(LIBDIRS),-I$(dir)/include)\
-					-I$(CURDIR)/$(BUILD)
-export LIBPATHS  := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+export INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir))\
+                  $(foreach dir,$(LIBDIRS),-I$(dir)/include)\
+                 -I$(CURDIR)/$(BUILD)
+export LIBPATHS := $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 .PHONY: $(BUILD) all clean
 
@@ -171,15 +176,15 @@ endif
 all: $(OUTPUT).nds $(OUTPUT).dsi
 
 $(OUTPUT).nds: $(OUTPUT).elf $(NITRO_FILES) $(GAME_ICON)
-	$(SILENTCMD)ndstool -c $@ -9 $(OUTPUT).elf $(_ADDFILES) \
+	$(SILENTCMD)ndstool -c $@ -9 $(OUTPUT).elf $(_ARM7_ELF) $(_ADDFILES) \
 		-z 80040000
-	$(SILENTCMD)$(PYTHON) ../animatedbannerpatch.py $@ ../banner.bin
+	$(SILENTCMD)$(PYTHON) ../animatedbannerpatch.py $@ $(BANNER)
 	@echo built ... $(notdir $@)
 
 $(OUTPUT).dsi: $(OUTPUT).elf $(NITRO_FILES) $(GAME_ICON)
-	$(SILENTCMD)ndstool -c $@ -9 $(OUTPUT).elf $(_ADDFILES) \
+	$(SILENTCMD)ndstool -c $@ -9 $(OUTPUT).elf $(_ARM7_ELF) $(_ADDFILES) \
 		-g $(GAME_CODE) 00 "WORDLE DS" -z 80040000 -u 00030004
-	$(SILENTCMD)$(PYTHON) ../animatedbannerpatch.py $@ ../banner.bin
+	$(SILENTCMD)$(PYTHON) ../animatedbannerpatch.py $@ $(BANNER)
 	@echo built ... $(notdir $@)
 
 $(OUTPUT).elf: $(OFILES)
@@ -189,9 +194,6 @@ $(OFILES_SOURCES) : $(HFILES)
 
 # need to build soundbank first
 $(OFILES): $(SOUNDBANK)
-
-banner.bin:
-	@python3
 
 #---------------------------------------------------------------------------------
 # rule to build solution from music files

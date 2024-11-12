@@ -85,8 +85,8 @@ Game::Game() :
 
 	// Check if bootstub exists
 	extern char *fake_heap_end;
-	__bootstub *bootstub = (struct __bootstub *)fake_heap_end;
-	_bootstubExists = bootstub->bootsig == BOOTSIG;
+	EnvNdsBootstubHeader *bootstub = (struct EnvNdsBootstubHeader *)fake_heap_end;
+	_bootstubExists = bootstub->magic == ENV_NDS_BOOTSTUB_MAGIC;
 }
 
 Game::~Game() {
@@ -141,7 +141,7 @@ bool Game::run() {
 	u16 pressed, held;
 	char16_t key = NOKEY;
 	touchPosition touch;
-	while(1) {
+	while(pmMainLoop()) {
 		do {
 			swiWaitForVBlank();
 			scanKeys();
@@ -160,7 +160,7 @@ bool Game::run() {
 
 			if(!Gfx::popupVisible() && _showRefresh && !_data.refreshSprite().visible())
 				_data.refreshSprite().visible(true).update();
-		} while(!pressed && key == Kbd::NOKEY);
+		} while(pmMainLoop() && (!pressed && key == Kbd::NOKEY));
 
 		// Process keyboard
 		switch(key) {

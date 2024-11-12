@@ -150,7 +150,7 @@ bool Stats::showQr() {
 	do {
 		swiWaitForVBlank();
 		scanKeys();
-	} while(!(keysDown() & (KEY_A | KEY_B | KEY_TOUCH)));
+	} while(pmMainLoop() && !(keysDown() & (KEY_A | KEY_B | KEY_TOUCH)));
 
 	return true;
 }
@@ -211,7 +211,7 @@ void Stats::showMenu() {
 	// Change to stats menu background
 	game->data().statsBottom().decompressAll(BG_SUB(0));
 
-	while(1) {
+	while(pmMainLoop()) {
 		// Print stats
 		if(game->data().oldStatsMenu()) {
 			// Old version without the average time
@@ -261,7 +261,7 @@ void Stats::showMenu() {
 			scanKeys();
 			pressed = keysDown();
 			touchRead(&touch);
-		} while(!(pressed & (KEY_A | KEY_B | KEY_TOUCH)));
+		} while(pmMainLoop() && !(pressed & (KEY_A | KEY_B | KEY_TOUCH)));
 
 		if(pressed & (KEY_A | KEY_B)) {
 			break;

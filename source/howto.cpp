@@ -49,7 +49,7 @@ void howtoMenu(bool slowFade) {
 		scanKeys();
 		pressed = keysDown();
 		touchRead(&touch);
-	} while(!((pressed & (KEY_A | KEY_B)) || ((pressed & KEY_TOUCH) && (touch.px > 232 && touch.py < 24))));
+	} while(pmMainLoop() && (!((pressed & (KEY_A | KEY_B)) || ((pressed & KEY_TOUCH) && (touch.px > 232 && touch.py < 24)))));
 
 	Gfx::fadeOut(FADE_FAST, FADE_TOP | FADE_BOTTOM);
 

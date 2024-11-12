@@ -188,7 +188,7 @@ void Settings::showMenu() {
 
 	Gfx::fadeIn(FADE_FAST, FADE_BOTTOM);
 
-	while(1) {
+	while(pmMainLoop()) {
 		if(game->data().oldSettingsMenu()) {
 			hardToggle
 				.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
@@ -207,7 +207,7 @@ void Settings::showMenu() {
 			swiWaitForVBlank();
 			scanKeys();
 			pressed = keysDown();
-		} while(!(pressed & (KEY_B | KEY_TOUCH)));
+		} while(pmMainLoop() && !(pressed & (KEY_B | KEY_TOUCH)));
 
 		if(pressed & KEY_B) {
 			break;
@@ -346,7 +346,7 @@ void Settings::gameSettings() {
 	Sprite musicToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	musicToggle.move(game->data().musicToggle());
 
-	while(1) {
+	while(pmMainLoop()) {
 		hardModeToggle
 			.gfx(_hardMode ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_hardMode ? TilePalette::green : TilePalette::gray);
@@ -367,7 +367,7 @@ void Settings::gameSettings() {
 			swiWaitForVBlank();
 			scanKeys();
 			pressed = keysDown();
-		} while(!(pressed & (KEY_B | KEY_TOUCH)));
+		} while(pmMainLoop() && !(pressed & (KEY_B | KEY_TOUCH)));
 
 		if(pressed & KEY_B) {
 			break;
@@ -417,7 +417,7 @@ void Settings::shareMsgSettings() {
 	Sprite urlToggle(false, SpriteSize_32x16, SpriteColorFormat_16Color);
 	urlToggle.move(game->data().shareUrlToggle());
 
-	while(1) {
+	while(pmMainLoop()) {
 		timerToggle
 			.gfx(_shareTimer ? game->data().toggleOnGfx() : game->data().toggleOffGfx())
 			.palette(_shareTimer ? TilePalette::green : TilePalette::gray);
@@ -435,7 +435,7 @@ void Settings::shareMsgSettings() {
 			swiWaitForVBlank();
 			scanKeys();
 			pressed = keysDown();
-		} while(!(pressed & (KEY_B | KEY_TOUCH)));
+		} while(pmMainLoop() && !(pressed & (KEY_B | KEY_TOUCH)));
 
 		if(pressed & KEY_B) {
 			break;
@@ -501,7 +501,7 @@ void Settings::selectMod() {
 			break;
 		}
 	}
-	while(1) {
+	while(pmMainLoop()) {
 		// Scroll if needed
 		if(cursorPos < scrollPos)
 			scrollPos = cursorPos;
@@ -521,7 +521,7 @@ void Settings::selectMod() {
 			scanKeys();
 			pressed = keysDown();
 			held = keysDownRepeat();
-		} while(!(held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT) || pressed & (KEY_A | KEY_B | KEY_TOUCH)));
+		} while(pmMainLoop() && !(held & (KEY_UP | KEY_DOWN | KEY_LEFT | KEY_RIGHT) || pressed & (KEY_A | KEY_B | KEY_TOUCH)));
 
 		if(held & KEY_UP) {
 			if(cursorPos > 0)

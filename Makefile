@@ -159,10 +159,10 @@ else
 #---------------------------------------------------------------------------------
 # Get version number from git
 #---------------------------------------------------------------------------------
-ifneq ($(shell echo $(shell git tag -l --points-at HEAD --exclude git) | head -c 1),) # If on a tagged commit, use just tag
+ifneq ($(shell echo $(shell git tag -l --points-at HEAD --exclude dev) | head -c 1),) # If on a tagged commit, use just tag
 GIT_VER := $(shell git tag -l --points-at HEAD)
 else # Otherwise include commit
-GIT_VER := $(shell git describe --tags --exclude git)
+GIT_VER := $(shell git describe --tags --exclude dev)
 endif
 
 # Print new version if changed

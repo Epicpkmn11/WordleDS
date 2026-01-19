@@ -14,13 +14,23 @@ def update_words(output):
 	# First get the HTML and figure out what the current JS is
 	html = get("https://www.nytimes.com/games/wordle/index.html").text
 	soup = BeautifulSoup(html, "html.parser")
-	script, = [script["src"] for script in soup.findAll("script") if script.has_attr("src") and script["src"].startswith("https://www.nytimes.com/games-assets/v2/wordle.")]
+	scripts = [script["src"] for script in soup.find_all("script") if script.has_attr("src") and script["src"].startswith("https://www.nytimes.com/games-assets/v2/")]
 
 	# So we can get that and grab the base list incase they ever update that again
-	js = get(script).text
-	guesses = json.loads(re.findall(r'\["aahed"(?:,"\w{5}")*(?=,"cigar")', js)[0] + "]")
-	guesses.sort()
-	choices = json.loads("[" + re.findall(r'"cigar"(?:,"\w{5}")*\]', js)[0])
+	for script in scripts:
+		print(f"Trying {script}")
+
+		js = get(script).text
+		if re.findall("aahed", js) == []:
+			continue
+
+		print(f"Using {script}")
+
+		guesses = json.loads(re.findall(r'\["aahed"(?:,"\w{5}")*(?=,"cigar")', js)[0] + "]")
+		guesses.sort()
+		choices = json.loads("[" + re.findall(r'"cigar"(?:,"\w{5}")*\]', js)[0])
+
+		break
 
 	# Then grab the known word order
 	words = get("https://wordle.xn--rck9c.xn--tckwe/words.php?date=2021-06-19&limit=10000&include=id").json()

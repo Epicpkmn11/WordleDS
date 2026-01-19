@@ -325,7 +325,7 @@ public:
 	void setPalettes(bool altPalette) const;
 	const std::u16string &getAnswer(time_t day) const;
 
-	void appendChoiceOrder(const std::vector<int> &ids);
+	bool appendChoiceOrder(const std::vector<int> &ids);
 };
 
 #endif // GAME_DATA_HPP

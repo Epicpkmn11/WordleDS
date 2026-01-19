@@ -268,7 +268,7 @@ bool Game::run() {
 					fadeIn(FADE_FAST, FADE_BOTTOM);
 				} else if(_data.choiceOrderUrl() != "" && _data.updateBtn().touching(touch)) {
 					WiFi::getWords(_data.choiceOrderUrl().c_str());
-					if(_answer == u"" && _data.getAnswer(_today) != u"") {
+					if(_answer != _data.getAnswer(_today)) {
 						return true;
 					}
 				} else if(_data.settingsBtn().touching(touch)) {

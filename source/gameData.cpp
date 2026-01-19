@@ -529,9 +529,20 @@ const std::u16string &GameData::getAnswer(time_t day) const {
 	return emptyString;
 }
 
-void GameData::appendChoiceOrder(const std::vector<int> &ids) {
-	_choiceOrder.reserve(_choiceOrder.size() + ids.size());
-	_choiceOrder.insert(_choiceOrder.end(), ids.begin(), ids.end());
+bool GameData::appendChoiceOrder(const std::vector<int> &ids) {
+	int index = time(NULL) / 24 / 60 / 60 - _firstDay;
+	_choiceOrder.resize(index + ids.size(), 0);
+
+	bool different = false;
+	for(size_t i = 0; i < ids.size(); i++) {
+		if(ids[i] != _choiceOrder[index + i]) {
+			_choiceOrder[index + i] = ids[i];
+			different = true;
+		}
+	}
+
+	if(!different)
+		return false;
 
 	Json json((_modPath + MOD_JSON).c_str(), true);
 	if(json.get() == nullptr)
@@ -549,4 +560,6 @@ void GameData::appendChoiceOrder(const std::vector<int> &ids) {
 		fwrite(str.c_str(), 1, str.size(), modJson);
 		fclose(modJson);
 	}
+
+	return true;
 }

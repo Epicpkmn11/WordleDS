@@ -79,69 +79,76 @@ HttpResponse httpGet(const char *host, const char *path) {
 	}
 }
 
-void WiFi::getWords(const char *url) {
+bool WiFi::getWords(const char *url) {
 	Gfx::showPopup("Connecting to Wi-Fi");
 	if(Wifi_InitDefault(WFC_CONNECT)) {
 		Gfx::showPopup("Connected to Wi-Fi!");
 	} else {
 		Gfx::showPopup("Failed to connect to Wi-Fi", 120);
-		return;
+		return false;
 	}
 
 	// Parse out the host and request path
 	char host[256], path[256];
 	if(memcmp(url, "http://", 7) != 0)
-		return; // Invalid URL, must be HTTP not HTTPS
+		return false; // Invalid URL, must be HTTP not HTTPS
 
 	// The host is from after the 'http://' until the '/path/to/file.json'
 	snprintf(host, sizeof(host), "%s", url + 7);
 	char *slash = strchr(host, '/');
 	if(!slash)
-		return;
+		return false;
 	*slash = '\0';
 
 	// The path should include a date since we only want new IDs, so strftime that in
-	time_t epoch = (game->data().firstDay() + game->data().choiceOrder().size()) * 24 * 60 * 60;
-	tm *time = localtime(&epoch);
-	strftime(path, sizeof(path), url + 7 + (slash - host), time);
+	time_t timestamp = time(NULL);
+	tm *tmStruct = localtime(&timestamp);
+	strftime(path, sizeof(path), url + 7 + (slash - host), tmStruct);
 
 	// Try get the page
 	Gfx::showPopup("Updating words...");
 	HttpResponse res = httpGet(host, path);
 	Wifi_DisconnectAP();
 
-	if(res.status == 200) {
-		// We should now have a JSON array of new IDs
-		Json json(res.content.c_str(), false);
-		if(json.isObject() && json.contains("status") && strcmp(json["status"].get()->valuestring, "ERROR") == 0) {
-			Gfx::showPopup(json["message"].get()->valuestring, 120);
-		} else if(json.isArray()) {
-			// Validate results
-			const int choiceCount = game->data().choices().size();
-			const int guessCount = -game->data().guesses().size(); // Guess list IDs are negative
-			std::vector<int> ids;
-			for(const Json id : json) {
-				if(id.isNumber()) {
-					int val = id.get()->valueint;
-					if((val >= 1 && val <= choiceCount) || (val <= -1 && val >= guessCount))
-						ids.push_back(id.get()->valueint);
-					else
-						Gfx::showPopup("Error: Invalid ID", 120);
-				} else {
-					Gfx::showPopup("Error: Non-numeric ID", 120);
-					return;
-				}
-			}
-
-			// Save to mod.json
-			Gfx::showPopup("Saving...");
-			game->data().appendChoiceOrder(ids);
-
-			Gfx::showPopup("Update successful!", 120);
-		} else {
-			Gfx::showPopup("Invalid JSON!", 120);
-		}
-	} else {
+	if(res.status != 200) {
 		Gfx::showPopup("Update failed!!", 120);
+		return false;
+	}
+
+	// We should now have a JSON array of new IDs
+	Json json(res.content.c_str(), false);
+	if(json.isObject() && json.contains("status") && strcmp(json["status"].get()->valuestring, "ERROR") == 0) {
+		Gfx::showPopup(json["message"].get()->valuestring, 120);
+		return false;
+	} else if(!json.isArray()) {
+		Gfx::showPopup("Invalid JSON!", 120);
+		return false;
+	}
+
+	// Validate results
+	const int choiceCount = game->data().choices().size();
+	const int guessCount = -game->data().guesses().size(); // Guess list IDs are negative
+	std::vector<int> ids;
+	for(const Json id : json) {
+		if(id.isNumber()) {
+			int val = id.get()->valueint;
+			if((val >= 1 && val <= choiceCount) || (val <= -1 && val >= guessCount))
+				ids.push_back(id.get()->valueint);
+			else
+				Gfx::showPopup("Error: Invalid ID", 120);
+		} else {
+			Gfx::showPopup("Error: Non-numeric ID", 120);
+			return false;
+		}
+	}
+
+	// Save to mod.json
+	Gfx::showPopup("Saving...");
+	if(game->data().appendChoiceOrder(ids)) {
+		Gfx::showPopup("Update successful!", 120);
+		return true;
+	} else {
+		Gfx::showPopup("Already up to date!", 120);
+		return false;
 	}
 }

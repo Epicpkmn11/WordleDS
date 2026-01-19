@@ -321,7 +321,7 @@ GameData::GameData(const std::string &folder) : _modPath(DATA_PATH + folder) {
 				const int guessCount = -(int)_guesses.size(); // Guess counts are indicated by negatives
 				for(const Json &word : json["words"]["order"]) {
 					int i = word.get()->valueint;
-					sassert((i >= 1 && i <= choiceCount) || (i <= -1 && i >= guessCount), "Invalid choice order ID\n\n(ID %d)", i);
+					sassert(i <= choiceCount && i >= guessCount, "Invalid choice order ID\n\n(ID %d)", i);
 					_choiceOrder.push_back(i);
 				}
 			}
@@ -512,11 +512,14 @@ void GameData::setPalettes(bool altPalette) const {
 }
 
 const std::u16string &GameData::getAnswer(time_t day) const {
+	const static std::u16string emptyString;
 	unsigned int index = (unsigned int)day - _firstDay;
 	if(_choiceOrder.size() > 0 && !settings->infiniteMode()) {
 		if(index < _choiceOrder.size()) {
 			int id = _choiceOrder[index];
-			if(id > 0 && id <= (int)_choices.size())
+			if(id == 0)
+				return emptyString;
+			else if(id > 0 && id <= (int)_choices.size())
 				return _choices[id - 1];
 			else if(id < 0 && id >= -(int)_guesses.size())
 				return _guesses[-id - 1];
@@ -525,7 +528,6 @@ const std::u16string &GameData::getAnswer(time_t day) const {
 		return _choices[index % _choices.size()];
 	}
 
-	const static std::u16string emptyString;
 	return emptyString;
 }
 

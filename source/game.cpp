@@ -96,7 +96,7 @@ Game::~Game() {
 
 bool Game::run() {
 	// Reload game state from config
-	if(_stats.boardState().size() > 0) {
+	if(!_answer.empty() && _stats.boardState().size() > 0) {
 		std::vector<TilePalette> palettes;
 		for(const std::string &guess8 : _stats.boardState()) {
 			std::u16string _guess = Font::utf8to16(guess8);

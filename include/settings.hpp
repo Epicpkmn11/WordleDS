@@ -9,6 +9,7 @@
 class Settings {
 	std::string _path;
 
+	bool _sdFound = false;
 	bool _hardMode = false;
 	bool _infiniteMode = false;
 	bool _altPalette = false;
@@ -27,13 +28,15 @@ class Settings {
 	std::string currentWordIndex(void);
 
 public:
-	Settings(const std::string &path);
+	Settings(const std::string &path, bool sdFound);
 
 	bool save(void);
 
 	static void legacyImport(const std::string &path);
 
 	void showMenu(void);
+
+	bool sdFound(void) const { return _sdFound; }
 
 	bool hardMode(void) const { return _hardMode; }
 	Settings &hardMode(bool hardMode) { _hardMode = hardMode; return *this; }

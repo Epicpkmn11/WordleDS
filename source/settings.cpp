@@ -33,7 +33,7 @@ std::string Settings::currentWordIndex() {
 	return str;
 }
 
-Settings::Settings(const std::string &path) : _path(path) {
+Settings::Settings(const std::string &path, bool sdFound) : _path(path), _sdFound(sdFound) {
 	Json json(_path.c_str(), true);
 	if(!json.get())
 		return;
@@ -105,7 +105,7 @@ void Settings::legacyImport(const std::string &path) {
 
 	// Settings
 	if(json.contains("settings") && json["settings"].isObject()) {
-		Settings settings(SETTINGS_JSON);
+		Settings settings(SETTINGS_JSON, true);
 
 		if(json["settings"].contains("hardMode") && json["settings"]["hardMode"].isBool())
 			settings.hardMode(json["settings"]["hardMode"].isTrue());

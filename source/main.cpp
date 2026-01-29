@@ -26,7 +26,7 @@ int main() {
 	srand(time(NULL));
 
 	Gfx::init();
-	settings = new Settings(SETTINGS_JSON);
+	settings = new Settings(SETTINGS_JSON, fatInited);
 	game = new Game();
 	Music::music = new Music(settings->mod());
 	if(settings->music())

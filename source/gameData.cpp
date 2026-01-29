@@ -546,6 +546,12 @@ bool GameData::appendChoiceOrder(const std::vector<int> &ids) {
 	if(!different)
 		return false;
 
+	// If we don't have an SD card, edit the defaults in RAM
+	if(!settings->sdFound()) {
+		Words::order = _choiceOrder;
+		return true;
+	}
+
 	Json json((_modPath + MOD_JSON).c_str(), true);
 	if(json.get() == nullptr)
 		json = Json();
